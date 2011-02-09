@@ -21,7 +21,19 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
+
+
+/**
+ * 2011-02-08: Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * - debugged
+ * - improved structure
+ * - > 20X speed improvement
+ */
+
+
+
 ini_set ('max_execution_time', '180');
+
 /**
  * Class "tx_nkwgok_loadxml" provides task procedures
  *
@@ -31,111 +43,118 @@ ini_set ('max_execution_time', '180');
  *
  */
 class tx_nkwgok_loadxml extends tx_scheduler_Task {
-	/**
-	 * A page uid to be cleaned up
-	 *
-	 * @var	int		$pageid
-	 */
-	 var $pageid;
+
 	/**
 	 * Function executed from the Scheduler.
-	 * Hides all content elements of a page
 	 *
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
-		$success = FALSE;
-		$trigger = array('045A', '044E', '009B', '038D', '003@', '045G', 'str');
-		$dir = $GLOBALS['_SERVER']['DOCUMENT_ROOT'] . '/fileadmin/gok/';
-		// get files for import
-		if ($handle = opendir($dir)) {
-			while (false !== ($file = readdir($handle))) {
-				if ($file != '.' && $file != '..' && $file != '.DS_Store') {
-					$files[] = $file;
+		$result = False;
+		$wantedFieldNames = array('045A', '044E', '009B', '038D', '003@', '045G', 'str');
+		$dir = PATH_site . '/fileadmin/gok/';
+		$fileList = glob($dir . '*.xml');
+
+		if (count($fileList) > 0) {
+			// Empty our database table.
+			$GLOBALS['TYPO3_DB']->sql_query('TRUNCATE tx_nkwgok_data');
+
+			// Run through all files once to get a list of parent element PPNs.
+			// $parentPPNs is a dictionary whose keys are the parent element PPNs.
+			$parentPPNs = Array();
+
+			foreach ($fileList as $xmlPath) {
+				$xml = simplexml_load_file($xmlPath);
+				$parentGOKs = $xml->xpath('/RESULT/SET/SHORTTITLE/record/datafield[@tag="038D"]/subfield[@code="9"]');
+				foreach($parentGOKs as $parentPPN) {
+					$parentPPNs[trim($parentPPN)] = True;
 				}
 			}
-			closedir($handle);
-		}
-		$size = sizeof($files);
-		$arrParents = array();
-		if ($size >= 1) {
-			// clean (truncate) DB table
-			$GLOBALS['TYPO3_DB']->sql_query('TRUNCATE tx_nkwgok_data');
-			$time = time();
-			for ($i = 0; $i < $size; $i++) {
-				$actionFile = $dir . $files[$i];
-				$xml = simplexml_load_file($actionFile);
-				$x = 0;
-				foreach($xml->SET->SHORTTITLE AS $set) {
-					unset($arr[$x]);
-					foreach($set->record->datafield AS $field) {
-						# we are here (current datafield)
-						$thisField = trim((string)$field->attributes());
-						# trigger only if datafields we really want
-						if (in_array($thisField, $trigger)) {
-							# check duplicate tag fields
-							# append "_2" if duplicate
-							if ($thisField == $prevField) {
-								$thisField = $thisField . '_2';
+
+		t3lib_div::devLog('First pass completed', 'nkwgok', 1);
+
+
+			// Run through the files again, read all data, add the information
+			// about parent elements and store it to our table in the database.
+			foreach ($fileList as $xmlPath) {
+				$xml = simplexml_load_file($xmlPath);
+
+				foreach ($xml->SET->SHORTTITLE AS $GOKElement) {
+					$previousFieldName = Null;
+					$GOK = Array();
+
+					foreach($GOKElement->record->datafield AS $field) {
+						$fieldName = trim((string)$field->attributes());
+
+						// Only read the desired fields
+						if (in_array($fieldName, $wantedFieldNames)) {
+							// append "_2" to field Name to avoid duplication (ahem)
+							if ($fieldName == $previousFieldName) {
+								$fieldName = $fieldName . '_2';
 							}
-							$prevField = $thisField;
-							# get first subfield
-							if (trim((string)$field->subfield[0])) {
-								$arr[$x][$thisField][(string)$field->subfield[0]['code']] = trim(
-									(string)$field->subfield[0]);
-							}
-							# get second subfield
-							if (trim((string)$field->subfield[1])) {
-								$arr[$x][$thisField][(string)$field->subfield[1]['code']] = trim(
-									(string)$field->subfield[1]);
-							}
-							if ($arr[$x]['038D'][9]) {
-								array_push($arrParents, $arr[$x]['038D'][9]);
+							$previousFieldName = $fieldName;
+
+							// Get subfields
+							foreach ($field->subfield as $subfield) {
+								$subfieldName = (string)$subfield['code'];
+								$subfieldContent = trim((string)$subfield);
+								if ($subfieldContent) {
+									$GOK[$fieldName][$subfieldName] = $subfieldContent;
+								}
 							}
 						}
+					} // end of datafield loop
+
+
+					// Build complete record and insert into database.
+					if ($GOK['str']) {
+						$search = $GOK['str']['a'];
 					}
-					$x++;
-				}
-				$arrParents = array_unique($arrParents);
-				for ($x = 0; $x < sizeof($arr); $x++) {
-					unset($values);
-					unset($search);
-					$haschildren = 0;
-					if (in_array($arr[$x]['003@'][0], $arrParents)) {
-						$haschildren = 1;
+					elseif ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
+						$search = $GOK['045G']['C'] . '+' . $GOK['045G']['a'];
 					}
-					if ($arr[$x]["str"]) {
-						$search = trim($arr[$x]['str']['a']);
-					} elseif ($arr[$x]['045G'] && $arr[$x]['045G']['C'] == 'MSC') {
-						$search = $arr[$x]['045G']['C'] . '+' . $arr[$x]['045G']['a'];
-					} else {
-						$search = $arr[$x]['045A']['a'];
+					else {
+						$search = $GOK['045A']['a'];
 					}
-					$search = preg_replace(
-						array('/lkl/', '/\ /', '/\?/'),
-						array('LKL', '+', '%3F'),
-						$search);
+
+					$search = preg_replace(	array('/lkl/', '/\ /', '/\?/'),
+											array('LKL', '+', '%3F'),
+											trim($search) );
+
+					$GOKPPN = trim($GOK['003@']['0']);
+
 					$values = array(
-						'ppn' => trim($arr[$x]['003@'][0]),
-						'parent' => trim($arr[$x]['038D'][9]),
-						'hierarchy' => trim($arr[$x]['009B']['a']),
-						'descr' => trim($arr[$x]['044E']['a']),
-						'gok' => trim($arr[$x]['045A']['a']),
-						'crdate' => $time,
-						'tstamp' => $time,
+						'ppn' => $GOKPPN,
+						'parent' => trim($GOK['038D'][9]),
+						'hierarchy' => trim($GOK['009B']['a']),
+						'descr' => trim($GOK['044E']['a']),
+						'gok' => trim($GOK['045A']['a']),
+						'crdate' => time(),
+						'tstamp' => time(),
 						'search' => $search,
-						'haschildren' => $haschildren);
+						'haschildren' => ($parentPPNs[$GOKPPN]) ? 1 : 0);
+
 					$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
-				}
-			}
+
+				} // end of loop over GOKs
+			} // end of loop over files
+
+			t3lib_div::devLog('Loading of GOK XML completed', 'nkwgok', 1);
+			$result = True;
 		}
-		t3lib_div::devLog('[scheduler: GOK Load XML]: Yeah!' . $asdf, 'nkwgok', 3);
-		$success = TRUE;
-		return $success;
+		else {
+			t3lib_div::devLog('No "*.xml" files found in ' . $dir, 'nkwgok', 3);
+		}
+
+		return $result;
 	}
+
 }
-if (defined('TYPO3_MODE') 
+
+
+if (defined('TYPO3_MODE')
 	&& $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_loadxml.php']) {
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_loadxml.php']);
 }
+
 ?>
