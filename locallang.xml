@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>General language labels for extension 'nkwgok'</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="scheduler.loadxml.name">Load XML</label>
+			<label index="scheduler.loadxml.description">A scheduler task to to load XML data of GOK.</label>
+			<label index="scheduler.loadxml.label.pageid">Page id</label>
+			<label index="scheduler.loadxml.flashmessage.invalid_pid">The value for page id is not valid. Only positive integer allowed.</label>
+		</languageKey>
+	</data>
+</T3locallang>

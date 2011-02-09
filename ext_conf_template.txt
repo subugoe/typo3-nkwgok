@@ -1,0 +1,8 @@
+# cat=basic//130; type=text; label= Default OPAC URL (de,en)
+defaultOpacUrl =
+
+# cat=basic//130; type=text; label= Alternative OPAC Redirect URL
+alternativeOpacUrl = 
+
+# cat=basic//130; type=text; label= Trigger for alternative OPAC Redirect URL
+alternativeOpacUrlTrigger = 

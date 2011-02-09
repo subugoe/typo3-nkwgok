@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>database</type>
+		<description>Language labels for database tables/fields belonging to extension 'nkwgok'</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="tx_nkwgok_data">GOK</label>
+			<label index="tx_nkwgok_data.gok">gok</label>
+			<label index="tx_nkwgok_data.ppn">ppn</label>
+			<label index="tx_nkwgok_data.descr">descr</label>
+			<label index="tx_nkwgok_data.parent">parent</label>
+			<label index="tx_nkwgok_data.hierarchy">hierarchy</label>
+			<label index="tt_content.list_type_pi1">GOK I</label>
+			<label index="flexform.gok">GOK</label>
+			<label index="flexform.url">URL</label>
+		</languageKey>
+		<languageKey index="de" type="array">
+			<label index="tx_nkwgok_data">GOK</label>
+			<label index="tx_nkwgok_data.gok">gok</label>
+			<label index="tx_nkwgok_data.ppn">ppn</label>
+			<label index="tx_nkwgok_data.descr">descr</label>
+			<label index="tx_nkwgok_data.parent">parent</label>
+			<label index="tx_nkwgok_data.hierarchy">hierarchy</label>
+			<label index="tt_content.list_type_pi1">GOK I</label>
+			<label index="flexform.gok">GOK</label>
+			<label index="flexform.url">URL</label>
+		</languageKey>
+	</data>
+</T3locallang>

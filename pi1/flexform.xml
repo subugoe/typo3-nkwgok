@@ -1,0 +1,35 @@
+<T3DataStructure>
+	<meta>
+		<langDisable>1</langDisable>
+	</meta>
+	<sheets>
+		<sDEF>
+			<ROOT>
+				<TCEforms>
+					<sheetTitle>LLL:EXT:nkwlib/locallang_db.xml:flexform.options</sheetTitle>
+				</TCEforms>
+				<type>array</type>
+				<el>
+					<source>
+						<TCEforms>
+							<label>LLL:EXT:nkwgok/pi1/locallang.xml:source</label>
+							<config>
+								<type>select</type>
+								<itemsProcFunc>tx_nkwgok_ff->addFields</itemsProcFunc>
+							</config>
+						</TCEforms>
+					</source>
+					<altSource>
+						<TCEforms>
+							<label>LLL:EXT:nkwgok/pi1/locallang.xml:altSource</label>
+							<config>
+								<type>input</type>
+								<size>30</size>
+							</config>
+						</TCEforms>
+					</altSource>
+				</el>
+			</ROOT>
+		</sDEF>
+	</sheets>
+</T3DataStructure>

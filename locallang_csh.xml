@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<description>Contents of scheduler task csh</description>
+		<type>CSH</type>
+		<csh_table>xMOD_tx_nkwgok</csh_table>
+		<fileId>EXT:nkwgok/locallang_csh.xml</fileId>
+		<labelContext type="array">
+		</labelContext>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="task_pageid.alttitle">Page id</label>
+			<label index="task_pageid.description">Enter the uid of a page where the content should be hidden</label>
+		</languageKey>
+	</data>
+</T3locallang>
