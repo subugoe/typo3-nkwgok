@@ -44,10 +44,9 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
-		set_time_limit(1000);
 		$success = FALSE;
 		$trigger = array('045A', '044E', '009B', '038D', '003@', '045G', 'str');
-		$dir = PATH_site . '/fileadmin/gok/';
+		$dir = $GLOBALS['_SERVER']['DOCUMENT_ROOT'] . '/fileadmin/gok/';
 		// get files for import
 		if ($handle = opendir($dir)) {
 			while (false !== ($file = readdir($handle))) {
