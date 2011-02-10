@@ -25,6 +25,7 @@
 /**
  * Changed by Sven-S. Porst <porst@sub.uni-goettingen.de>
  * 2011-02-10: fix image and Ajax paths to work with sites not at /
+ * 2011-02-10: pass language code to eID
  */
 
 

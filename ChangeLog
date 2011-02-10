@@ -1,16 +1,29 @@
+2011-02-10 - 0.0.24 - Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* fix reliance on Typo3 being at document root
+	* rework import script to be more reliable/efficient/fast
+	* add import of English translations from 044F $a
+	* add display of English translations
+	* fix quotation errors in JavaScript strings
+	* cleaner display of subject names
+	* use t3jquery to formalise jQuery dependency
+
 2010-10-22 - 0.0.23 - Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
 	* jQuery Statusmeldung internationalisiert und in locallang.xml ausgelagert
+
+2010-09-24 - 0.0.22 - Nils K. Windisch <windisch@sub.uni-goettingen.de>
+	* UI and AJAX changes
+	* TODO: HTML fallback broken... sort of
+
+2010-09-08 - 0.0.21  Nils K. Windisch <windisch@sub.uni-goettingen.de>
+	* bug fix in ext_emconf.php
+
+2010-09-02 - 0.0.20 - Nils K. Windisch
+	* removed debug output
+
+2010-08-24 - 0.0.18 - Nils K. Windisch
+	* lang fix
 
 2010-08-24 - 0.0.17 - Nils K. Windisch
 	* Dynamische Flexform liest die oberste Ebene der GOK aus
 	* Angabe einer einzelnen GOK als Startpunkt möglich
 	* new file: EXT:lib/class.tx_nkwgok_ff.php
-2010-08-24 - 0.0.18 - Nils K. Windisch
-	* lang fix
-2010-09-02 - 0.0.20 - Nils K. Windisch
-	* removed debug output
-2010-09-08 - 0.0.21  Nils K. Windisch <windisch@sub.uni-goettingen.de>
-	* bug fix in ext_emconf.php
-2010-09-24 - 0.0.22 - Nils K. Windisch <windisch@sub.uni-goettingen.de>
-	* UI and AJAX changes
-	* TODO: HTML fallback broken... sort of
