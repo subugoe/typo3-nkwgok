@@ -32,15 +32,13 @@
 
 
 
-ini_set ('max_execution_time', '180');
-
 /**
  * Class "tx_nkwgok_loadxml" provides task procedures
  *
  * @author		Nils K. Windisch <windisch@sub.uni-goettingen.de>
+ * @author		Sven-S. Porst <porst@sub.uni-goettingen.de>
  * @package		TYPO3
  * @subpackage	tx_nkwgok
- *
  */
 class tx_nkwgok_loadxml extends tx_scheduler_Task {
 

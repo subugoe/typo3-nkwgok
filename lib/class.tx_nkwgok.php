@@ -132,6 +132,8 @@ class tx_nkwgok extends tx_nkwlib {
 		$link = ereg_replace('PLACEHOLDER', $str['search'], $opacUrl);
 		return $link;
 	}
+
+	
 	/**
 	 * undocumented function
 	 *
@@ -153,8 +155,9 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @author Nils K. Windisch
 	 **/
 	function getChildren($parentPPN, $level, $depth) {
+		$children = Null;
+
 		if ($level < $depth || in_array($parentPPN, $this->getvarsExpandArr)) {
-			$i0 = 0;
 			$whereClause = 'parent = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN);
 			$res0 = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 				$this->getQueryFor(), 
@@ -163,15 +166,17 @@ class tx_nkwgok extends tx_nkwlib {
 				'', 
 				'gok ASC', 
 				'');
+
+			$children = Array();
 			while($row0 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res0)) {
-				$children[$i0] = $row0;
-				$return = $this->getChildren($row0['ppn'], ($level+1), $depth);
-				$children[$i0]['children'] = $return;
-				$i0++;
+				$row0['children'] = $this->getChildren($row0['ppn'], ($level+1), $depth);
+				$children[] = $row0;
 			}
 		}
 		return $children;
 	}
+
+
 	/**
 	 * undocumented function
 	 *
@@ -179,7 +184,6 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @author Nils K. Windisch
 	 **/
 	function getChildrenAjax($parentPPN, $level, $depth) {
-		$i0 = 0;
 		$ppn = mysql_real_escape_string($parentPPN);
 		$res0 = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 			$this->getQueryFor(), 
@@ -188,12 +192,14 @@ class tx_nkwgok extends tx_nkwlib {
 			'', 
 			'gok ASC', 
 			'');
+		$children = Array();
 		while($row0 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res0)) {
-			$children[$i0] = $row0;
-			$i0++;
+			$children[] = $row0;
 		}
 		return $children;
 	}
+
+
 	/**
 	 * undocumented function
 	 *
@@ -201,6 +207,8 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @author Nils K. Windisch
 	 **/
 	function displayChildrenAjax($gok, $parentPpn, $lang = 0) {
+		$return = '';
+		$level = 0;
 		$size0 = sizeof($gok);
 		// $return .= "<a href='#' id='ajaxLinkHide" . $parentPpn . "' style='cursor: pointer;' " 
 		// 	. "onclick='hideGok(\"" . $parentPpn . "\"); return false'>" 
@@ -229,11 +237,13 @@ class tx_nkwgok extends tx_nkwlib {
 			}
 
 			$return .= $tmpGokLink;
-			$return .= '</li>\n';
+			$return .= "</li>\n";
 		}
-		$return .= '</ul>\n';
+		$return .= "</ul>\n";
 		return $return;
 	}
+
+
 	/**
 	 * undocumented function
 	 *
@@ -241,6 +251,7 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @author Nils K. Windisch
 	 **/
 	function displayChildren($conf, $gok, $level = 0, $expandMarker = 0, $parentPpn = 0) {
+		$tmp = '';
 		$size0 = sizeof($gok);
 		if ($size0 >= 1) {
 			$tmp .= '<ul id="ul' . $gok[0]['parent'] . '" class="tx-nkwgok-pi1-level-' . $level . '">';
@@ -251,10 +262,8 @@ class tx_nkwgok extends tx_nkwlib {
 				if ($level != 1) {
 					$expand = $expandMarker . '-' . $ppnCurrent;
 				}
-				// check if chirldren to display
-				if (sizeof($gok[$i0]['children']) >= 1) {
-					$gokHasChildren = TRUE;
-				}
+				// check if children to display
+				$gokHasChildren = (sizeof($gok[$i0]['children']) >= 1);
 				// construct A HREF to OPAC
 				$tmpLink = $this->linkToOpac($gok[$i0], $this->getLanguage());
 				// construct More Link
@@ -308,10 +317,6 @@ class tx_nkwgok extends tx_nkwlib {
 				}
 				// link to OPAC
 				$tmp .= $tmpLink;
-				// unset stuff
-				unset($expand);
-				unset($gokHasChildren);
-				// close LI
 				$tmp .= "</li>\n";
 			}
 			$tmp .= "</ul>\n";
@@ -320,4 +325,3 @@ class tx_nkwgok extends tx_nkwlib {
 	}
 }
 ?>
-

@@ -46,6 +46,8 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 	var $scriptRelPath = 'pi1/class.tx_nkwgok_pi1.php';
 	var $extKey        = 'nkwgok';
 	var $pi_checkCHash = true;
+
+
 	/**
 	 * The main method of the PlugIn
 	 *
@@ -80,8 +82,7 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 			$conf['getVars']['expand'] = array_unique($tmpArr);
 			$this->setGetvarsExpandArr(array_unique($tmpArr));
 		}
-		// helper
-		$i0 = 0;
+
 		// default query and depth
 		$where0 = "parent = ''";
 		$depth = 0;
@@ -99,10 +100,10 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 				'gok ASC', 
 				'');
 		// read query result
-		while($row0 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res0)) {
-			$gok[$i0] = $row0;
-			$gok[$i0]['children'] = $this->getChildren($row0['ppn'], 0, $depth);
-			$i0++;
+		$gok = Array();
+		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res0)) {
+			$row['children'] = $this->getChildren($row['ppn'], 0, $depth);
+			$gok[] = $row;
 		}
 		// display children
 		$tmp = $this->displayChildren($conf, $gok, 0);
@@ -131,13 +132,16 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		jQuery('#ajaxLinkHide' + id).hide();
 	};
 </script>";
-		// build content
+
+		// build and return content
 		$content .= $js . $tmp;
-		// return content
 		return $this->pi_wrapInBaseClass($content);
 	}
 }
+
+
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/pi1/class.tx_nkwgok_pi1.php']) {
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/pi1/class.tx_nkwgok_pi1.php']);
 }
+
 ?>

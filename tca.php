@@ -58,6 +58,15 @@ $TCA['tx_nkwgok_data'] = array(
 				'rows' => '5'
 			)
 		),
+		'descr-en' => array(
+			'exclude' => 0,
+			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.descr_en',
+			'config' => array(
+				'type' => 'text',
+				'cols' => '30',
+				'rows' => '5'
+			)
+		),
 		'parent' => array(
 			'exclude' => 0, 
 			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.parent', 
