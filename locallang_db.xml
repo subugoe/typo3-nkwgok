@@ -7,10 +7,11 @@
 	<data type="array">
 		<languageKey index="default" type="array">
 			<label index="tx_nkwgok_data">GOK</label>
-			<label index="tx_nkwgok_data.gok">gok</label>
-			<label index="tx_nkwgok_data.ppn">ppn</label>
-			<label index="tx_nkwgok_data.descr">descr</label>
-			<label index="tx_nkwgok_data.parent">parent</label>
+			<label index="tx_nkwgok_data.gok">GOK</label>
+			<label index="tx_nkwgok_data.ppn">PPN</label>
+			<label index="tx_nkwgok_data.descr">Title (German)</label>
+			<label index="tx_nkwgok_data.descr_en">Title (English)</label>
+			<label index="tx_nkwgok_data.parent">PPN of parent element</label>
 			<label index="tx_nkwgok_data.hierarchy">hierarchy</label>
 			<label index="tt_content.list_type_pi1">GOK I</label>
 			<label index="flexform.gok">GOK</label>
@@ -18,10 +19,11 @@
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="tx_nkwgok_data">GOK</label>
-			<label index="tx_nkwgok_data.gok">gok</label>
-			<label index="tx_nkwgok_data.ppn">ppn</label>
-			<label index="tx_nkwgok_data.descr">descr</label>
-			<label index="tx_nkwgok_data.parent">parent</label>
+			<label index="tx_nkwgok_data.gok">GOK</label>
+			<label index="tx_nkwgok_data.ppn">PPN</label>
+			<label index="tx_nkwgok_data.descr">Titel (Deutsch)</label>
+			<label index="tx_nkwgok_data.descr_en">Titel (Englisch)</label>
+			<label index="tx_nkwgok_data.parent">PPN des Elternelements</label>
 			<label index="tx_nkwgok_data.hierarchy">hierarchy</label>
 			<label index="tt_content.list_type_pi1">GOK I</label>
 			<label index="flexform.gok">GOK</label>
