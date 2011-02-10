@@ -114,6 +114,53 @@ class tx_nkwgok extends tx_nkwlib {
 	function getGetvarsExpandArr($str) {
 		return $this->getvarsExpandArr;
 	}
+
+
+
+	/**
+	 * Return GOK name based on the current language code.
+	 *
+	 * Typo3 returns the language code in ISO 639-1 format, e.g. 'de' or 'en'.
+	 * We default to German and try to use the English term if the current
+	 * language is English and the English term exists.
+	 *
+	 * German GOK names are stored in field 044E $a. These always exist.
+	 * Other GOK names are store in field 044F $a with subfield 044 $b
+	 * containing a language code designating the language in ISO 639-2/B
+	 * format, e.g. 'ger' or 'eng'.
+	 *
+	 * Some GOK names end in a super-subject indicator which can be helpful
+	 * when viewing the subject name on its own but will be redundant when
+	 * viewed inside the subject hierarchy. The parameter $simplify = True
+	 * removed that indicator.
+	 *
+	 * @author Sven-S. Porst <porst@sub.uni-goettingen.de>
+	 * @param Array $gokRecord
+	 * @param Boolean $simplify should the trailing {…} be removed? defaults to False
+	 * @return string
+	 */
+	private function GOKName ($gokRecord, $language="de", $simplify = False) {
+		$displayName = $gokRecord['descr'];
+
+		if ($language == 'en') {
+			$englishName = $gokRecord['descr_en'];
+						t3lib_div::devLog($language . ": ". $englishName . $gokRecord['descr'], 'nkwgok', 1);
+
+			if ($englishName) {
+				$displayName = $englishName;
+			}
+		}
+
+		// Remove trailing super-subject designator in { }
+		if ($simplify) {
+			$displayName = preg_replace("/( \{.*\})$/", "", $displayName);
+		}
+
+		return trim($displayName);
+	}
+
+
+
 	/**
 	 * undocumented function
 	 *
@@ -140,11 +187,10 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @return void
 	 * @author Nils K. Windisch
 	 **/
-	function linkToOpac($gok, $lang = 0) {
-		$str = '<a title="(' . $gok['gok'] . ') ' . $gok['descr'] . 
-			'" target="_blank" href="' . $this->makeOPAClink($gok, $lang) . '">'
-			. '(' . $gok['gok'] . ') ' . $gok['descr'] 
-			. '</a>';
+	function linkToOpac($gok, $lang = 0, $simplifyName = False, $language = "de") {
+		$str = '<a title="(' . $gok['gok'] . ') ' . $this->GOKName($gok, $language, $simplifyName) .
+			'" target="_blank" href="' . $this->makeOPAClink($gok, $lang) . '">' .
+			'<span class="GOKID">(' . $gok['gok'] . ')</span> ' . $this->GOKName($gok, $language, $simplifyName) . '</a>';
 		return $str;
 	}
 
@@ -206,7 +252,7 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @return void
 	 * @author Nils K. Windisch
 	 **/
-	function displayChildrenAjax($gok, $parentPpn, $lang = 0) {
+	function displayChildrenAjax($gok, $parentPpn, $lang = 0, $language = 'de') {
 		$return = '';
 		$level = 0;
 		$size0 = sizeof($gok);
@@ -225,7 +271,7 @@ class tx_nkwgok extends tx_nkwlib {
 					. '[-]</a>';
 			}
 			// construct link to OPAC
-			$tmpGokLink = $this->linkToOpac($gok[$i0], $lang);
+			$tmpGokLink = $this->linkToOpac($gok[$i0], $lang, True, $language);
 			// construct More Link
 			$tmpGokMoreLink = "<a href='#' id='ajaxLinkShow" . $ppnCurrent 
 				. "' style='cursor: pointer;' onclick='expandGok(\"" . $ppnCurrent . "\", \"c" . $ppnCurrent 
@@ -265,7 +311,7 @@ class tx_nkwgok extends tx_nkwlib {
 				// check if children to display
 				$gokHasChildren = (sizeof($gok[$i0]['children']) >= 1);
 				// construct A HREF to OPAC
-				$tmpLink = $this->linkToOpac($gok[$i0], $this->getLanguage());
+				$tmpLink = $this->linkToOpac($gok[$i0], $this->getLanguage(), True);
 				// construct More Link
 				// make JS more link
 				$tmpMoreLink = "<script type='text/javascript'>";

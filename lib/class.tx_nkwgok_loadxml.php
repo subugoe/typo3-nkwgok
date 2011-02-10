@@ -49,7 +49,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	 */
 	public function execute() {
 		$result = False;
-		$wantedFieldNames = array('045A', '044E', '009B', '038D', '003@', '045G', 'str');
+		$wantedFieldNames = array('045A', '044E', '044F', '009B', '038D', '003@', '045G', 'str');
 		$dir = PATH_site . '/fileadmin/gok/';
 		$fileList = glob($dir . '*.xml');
 
@@ -127,7 +127,12 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						'crdate' => time(),
 						'tstamp' => time(),
 						'search' => $search,
-						'haschildren' => ($parentPPNs[$GOKPPN]) ? 1 : 0);
+						'haschildren' => ($parentPPNs[$GOKPPN]) ? 1 : 0
+					);
+
+					if ($GOK['044F']['b'] == 'eng' && $GOK['044F']['a']) {
+						$values['descr_en'] = trim($GOK['044F']['a']);
+					}
 
 					$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
 

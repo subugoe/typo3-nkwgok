@@ -119,7 +119,9 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		jQuery.ajax({
 			method: 'get',
 			url: '" . t3lib_extMgm::siteRelPath('nkwgok') . "index.php',
-			data: 'eID=" . $this->extKey . "&l=" . $this->getLanguage() . "&tx_" . $this->extKey . "[expand]=' + id,
+			data: 'eID=" . $this->extKey . "&l=" . $this->getLanguage() .
+				"&language=" . $GLOBALS['TSFE']->lang . 
+				"&tx_" . $this->extKey . "[expand]=' + id,
 			success: function(html){
 				jQuery('#ajaxPlaceholder' + id).remove();
 				jQuery('#c' + id).append(html);

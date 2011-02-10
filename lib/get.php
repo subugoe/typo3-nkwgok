@@ -54,11 +54,11 @@ class tx_nkwgok_eid extends tx_nkwgok {
 		}
 		// set something
 		$nkwgok->setQueryTable('tx_nkwgok_data');
-		$nkwgok->setQueryFor('ppn, gok, search, descr, parent, haschildren');
+		$nkwgok->setQueryFor('ppn, gok, search, descr, descr_en, parent, haschildren');
 		// go get all items
 		$gok = $nkwgok->getChildrenAjax($ppn, 0, 1);
 		// and display them
-		$display = $nkwgok->displayChildrenAjax($gok, $ppn, $lang);
+		$display = $nkwgok->displayChildrenAjax($gok, $ppn, $lang, $get['language']);
 		// track action
 		$doStatistics = t3lib_div::getUserObj('EXT:ke_stats/pi1/class.tx_kestats_pi1.php:tx_kestats_pi1');
 		$doStatistics->initApi();
