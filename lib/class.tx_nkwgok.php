@@ -139,8 +139,8 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @author Nils K. Windisch
 	 **/
 	function linkToOpac($gok, $lang = 0) {
-		$str = '<a title="(' . $gok['gok'] . ') "' . $gok['descr'] . 
-			' target="_blank" href="' . $this->makeOPAClink($gok, $lang) . '">' 
+		$str = '<a title="(' . $gok['gok'] . ') ' . $gok['descr'] . 
+			'" target="_blank" href="' . $this->makeOPAClink($gok, $lang) . '">'
 			. '(' . $gok['gok'] . ') ' . $gok['descr'] 
 			. '</a>';
 		return $str;
@@ -229,9 +229,9 @@ class tx_nkwgok extends tx_nkwlib {
 			}
 
 			$return .= $tmpGokLink;
-			$return .= '</li>';
+			$return .= '</li>\n';
 		}
-		$return .= '</ul>';
+		$return .= '</ul>\n';
 		return $return;
 	}
 	/**
@@ -260,10 +260,10 @@ class tx_nkwgok extends tx_nkwlib {
 				// construct More Link
 				// make JS more link
 				$tmpMoreLink = "<script type='text/javascript'>";
-				$tmpMoreLink .= "document.write('<a href='#' id='ajaxLinkShow" . $ppnCurrent 
-					. "' style='cursor: pointer;' onclick='expandGok(\"" 
-					. $ppnCurrent . "\", \"c" . $ppnCurrent . "\");return false;'>[+]</a>');";
-				$tmpMoreLink .= '</script>';
+				$tmpMoreLink .= "document.write('<a href=\"#\" id=\"ajaxLinkShow" . $ppnCurrent
+					. "\" style=\"cursor: pointer;\" onclick=\"expandGok(\'"
+					. $ppnCurrent . "\', \'c" . $ppnCurrent . "\');return false;\">[+]</a>');";
+				$tmpMoreLink .= "</script>\n";
 
 
 				// make no JS more link
@@ -272,13 +272,13 @@ class tx_nkwgok extends tx_nkwlib {
 					'[+]', 
 					$GLOBALS['TSFE']->id . "#c" . $ppnCurrent, '',
 					array('tx_' . $this->extKey . '[expand]' => $expand, 'no_cache' => 1));
-				$tmpMoreLink .= '</noscript>';
+				$tmpMoreLink .= "</noscript>\n";
 				// construct Less Link
 				$tmpLessLink = "<script type='text/javascript'>";
-				$tmpLessLink .= "document.write('<a href='#' id='ajaxLinkHide" 
-					. $ppnCurrent . "' style='cursor: pointer; display: none;' onclick='hideGok(\"" . $ppnCurrent . "\", \"c" 
-					. $ppnCurrent . "\");return false;'>[-]</a>')";
-				$tmpLessLink .= '</script>';
+				$tmpLessLink .= "document.write('<a href=\"#\" id=\"ajaxLinkHide"
+					. $ppnCurrent . "\" style=\"cursor: pointer; display: none;\" onclick=\"hideGok(\'" . $ppnCurrent . "\', \'c"
+					. $ppnCurrent . "\');return false;\">[-]</a>')";
+				$tmpLessLink .= "</script>\n";
 				// make JS less link
 				$tmpLessLink .= '<noscript>';
 				$tmpLessLink .= '&nbsp;';
@@ -287,7 +287,7 @@ class tx_nkwgok extends tx_nkwlib {
 					$GLOBALS['TSFE']->id, 
 					'', 
 					array('tx_' . $this->extKey . '[expand]' => $expandMarker));
-				$tmpLessLink .= '</noscript>';
+				$tmpLessLink .= "</noscript>\n";
 				if (!in_array($ppnCurrent, $conf['getVars']['expand']) && $gok[$i0]['haschildren']) {
 					// next line to catch in single gok view
 					if (($level == 1 && $conf['gok'] == 'all') || $level != 1) {
@@ -312,11 +312,12 @@ class tx_nkwgok extends tx_nkwlib {
 				unset($expand);
 				unset($gokHasChildren);
 				// close LI
-				$tmp .= '</li>';
+				$tmp .= "</li>\n";
 			}
-			$tmp .= '</ul>';
+			$tmp .= "</ul>\n";
 		}
 		return $tmp;
 	}
 }
 ?>
+
