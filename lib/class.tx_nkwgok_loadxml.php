@@ -71,9 +71,6 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				}
 			}
 
-		t3lib_div::devLog('First pass completed', 'nkwgok', 1);
-
-
 			// Run through the files again, read all data, add the information
 			// about parent elements and store it to our table in the database.
 			foreach ($fileList as $xmlPath) {
