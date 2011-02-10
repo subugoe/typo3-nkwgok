@@ -34,6 +34,7 @@ $EM_CONF[$_EXTKEY] = array(
 		'depends' => array(
 			'nkwlib' => '',
 			'ke_stats' => '',
+			't3jquery' => '1.8.15-0.0.0'
 		),
 		'conflicts' => array(
 		),
