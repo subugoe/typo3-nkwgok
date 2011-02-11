@@ -1,3 +1,7 @@
+2011-02-11 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
+	* Removed Ajax spinner Icon and loading-message
+	* Fixed deprecated function ereg-replace
+
 2011-02-10 - 0.0.24 - Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* fix reliance on Typo3 being at document root
 	* rework import script to be more reliable/efficient/fast

@@ -1,37 +1,34 @@
 <?php
-/***************************************************************
-*  Copyright notice
-*
-*  (c) 2010 Nils K. Windisch <windisch@sub.uni-goettingen.de>
-*  All rights reserved
-*
-*  This script is part of the TYPO3 project. The TYPO3 project is
-*  free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 2 of the License, or
-*  (at your option) any later version.
-*
-*  The GNU General Public License can be found at
-*  http://www.gnu.org/copyleft/gpl.html.
-*
-*  This script is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  This copyright notice MUST APPEAR in all copies of the script!
-***************************************************************/
+
+/* * *************************************************************
+ *  Copyright notice
+ *
+ *  (c) 2010 Nils K. Windisch <windisch@sub.uni-goettingen.de>
+ *  All rights reserved
+ *
+ *  This script is part of the TYPO3 project. The TYPO3 project is
+ *  free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  The GNU General Public License can be found at
+ *  http://www.gnu.org/copyleft/gpl.html.
+ *
+ *  This script is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  This copyright notice MUST APPEAR in all copies of the script!
+ * ************************************************************* */
 
 /**
  * Changed by Sven-S. Porst <porst@sub.uni-goettingen.de>
  * 2011-02-10: fix image and Ajax paths to work with sites not at /
  * 2011-02-10: pass language code to eID
  */
-
-
-
 require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok.php');
-
 
 /**
  * Plugin 'GOK I' for the 'nkwgok' extension.
@@ -43,11 +40,11 @@ require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok.php');
  * @subpackage	tx_nkwgok
  */
 class tx_nkwgok_pi1 extends tx_nkwgok {
-	var $prefixId      = 'tx_nkwgok_pi1';
-	var $scriptRelPath = 'pi1/class.tx_nkwgok_pi1.php';
-	var $extKey        = 'nkwgok';
-	var $pi_checkCHash = true;
 
+	var $prefixId = 'tx_nkwgok_pi1';
+	var $scriptRelPath = 'pi1/class.tx_nkwgok_pi1.php';
+	var $extKey = 'nkwgok';
+	var $pi_checkCHash = true;
 
 	/**
 	 * The main method of the PlugIn
@@ -62,7 +59,7 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
 		$this->pi_initPIflexform();
-		$this->pi_USER_INT_obj=1;
+		$this->pi_USER_INT_obj = 1;
 		// build query stuff
 		$this->setQueryTable('tx_' . $this->extKey . '_data');
 		$this->setQueryFor('ppn, gok, search, descr, parent, haschildren');
@@ -94,15 +91,15 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		}
 		// query
 		$res0 = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-				$this->getQueryFor(), 
-				$this->getQueryTable(), 
-				$where0, 
-				'', 
-				'gok ASC', 
-				'');
+						$this->getQueryFor(),
+						$this->getQueryTable(),
+						$where0,
+						'',
+						'gok ASC',
+						'');
 		// read query result
 		$gok = Array();
-		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res0)) {
+		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res0)) {
 			$row['children'] = $this->getChildren($row['ppn'], 0, $depth);
 			$gok[] = $row;
 		}
@@ -114,12 +111,11 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 	function expandGok(id) {
 		jQuery('#ajaxLinkShow' + id).hide();
 		jQuery('#ajaxLinkHide' +id).show();
-		
 		jQuery.ajax({
 			method: 'get',
 			url: '" . t3lib_extMgm::siteRelPath('nkwgok') . "index.php',
 			data: 'eID=" . $this->extKey . "&l=" . $this->getLanguage() .
-				"&language=" . $GLOBALS['TSFE']->lang . 
+				"&language=" . $GLOBALS['TSFE']->lang .
 				"&tx_" . $this->extKey . "[expand]=' + id,
 			success: function(html){
 				jQuery('#ajaxPlaceholder' + id).remove();
@@ -138,11 +134,10 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		$content .= $js . $tmp;
 		return $this->pi_wrapInBaseClass($content);
 	}
-}
 
+}
 
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/pi1/class.tx_nkwgok_pi1.php']) {
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/pi1/class.tx_nkwgok_pi1.php']);
 }
-
 ?>
