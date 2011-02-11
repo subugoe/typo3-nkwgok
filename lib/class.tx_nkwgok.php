@@ -176,7 +176,7 @@ class tx_nkwgok extends tx_nkwlib {
 		if (in_array($str['gok']{0}, $alternativeOpacUrlTrigger)) {
 			$opacUrl = $alternativeOpacUrl[$lang];
 		}
-		$link = ereg_replace('PLACEHOLDER', $str['search'], $opacUrl);
+		$link = preg_replace('/PLACEHOLDER/', $str['search'], $opacUrl);
 		return $link;
 	}
 
