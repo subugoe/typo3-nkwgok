@@ -255,39 +255,35 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @return void
 	 * @author Nils K. Windisch
 	 * */
-	function displayChildrenAjax($gok, $parentPpn, $lang = 0, $language = 'de') {
+	function displayChildrenAjax($GOKs, $parentPpn, $lang = 0, $language = 'de') {
 		$return = '';
 		$level = 0;
-		$size0 = sizeof($gok);
 		// $return .= "<a href='#' id='ajaxLinkHide" . $parentPpn . "' style='cursor: pointer;' " 
 		// 	. "onclick='hideGok(\"" . $parentPpn . "\"); return false'>" 
 		// 	. '[-ajax]</a>';
 		$return .= '<ul class="tx-nkwgok-pi1-level-' . $level . '" id="ul' . $parentPpn . '">';
 		$level++;
-		for ($i0 = 0; $i0 < $size0; $i0++) {
-			$ppnCurrent = $gok[$i0]['ppn'];
-			$expand = $ppnCurrent;
-			$return .= '<li id="c' . $ppnCurrent . '">';
-			if ($gok[$i0]['haschildren']) {
-				$return .= "<a href='#' id='ajaxLinkHide" . $ppnCurrent . "' style='cursor: pointer; display: none;' "
-						. "onclick='hideGok(\"" . $ppnCurrent . "\"); return false'>"
+
+		foreach ($GOKs as $GOK) {
+			$PPN = $GOK['ppn'];
+
+			$return .= '<li id="c' . $PPN . '">';
+
+			if ($GOK['haschildren']) {
+				// Links for expanding and reducing tree levels
+				$return .= "<a href='#' id='ajaxLinkHide" . $PPN . "' style='cursor: pointer; display: none;' "
+						. "onclick='hideGok(\"" . $PPN . "\"); return false'>"
 						. '[-]</a>';
-			}
-			// construct link to OPAC
-			$tmpGokLink = $this->linkToOpac($gok[$i0], $lang, True, $language);
-			// construct More Link
-			$tmpGokMoreLink = "<a href='#' id='ajaxLinkShow" . $ppnCurrent
-					. "' style='cursor: pointer;' onclick='expandGok(\"" . $ppnCurrent . "\", \"c" . $ppnCurrent
+				$return .= "<a href='#' id='ajaxLinkShow" . $PPN
+					. "' style='cursor: pointer;' onclick='expandGok(\"" . $PPN . "\", \"c" . $PPN
 					. "\"); return false;'>"
 					. '[+]</a> ';
-
-			if ($gok[$i0]['haschildren']) {
-				$return .= $tmpGokMoreLink;
 			}
 
-			$return .= $tmpGokLink;
+			$return .= $this->linkToOpac($GOK, $lang, True, $language);
 			$return .= "</li>\n";
 		}
+
 		$return .= "</ul>\n";
 		return $return;
 	}
@@ -298,78 +294,77 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @return void
 	 * @author Nils K. Windisch
 	 * */
-	function displayChildren($conf, $gok, $level = 0, $expandMarker = 0, $parentPpn = 0) {
-		$tmp = '';
-		$size0 = sizeof($gok);
-		if ($size0 >= 1) {
-			$tmp .= '<ul id="ul' . $gok[0]['parent'] . '" class="tx-nkwgok-pi1-level-' . $level . '">';
+	function displayChildren($conf, $GOKs, $level = 0, $expandMarker = 0, $parentPpn = 0) {
+		$markup = '';
+
+		if (sizeof($GOKs) > 0) {
+			$markup .= '<ul id="ul' . $GOKs[0]['parent'] . '" class="tx-nkwgok-pi1-level-' . $level . '">';
 			$level++;
-			for ($i0 = 0; $i0 < $size0; $i0++) {
-				$ppnCurrent = $gok[$i0]['ppn'];
-				$expand = $ppnCurrent;
+			foreach ($GOKs as $GOK) {
+				$PPN = $GOK['ppn'];
+				$expand = $PPN;
 				if ($level != 1) {
-					$expand = $expandMarker . '-' . $ppnCurrent;
+					$expand = $expandMarker . '-' . $PPN;
 				}
-				// check if children to display
-				$gokHasChildren = (sizeof($gok[$i0]['children']) >= 1);
-				// construct A HREF to OPAC
-				$tmpLink = $this->linkToOpac($gok[$i0], $this->getLanguage(), True);
-				// construct More Link
-				// make JS more link
-				$tmpMoreLink = "<script type='text/javascript'>";
-				$tmpMoreLink .= "document.write('<a href=\"#\" id=\"ajaxLinkShow" . $ppnCurrent
+
+				// Expand link: JavaScript and static versions.
+				$expandLink = "<script type='text/javascript'>"
+						. "document.write('<a href=\"#\" id=\"ajaxLinkShow" . $PPN
 						. "\" style=\"cursor: pointer;\" onclick=\"expandGok(\'"
-						. $ppnCurrent . "\', \'c" . $ppnCurrent . "\');return false;\">[+]</a>');";
-				$tmpMoreLink .= "</script>\n";
-
-
-				// make no JS more link
-				$tmpMoreLink .= "<noscript>";
-				$tmpMoreLink .= $this->pi_LinkToPage(
+						. $PPN . "\', \'c" . $PPN . "\');return false;\">[+]</a>');\n"
+						. "</script>";
+				$expandLink .= "<noscript>"
+						. $this->pi_LinkToPage(
 								'[+]',
-								$GLOBALS['TSFE']->id . "#c" . $ppnCurrent, '',
-								array('tx_' . $this->extKey . '[expand]' => $expand, 'no_cache' => 1));
-				$tmpMoreLink .= "</noscript>\n";
-				// construct Less Link
-				$tmpLessLink = "<script type='text/javascript'>";
-				$tmpLessLink .= "document.write('<a href=\"#\" id=\"ajaxLinkHide"
-						. $ppnCurrent . "\" style=\"cursor: pointer; display: none;\" onclick=\"hideGok(\'" . $ppnCurrent . "\', \'c"
-						. $ppnCurrent . "\');return false;\">[-]</a>')";
-				$tmpLessLink .= "</script>\n";
-				// make JS less link
-				$tmpLessLink .= '<noscript>';
-				$tmpLessLink .= '&nbsp;';
-				$tmpLessLink .= $this->pi_LinkToPage(
+								$GLOBALS['TSFE']->id . "#c" . $PPN, '',
+								array('tx_' . $this->extKey . '[expand]' => $expand, 'no_cache' => 1))
+						. "</noscript>\n";
+				
+				// Collapse Link: JavaScript and static versions.
+				$collapseLink = "<script type='text/javascript'>"
+						. "document.write('<a href=\"#\" id=\"ajaxLinkHide"
+						. $PPN . "\" style=\"cursor: pointer; display: none;\" onclick=\"hideGok(\'" . $PPN . "\', \'c"
+						. $PPN . "\');return false;\">[-]</a>')"
+						. "</script>\n";
+				$collapsLink .= '<noscript>&nbsp;'
+						. $this->pi_LinkToPage(
 								'[-]',
 								$GLOBALS['TSFE']->id,
 								'',
-								array('tx_' . $this->extKey . '[expand]' => $expandMarker));
-				$tmpLessLink .= "</noscript>\n";
-				if (!in_array($ppnCurrent, $conf['getVars']['expand']) && $gok[$i0]['haschildren']) {
+								array('tx_' . $this->extKey . '[expand]' => $expandMarker))
+						. "</noscript>\n";
+
+
+
+
+				if (!in_array($PPN, $conf['getVars']['expand']) && $GOK['haschildren']) {
 					// next line to catch in single gok view
 					if (($level == 1 && $conf['gok'] == 'all') || $level != 1) {
 						// construct LI
-						$tmp .= '<li class="open" id="c' . $ppnCurrent . '">';
-						$tmp .= $tmpMoreLink . $tmpLessLink . '&nbsp;';
+						$markup .= '<li class="open" id="c' . $PPN . '">';
+						$markup .= $expandLink . $collapseLink . '&nbsp;';
 					}
 				}
-				// show less option if a children attached
-				if ($gokHasChildren == TRUE) {
+
+				// show less option if children exist
+				if (sizeof($GOK['children']) > 0) {
 					// next line to catch in single gok view
 					if ($conf['gok'] == 'all' || ($conf['gok'] != 'all' && $level != 1)) {
 						// construct LI
-						$tmp .= '<li class="close" id="c' . $ppnCurrent . '">';
-						$tmp .= $tmpLessLink;
+						$markup .= '<li class="close" id="c' . $PPN . '">';
+						$markup .= $collapseLink;
 					}
-					$tmp .= $this->displayChildren($conf, $gok[$i0]['children'], $level, $expand);
+					$markup .= $this->displayChildren($conf, $GOK['children'], $level, $expand);
 				}
+
 				// link to OPAC
-				$tmp .= $tmpLink;
-				$tmp .= "</li>\n";
+				$markup .= $this->linkToOpac($GOK, $this->getLanguage(), True);
+				$markup .= "</li>\n";
 			}
-			$tmp .= "</ul>\n";
+			$markup .= "</ul>\n";
 		}
-		return $tmp;
+
+		return $markup;
 	}
 
 }
