@@ -45,6 +45,7 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 	var $scriptRelPath = 'pi1/class.tx_nkwgok_pi1.php';
 	var $extKey = 'nkwgok';
 	var $pi_checkCHash = true;
+	private $jQueryMarker;
 
 	/**
 	 * The main method of the PlugIn
@@ -60,6 +61,13 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		$this->pi_loadLL();
 		$this->pi_initPIflexform();
 		$this->pi_USER_INT_obj = 1;
+
+		//get parameters from ext template
+		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
+
+		//using jQuery nonConflict mode?
+		$this->jQueryMarker = $this->getJqueryMode(intval($extConf['jQueryNoConflict']));
+
 		// build query stuff
 		$this->setQueryTable('tx_' . $this->extKey . '_data');
 		$this->setQueryFor('ppn, gok, search, descr, parent, haschildren');
@@ -109,11 +117,11 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		$js = "
 <script type='text/javascript'>
 	function expandGok(id) {
-		jQuery('#ajaxLinkShow' + id).hide();
-		jQuery('#ajaxLinkHide' +id).show();
-		jQuery.ajax({
+		" . $this->jQueryMarker . "('#ajaxLinkShow' + id).hide();
+		" . $this->jQueryMarker . "('#ajaxLinkHide' +id).show();
+		" . $this->jQueryMarker . ".ajax({
 			method: 'get',
-			url: '" . t3lib_extMgm::siteRelPath('nkwgok') . "index.php',
+			url: '" . t3lib_extMgm::siteRelPath($this->extKey) . "index.php',
 			data: 'eID=" . $this->extKey . "&l=" . $this->getLanguage() .
 				"&language=" . $GLOBALS['TSFE']->lang .
 				"&tx_" . $this->extKey . "[expand]=' + id,
@@ -124,15 +132,33 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		});
 	};
 	function hideGok(id) {
-		jQuery('#ul' + id).remove();
-		jQuery('#ajaxLinkShow' + id).show();
-		jQuery('#ajaxLinkHide' + id).hide();
+		" . $this->jQueryMarker . "('#ul' + id).remove();
+		" . $this->jQueryMarker . "('#ajaxLinkShow' + id).show();
+		" . $this->jQueryMarker . "('#ajaxLinkHide' + id).hide();
 	};
 </script>";
 
 		// build and return content
 		$content .= $js . $tmp;
 		return $this->pi_wrapInBaseClass($content);
+	}
+
+	/**
+	 * Determine jQuery Mode
+	 * @param int $mode
+	 * @return string 
+	 */
+	private function getJqueryMode($mode) {
+
+		$marker = null;
+
+		if ($mode === 1) {
+			$marker = 'jQuery';
+		} else {
+			$marker = '$';
+		}
+
+		return $marker;
 	}
 
 }

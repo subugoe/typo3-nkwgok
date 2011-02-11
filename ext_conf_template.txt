@@ -5,4 +5,7 @@ defaultOpacUrl =
 alternativeOpacUrl = 
 
 # cat=basic//130; type=text; label= Trigger for alternative OPAC Redirect URL
-alternativeOpacUrlTrigger = 
+alternativeOpacUrlTrigger =
+
+# cat=basic//130; type=boolean; label= Should jQuery noClonflict mode be used?
+jQueryNoConflict = 1
