@@ -114,9 +114,7 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 	function expandGok(id) {
 		jQuery('#ajaxLinkShow' + id).hide();
 		jQuery('#ajaxLinkHide' +id).show();
-		jQuery('#c' + id).append('<ul id=\"ajaxPlaceholder' + id + '\"><li><img src=\"" .
-			t3lib_extMgm::siteRelPath('nkwgok') . "lib/loading.gif\" />" .
-			$this->pi_getLL('jqWeitereEintraege') . "</li></ul>');
+		
 		jQuery.ajax({
 			method: 'get',
 			url: '" . t3lib_extMgm::siteRelPath('nkwgok') . "index.php',
