@@ -2,6 +2,7 @@
 	* Removed Ajax spinner Icon and loading-message
 	* Fixed deprecated function ereg-replace
 	* Determine whether jQuery nonClonflict Mode shall be used or not
+	* Fixed link to index.php
 
 2011-02-10 - 0.0.24 - Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* fix reliance on Typo3 being at document root

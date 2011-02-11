@@ -1,26 +1,27 @@
 <?php
-/***************************************************************
-*  Copyright notice
-*
-*  (c) 2009 Nils K. Windisch (windisch@sub.uni-goettingen.de)
-*  All rights reserved
-*
-*  This script is part of the TYPO3 project. The TYPO3 project is
-*  free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 2 of the License, or
-*  (at your option) any later version.
-*
-*  The GNU General Public License can be found at
-*  http://www.gnu.org/copyleft/gpl.html.
-*
-*  This script is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*  This copyright notice MUST APPEAR in all copies of the script!
-***************************************************************/
+
+/* * *************************************************************
+ *  Copyright notice
+ *
+ *  (c) 2009 Nils K. Windisch (windisch@sub.uni-goettingen.de)
+ *  All rights reserved
+ *
+ *  This script is part of the TYPO3 project. The TYPO3 project is
+ *  free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  The GNU General Public License can be found at
+ *  http://www.gnu.org/copyleft/gpl.html.
+ *
+ *  This script is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  This copyright notice MUST APPEAR in all copies of the script!
+ * ************************************************************* */
 
 
 /**
@@ -29,8 +30,6 @@
  * - improved structure
  * - > 20X speed improvement
  */
-
-
 
 /**
  * Class "tx_nkwgok_loadxml" provides task procedures
@@ -44,7 +43,6 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 	/**
 	 * Function executed from the Scheduler.
-	 *
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
@@ -64,7 +62,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			foreach ($fileList as $xmlPath) {
 				$xml = simplexml_load_file($xmlPath);
 				$parentGOKs = $xml->xpath('/RESULT/SET/SHORTTITLE/record/datafield[@tag="038D"]/subfield[@code="9"]');
-				foreach($parentGOKs as $parentPPN) {
+				foreach ($parentGOKs as $parentPPN) {
 					$parentPPNs[trim($parentPPN)] = True;
 				}
 			}
@@ -78,8 +76,8 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					$previousFieldName = Null;
 					$GOK = Array();
 
-					foreach($GOKElement->record->datafield AS $field) {
-						$fieldName = trim((string)$field->attributes());
+					foreach ($GOKElement->record->datafield AS $field) {
+						$fieldName = trim((string) $field->attributes());
 
 						// Only read the desired fields
 						if (in_array($fieldName, $wantedFieldNames)) {
@@ -91,30 +89,26 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 							// Get subfields
 							foreach ($field->subfield as $subfield) {
-								$subfieldName = (string)$subfield['code'];
-								$subfieldContent = trim((string)$subfield);
+								$subfieldName = (string) $subfield['code'];
+								$subfieldContent = trim((string) $subfield);
 								if ($subfieldContent) {
 									$GOK[$fieldName][$subfieldName] = $subfieldContent;
 								}
 							}
 						}
 					} // end of datafield loop
-
-
 					// Build complete record and insert into database.
 					if ($GOK['str']) {
 						$search = $GOK['str']['a'];
-					}
-					elseif ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
+					} elseif ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
 						$search = $GOK['045G']['C'] . '+' . $GOK['045G']['a'];
-					}
-					else {
+					} else {
 						$search = $GOK['045A']['a'];
 					}
 
-					$search = preg_replace(	array('/lkl/', '/\ /', '/\?/'),
-											array('LKL', '+', '%3F'),
-											trim($search) );
+					$search = preg_replace(array('/lkl/', '/\ /', '/\?/'),
+									array('LKL', '+', '%3F'),
+									trim($search));
 
 					$GOKPPN = trim($GOK['003@']['0']);
 
@@ -135,14 +129,12 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					}
 
 					$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
-
 				} // end of loop over GOKs
 			} // end of loop over files
 
 			t3lib_div::devLog('Loading of GOK XML completed', 'nkwgok', 1);
 			$result = True;
-		}
-		else {
+		} else {
 			t3lib_div::devLog('No "*.xml" files found in ' . $dir, 'nkwgok', 3);
 		}
 
@@ -151,10 +143,8 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 }
 
-
 if (defined('TYPO3_MODE')
-	&& $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_loadxml.php']) {
+		&& $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_loadxml.php']) {
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_loadxml.php']);
 }
-
 ?>

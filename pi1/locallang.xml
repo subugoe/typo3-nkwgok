@@ -8,12 +8,10 @@
 		<languageKey index="en" type="array">
 			<label index="source">Show GOK-Part</label>
 			<label index="altSource">Anzuzeigender GOK-Ausschnitt (alternativ, Angabe einer GOK, überschreibt die erste Auswahl)</label>
-			<label index="jqWeitereEintraege">Loading…</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="source">Anzuzeigender GOK-Ausschnitt</label>
 			<label index="altSource">Anzuzeigender GOK-Ausschnitt (alternativ, Angabe einer GOK, überschreibt die erste Auswahl)</label>
-			<label index="jqWeitereEintraege">Lade weitere Fachgebiete…</label>
 		</languageKey>
 	</data>
 </T3locallang>

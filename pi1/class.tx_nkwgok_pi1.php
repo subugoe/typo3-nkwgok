@@ -75,6 +75,7 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		$conf['query']['for'] = $this->getQueryFor();
 		//  get getvars
 		$conf['getVars'] = t3lib_div::_GET('tx_' . $this->extKey);
+		
 		// get flexform
 		$conf['gok'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'source', 'sDEF');
 		$altSource = trim($this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'altSource', 'sDEF'));
@@ -90,29 +91,31 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		}
 
 		// default query and depth
-		$where0 = "parent = ''";
+		$whereZero = "parent = ''";
 		$depth = 0;
 		// mkay get more specific here
 		if ($conf['gok'] != 'all') {
 			$depth = 1;
-			$where0 = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok']);
+			$whereZero = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok']);
 		}
 		// query
-		$res0 = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+		$resZero = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 						$this->getQueryFor(),
 						$this->getQueryTable(),
-						$where0,
+						$whereZero,
 						'',
 						'gok ASC',
 						'');
 		// read query result
 		$gok = Array();
-		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res0)) {
+		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resZero)) {
 			$row['children'] = $this->getChildren($row['ppn'], 0, $depth);
 			$gok[] = $row;
 		}
 		// display children
 		$tmp = $this->displayChildren($conf, $gok, 0);
+
+
 		// construct javascript
 		$js = "
 <script type='text/javascript'>
@@ -121,7 +124,7 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		" . $this->jQueryMarker . "('#ajaxLinkHide' +id).show();
 		" . $this->jQueryMarker . ".ajax({
 			method: 'get',
-			url: '" . t3lib_extMgm::siteRelPath($this->extKey) . "index.php',
+			url: '" .t3lib_div::getIndpEnv('TYPO3_SITE_URL') ."index.php',
 			data: 'eID=" . $this->extKey . "&l=" . $this->getLanguage() .
 				"&language=" . $GLOBALS['TSFE']->lang .
 				"&tx_" . $this->extKey . "[expand]=' + id,

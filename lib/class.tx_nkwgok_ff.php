@@ -21,6 +21,10 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
+
+/**
+ * Description 
+ */
 class tx_nkwgok_ff {
 	function addFields($config) {
 		$res0 = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
