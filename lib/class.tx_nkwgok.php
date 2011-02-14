@@ -125,34 +125,29 @@ class tx_nkwgok extends tx_nkwlib {
 		return $this->getvarsExpandArr;
 	}
 
+
+
 	/**
 	 * Return GOK name based on the current language code.
 	 *
-	 * Typo3 returns the language code in ISO 639-1 format, e.g. 'de' or 'en'.
-	 * We default to German and try to use the English term if the current
-	 * language is English and the English term exists.
+	 * Use English if the language code is 'en' and German otherwise.
 	 *
-	 * German GOK names are stored in field 044E $a. These always exist.
-	 * Other GOK names are store in field 044F $a with subfield 044 $b
-	 * containing a language code designating the language in ISO 639-2/B
-	 * format, e.g. 'ger' or 'eng'.
-	 *
-	 * Some GOK names end in a super-subject indicator which can be helpful
-	 * when viewing the subject name on its own but will be redundant when
-	 * viewed inside the subject hierarchy. The parameter $simplify = True
-	 * removed that indicator.
+	 * Some GOK names end with a super-subject indicator enclosed in { }.
+	 * It is helpful when viewing the subject name on its own but is redundant
+	 * when viewed inside the subject hierarchy. The parameter $simplify = True
+	 * removes that indicator.
 	 *
 	 * @author Sven-S. Porst <porst@sub.uni-goettingen.de>
 	 * @param Array $gokRecord
-	 * @param Boolean $simplify should the trailing {…} be removed? defaults to False
+	 * @param string $language ISO-639-1 language code as used by Typo3 [defaults to 'de']
+	 * @param Boolean $simplify should the trailing {…} be removed? [defaults to False]
 	 * @return string
 	 */
-	private function GOKName($gokRecord, $language="de", $simplify = False) {
+	private function GOKName($gokRecord, $language='de', $simplify = False) {
 		$displayName = $gokRecord['descr'];
 
 		if ($language == 'en') {
 			$englishName = $gokRecord['descr_en'];
-			t3lib_div::devLog($language . ": " . $englishName . $gokRecord['descr'], 'nkwgok', 1);
 
 			if ($englishName) {
 				$displayName = $englishName;
