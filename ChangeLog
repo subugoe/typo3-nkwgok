@@ -1,3 +1,8 @@
+2011-02-23 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* major code cleanup
+	* single code path for Ajax and non Ajax case
+	* correct order of display in non Ajax case
+
 2011-02-11 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
 	* Removed Ajax spinner Icon and loading-message
 	* Fixed deprecated function ereg-replace
