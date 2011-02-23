@@ -45,10 +45,10 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 	var $scriptRelPath = 'pi1/class.tx_nkwgok_pi1.php';
 	var $extKey = 'nkwgok';
 	var $pi_checkCHash = true;
-	private $jQueryMarker;
 
+	
 	/**
-	 * The main method of the PlugIn
+	 * Main method of the PlugIn
 	 *
 	 * @param	string		$content: The PlugIn content
 	 * @param	array		$conf: The PlugIn configuration
@@ -62,17 +62,6 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		$this->pi_initPIflexform();
 		$this->pi_USER_INT_obj = 1;
 
-		//get parameters from ext template
-		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][$this->extKey]);
-
-		//using jQuery nonConflict mode?
-		$this->jQueryMarker = $this->getJqueryMode(intval($extConf['jQueryNoConflict']));
-
-		// build query stuff
-		$this->setQueryTable('tx_' . $this->extKey . '_data');
-		$this->setQueryFor('ppn, gok, search, descr, parent, haschildren');
-		$conf['query']['table'] = $this->getQueryTable();
-		$conf['query']['for'] = $this->getQueryFor();
 		//  get getvars
 		$conf['getVars'] = t3lib_div::_GET('tx_' . $this->extKey);
 		
@@ -83,86 +72,21 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		if ($altSource) {
 			$conf['gok'] = $altSource;
 		}
-		// get and format getvars
+
+		// unique expand array
 		if ($conf['getVars']['expand']) {
 			$tmpArr = explode('-', $conf['getVars']['expand']);
 			$conf['getVars']['expand'] = array_unique($tmpArr);
-			$this->setGetvarsExpandArr(array_unique($tmpArr));
 		}
 
-		// default query and depth
-		$whereZero = "parent = ''";
-		$depth = 0;
-		// mkay get more specific here
-		if ($conf['gok'] != 'all') {
-			$depth = 1;
-			$whereZero = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok']);
-		}
-		// query
-		$resZero = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-						$this->getQueryFor(),
-						$this->getQueryTable(),
-						$whereZero,
-						'',
-						'gok ASC',
-						'');
-		// read query result
-		$gok = Array();
-		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resZero)) {
-			$row['children'] = $this->getChildren($row['ppn'], 0, $depth);
-			$gok[] = $row;
-		}
-		// display children
-		$tmp = $this->displayChildren($conf, $gok, 0);
-
-
-		// construct javascript
-		$js = "
-<script type='text/javascript'>
-	function expandGok(id) {
-		" . $this->jQueryMarker . "('#ajaxLinkShow' + id).hide();
-		" . $this->jQueryMarker . "('#ajaxLinkHide' +id).show();
-		" . $this->jQueryMarker . ".ajax({
-			method: 'get',
-			url: '" .t3lib_div::getIndpEnv('TYPO3_SITE_URL') ."index.php',
-			data: 'eID=" . $this->extKey . "&l=" . $this->getLanguage() .
-				"&language=" . $GLOBALS['TSFE']->lang .
-				"&tx_" . $this->extKey . "[expand]=' + id,
-			success: function(html){
-				jQuery('#ajaxPlaceholder' + id).remove();
-				jQuery('#c' + id).append(html);
-			}
-		});
-	};
-	function hideGok(id) {
-		" . $this->jQueryMarker . "('#ul' + id).remove();
-		" . $this->jQueryMarker . "('#ajaxLinkShow' + id).show();
-		" . $this->jQueryMarker . "('#ajaxLinkHide' + id).hide();
-	};
-</script>";
-
-		// build and return content
-		$content .= $js . $tmp;
-		return $this->pi_wrapInBaseClass($content);
+		$doc = $this->GOKTree($conf);
+		$content .= $doc->saveHTML();
+		return $content;
 	}
 
-	/**
-	 * Determine jQuery Mode
-	 * @param int $mode
-	 * @return string 
-	 */
-	private function getJqueryMode($mode) {
 
-		$marker = null;
+	
 
-		if ($mode === 1) {
-			$marker = 'jQuery';
-		} else {
-			$marker = '$';
-		}
-
-		return $marker;
-	}
 
 }
 
