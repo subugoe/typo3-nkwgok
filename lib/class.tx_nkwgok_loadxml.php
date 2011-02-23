@@ -63,7 +63,13 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				$xml = simplexml_load_file($xmlPath);
 				$parentGOKs = $xml->xpath('/RESULT/SET/SHORTTITLE/record/datafield[@tag="038D"]/subfield[@code="9"]');
 				foreach ($parentGOKs as $parentPPN) {
-					$parentPPNs[trim($parentPPN)] = True;
+					$parentPPN = trim($parentPPN);
+					if ($parentPPNs[$parentPPN]) {
+						$parentPPNs[$parentPPN]++;
+					}
+					else {
+						$parentPPNs[trim($parentPPN)] = 1;
+					}
 				}
 			}
 
@@ -111,7 +117,10 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 									trim($search));
 
 					$GOKPPN = trim($GOK['003@']['0']);
-
+					$hasChildren = 0;
+					if ($parentPPNs[$GOKPPN]) {
+						$hasChildren = $parentPPNs[$GOKPPN];
+					}
 					$values = array(
 						'ppn' => $GOKPPN,
 						'parent' => trim($GOK['038D'][9]),
@@ -121,7 +130,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						'crdate' => time(),
 						'tstamp' => time(),
 						'search' => $search,
-						'haschildren' => ($parentPPNs[$GOKPPN]) ? 1 : 0
+						'childcount' => $hasChildren
 					);
 
 					if ($GOK['044F']['b'] == 'eng' && $GOK['044F']['a']) {

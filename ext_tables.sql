@@ -14,7 +14,7 @@ CREATE TABLE tx_nkwgok_data (
 	descr_en text,
 	parent varchar(255) DEFAULT '' NOT NULL,
 	hierarchy int(11) DEFAULT '0' NOT NULL,
-	haschildren tinyint(1) DEFAULT '0' NOT NULL,
+	childcount int(11) DEFAULT '0' NOT NULL,
 	PRIMARY KEY (uid),
 	KEY parent (pid)
 );

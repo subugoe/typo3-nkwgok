@@ -26,7 +26,7 @@ require_once(t3lib_extMgm::extPath('nkwlib') . 'class.tx_nkwlib.php');
 
 define('NKWGOKExtKey', 'nkwgok');
 define('NKWGOKQueryTable', 'tx_nkwgok_data');
-define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, haschildren');
+define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, childcount');
 
 /**
  * undocumented class
@@ -333,7 +333,7 @@ class tx_nkwgok extends tx_nkwlib {
 				
 				$li->appendChild($this->OPACLinkElement($GOK, $doc, $language));
 
-				if ($GOK['haschildren']) {
+				if ($GOK['childcount'] > 0) {
 					$JSCommand = '';
 					$buttonText = '';
 					$noscriptLink = '#';
