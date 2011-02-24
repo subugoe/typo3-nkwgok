@@ -139,7 +139,7 @@ class tx_nkwgok extends tx_nkwlib {
 	public function AJAXGOKTreeChildren ($parentPPN, $language) {
 		$doc = DOMImplementation::createDocument();
 
-		$this->appendGOKTreeChildren($parentPPN, $doc, $doc, $language, Array($parentPPN))->firstChild;
+		$this->appendGOKTreeChildren($parentPPN, $doc, $doc, $language, Array($parentPPN), '', 1)->firstChild;
 
 		return $doc;
 	}
@@ -277,11 +277,12 @@ class tx_nkwgok extends tx_nkwlib {
 
 			$container->appendChild($doc->createTextNode(' '));
 			$container->appendChild($this->OPACLinkElement($GOK, $doc, $container));
-			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $GLOBALS['TSFE']->lang, $conf['getVars']['expand']);
+			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $GLOBALS['TSFE']->lang, $conf['getVars']['expand'], '', 1);
 		}
 
 		return $doc;
 	}
+
 
 
 
@@ -323,9 +324,10 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $doc)
 	 * @param string $language ISO 639-1 language code
 	 * @param string $expandMarker list of PPNs of open parent elements, separated by '-' [defaults to '']
+	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
 	 * @return void
 	 * */
-	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $expandInfo, $expandMarker = '') {
+	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $expandInfo, $expandMarker = '', $autoExpandLevel = 0) {
 		$GOKs = $this->getChildren($parentPPN);
 
 		if (sizeof($GOKs) > 0) {
@@ -365,7 +367,8 @@ class tx_nkwgok extends tx_nkwlib {
 					$mainTitle = $GOK['childcount'] . ' Unterkategorien anzeigen'; // localise
 					$alternativeTitle = 'Unterkategorien ausblenden'; // localise
 
-					if ( ($expandInfo && in_array($PPN, $expandInfo)) ) {
+					if ( ($expandInfo && in_array($PPN, $expandInfo))
+							|| $GOK['childcount'] <= $autoExpandLevel) {
 						$li->setAttribute('class', 'close');
 						$JSCommand = 'hideGOK';
 						$buttonText = '[-]';
@@ -376,7 +379,7 @@ class tx_nkwgok extends tx_nkwlib {
 								array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker) );
 						
 						// recursively call self to get child UL
-						$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $expandInfo, $expand)->firstChild;
+						$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $expandInfo, $expand, $autoExpandLevel)->firstChild;
 					}
 					else {
 						$li->setAttribute('class', 'open');
