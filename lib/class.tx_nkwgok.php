@@ -244,14 +244,8 @@ class tx_nkwgok extends tx_nkwlib {
 ';
 		$cssElement->appendChild($doc->createTextNode($css));
 
-		// default: query for the base node of the tree
-		$firstNodeCondition = "parent = ''";
-		// otherwise query for the specific GOK node by GOK Name
-
-		if ($conf['gok'] != 'all') {
-			$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok'], NKWGOKQueryTable);
-		}
-
+		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok'], NKWGOKQueryTable);
+		
 		// run query and collect result
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
