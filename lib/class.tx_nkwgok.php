@@ -411,6 +411,128 @@ class tx_nkwgok extends tx_nkwlib {
 		}
 	}
 
+
+
+	/**
+	 * Returns markup for GOK menus using the parameters passed in $conf.
+	 *
+	 * @author Sven-S. Porst
+	 * @param Array $conf
+	 * @return DOMElement containing the markup for a menu
+	 */
+	public function GOKMenus ($conf) {
+		// create Document and add JavaScript
+		$doc = DOMImplementation::createDocument();
+
+		$scriptElement = $doc->createElement('script');
+		$doc->appendChild($scriptElement);
+		$scriptElement->setAttribute('type', 'text/javascript');
+		$js = "";
+		$scriptElement->appendChild($doc->createTextNode($js));
+
+		$cssElement = $doc->createElement('style');
+		$doc->appendChild($cssElement);
+		$cssElement->setAttribute('type', 'text/css');
+		$css = "
+.gokMenuForm select { width: 50%; display:block;}
+";
+		$cssElement->appendChild($doc->createTextNode($css));
+
+		$form = $doc->createElement('form');
+		$doc->appendChild($form);
+		$form->setAttribute('class', 'gokMenuForm');
+		$form->setAttribute('method', 'get');
+		$form->setAttribute('action', t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'));
+		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok'], NKWGOKQueryTable);
+		// run query and collect result
+		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+					NKWGOKQueryFields,
+					NKWGOKQueryTable,
+					$firstNodeCondition,
+					'',
+					'gok ASC',
+					'');
+
+
+		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
+			$this->appendGOKMenuChildren($row['ppn'], $doc, $form, $GLOBALS['TSFE']->lang, $conf, 2);
+		}
+
+		$button = $doc->createElement('input');
+		$button->setAttribute('type', 'submit');
+		$form->appendChild($button);
+
+		return $doc;
+	}
+
+
+
+	/**
+	 * Looks up child elements for the given $parentPPN, creates DOM elements
+	 * for a popup menu containing the child elements and adds them to the
+	 * given $container element inside $doc, taking into account which
+	 * menu items are configured to be selected.
+	 *
+	 * Also tries to include short (as in at most the length of $autoExpandLevel)
+	 * submenus in higher level menus, adding an indent to their titles.
+	 *
+	 * @author Sven-S. Porst
+	 * @param string $parentPPN
+	 * @param DOMDocument $doc document used to create the resulting element
+	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $doc). Is expected to be a <select> element if the $autoExpandStep paramter is not 0 and a <form> element otherwise.
+	 * @param string $language ISO 639-1 language code
+	 * @param Array $conf settings used to create the menu
+	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
+	 * @param int $level the depth in the menu hierarchy [defaults to 0]
+	 * @param int $autoExpandStep the depth of auto-expansion [defaults to 0]
+	 */
+	private function appendGOKMenuChildren($parentPPN, $doc, $container, $language, $conf, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0) {
+		$GOKs = $this->getChildren($parentPPN);
+
+		if (sizeof($GOKs) > 0) {
+			$select = Null;
+
+			if ($autoExpandStep == 0) {
+				// Only create the containing <select> when we#re not auto-expanding.
+				$select = $doc->createElement('select');
+				$container->appendChild($select);
+				$select->setAttribute('id', 'select-' . $parentPPN);
+				$select->setAttribute('name', 'tx_' . NKWGOKExtKey . '[expand-' . $level . ']');
+				// add dummy item at the beginning of the menu
+				$defaultGOK = Array('descr' => 'Themengebiet auswählen', 'ppn' => 'dummyPPN'); // localise
+				array_unshift($GOKs, $defaultGOK);
+			}
+			else {
+				// When auto-expanding, continus using the previous <select>
+				// Element which should be passed to us as $container.
+				$select = $container;
+			}
+
+			foreach ($GOKs as $GOK) {
+				$PPN = $GOK['ppn'];
+
+				$option = $doc->createElement('option');
+				$select->appendChild($option);
+				$option->setAttribute('value', $PPN);
+				// Careful: non-breaking spaces used here to create in-menu indentation
+				$menuItemString = str_repeat('   ', $autoExpandStep) . $this->GOKName($GOK, $language, True);
+				$option->appendChild($doc->createTextNode($menuItemString));
+
+				if ($GOK['childcount'] <= $autoExpandLevel) {
+					$this->appendGOKMenuChildren($PPN, $doc, $select, $language, $conf, $autoExpandLevel, $level, $autoExpandStep + 1);
+				}
+
+				if ( $PPN == $conf['getVars']['expand-' . $level] ) {
+					// this item should be selected and the next menu should be added
+					$option->setAttribute('selected', 'selected');
+					$this->appendGOKMenuChildren($PPN, $doc, $container, $language, $conf, $autoExpandLevel, $level + 1);
+					// remove the first/default item of the menu if we have a selection already
+					$select->removeChild($select->firstChild);
+				}
+			}
+		}
+	}
+
 }
 
 ?>
