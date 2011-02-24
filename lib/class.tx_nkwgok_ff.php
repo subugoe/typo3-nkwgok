@@ -30,12 +30,12 @@ class tx_nkwgok_ff {
 		$res0 = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 			'*', 
 			'tx_nkwgok_data', 
-			"parent = ''", 
+			"parent = 'Root'",
 			'', 
 			'gok ASC', 
 			'');
 		$optionList = array();
-		$optionList[0] = array(0 => 'All', 1 => 'all');
+		$optionList[0] = array(0 => 'All', 1 => 'XXX');
 		while($row0 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res0)) {
 			$optionList[] = array(0 => '(' . $row0['gok'] . ') ' . $row0['descr'] , 1 => $row0['gok']);
 		}

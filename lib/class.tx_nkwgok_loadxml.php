@@ -39,6 +39,9 @@
  * @package		TYPO3
  * @subpackage	tx_nkwgok
  */
+
+define('NKWGOKRootNode', 'Root');
+
 class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 	/**
@@ -55,10 +58,10 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			// Empty our database table.
 			$GLOBALS['TYPO3_DB']->sql_query('TRUNCATE tx_nkwgok_data');
 
-			// Run through all files once to get a list of parent element PPNs.
+			// Run through all files once to get a child count for each parent
+			// element in the list, including the root element.
 			// $parentPPNs is a dictionary whose keys are the parent element PPNs.
-			$parentPPNs = Array();
-
+			$parentPPNs = Array(NKWGOKRootNode => 0);
 			foreach ($fileList as $xmlPath) {
 				$xml = simplexml_load_file($xmlPath);
 				$parentGOKs = $xml->xpath('/RESULT/SET/SHORTTITLE/record/datafield[@tag="038D"]/subfield[@code="9"]');
@@ -71,6 +74,9 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						$parentPPNs[trim($parentPPN)] = 1;
 					}
 				}
+
+				$topLevelNodeCount = count($xml->xpath('/RESULT/SET/SHORTTITLE/record/')) - count($parentGOKs);
+				$parentPPNs[NKWGOKRootNode] += $topLevelNodeCount;
 			}
 
 			// Run through the files again, read all data, add the information
@@ -116,30 +122,51 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 									array('LKL', '+', '%3F'),
 									trim($search));
 
-					$GOKPPN = trim($GOK['003@']['0']);
-					$hasChildren = 0;
-					if ($parentPPNs[$GOKPPN]) {
-						$hasChildren = $parentPPNs[$GOKPPN];
-					}
-					$values = array(
-						'ppn' => $GOKPPN,
-						'parent' => trim($GOK['038D'][9]),
-						'hierarchy' => trim($GOK['009B']['a']),
-						'descr' => trim($GOK['044E']['a']),
-						'gok' => trim($GOK['045A']['a']),
-						'crdate' => time(),
-						'tstamp' => time(),
-						'search' => $search,
-						'childcount' => $hasChildren
-					);
+					// discard records without a PPN
+					$PPN = trim($GOK['003@']['0']);
+					if ($PPN != '') {
+						$childCount = 0;
+						if ($parentPPNs[$PPN]) {
+							$childCount = $parentPPNs[$PPN];
+						}
+						$parent = trim($GOK['038D'][9]);
+						if ($parent == '') {
+							$parent = NKWGOKRootNode;
+						}
+						$values = array(
+							'ppn' => $PPN,
+							'parent' => $parent,
+							'hierarchy' => trim($GOK['009B']['a']),
+							'descr' => trim($GOK['044E']['a']),
+							'gok' => trim($GOK['045A']['a']),
+							'crdate' => time(),
+							'tstamp' => time(),
+							'search' => $search,
+							'childcount' => $childCount
+						);
 
-					if ($GOK['044F']['b'] == 'eng' && $GOK['044F']['a']) {
-						$values['descr_en'] = trim($GOK['044F']['a']);
-					}
+						if ($GOK['044F']['b'] == 'eng' && $GOK['044F']['a']) {
+							$values['descr_en'] = trim($GOK['044F']['a']);
+						}
 
-					$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
+						$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
+					}
 				} // end of loop over GOKs
 			} // end of loop over files
+
+			// Finally add the root node
+			$values = array(
+				'ppn' => NKWGOKRootNode,
+				'hierarchy' => '0',
+				'descr' => 'Göttinger Online Klassifikation (GOK)',
+				'descr_en' => 'Göttingen Online Classification (GOK)',
+				'gok' => 'XXX',
+				'crdate' => time(),
+				'tstamp' => time(),
+				'childcount' => $parentPPNs[NKWGOKRootNode]
+			);
+
+			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
 
 			t3lib_div::devLog('Loading of GOK XML completed', 'nkwgok', 1);
 			$result = True;
