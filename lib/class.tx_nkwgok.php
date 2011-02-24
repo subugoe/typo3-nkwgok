@@ -379,7 +379,7 @@ class tx_nkwgok extends tx_nkwlib {
 								array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker) );
 						
 						// recursively call self to get child UL
-						$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $expandInfo, $expand, $autoExpandLevel)->firstChild;
+						$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $expandInfo, $expand, $autoExpandLevel);
 					}
 					else {
 						$li->setAttribute('class', 'open');
