@@ -52,7 +52,9 @@ class tx_nkwgok_eid extends tx_nkwgok {
 
 		// and display them
 		$nkwgok = t3lib_div::makeInstance('tx_nkwgok');
-		$display = $nkwgok->AJAXGOKTreeChildren($ppn, $get['language']);
+//		$display = $nkwgok->AJAXGOKTreeChildren($ppn, $get['language']);
+
+		$display = $nkwgok->AJAXGOKMenuChildren($ppn, $get['level'], $get['language']);
 
 		// track action
 		if ($statsEnabled === true) {

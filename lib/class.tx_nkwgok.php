@@ -427,7 +427,38 @@ class tx_nkwgok extends tx_nkwlib {
 		$scriptElement = $doc->createElement('script');
 		$doc->appendChild($scriptElement);
 		$scriptElement->setAttribute('type', 'text/javascript');
-		$js = "";
+		$js = "
+		function GOKMenuSelectionChanged (menu) {
+			var selectedOption = menu.options[menu.selectedIndex];
+			if (selectedOption.hasAttribute('haschildren')) {
+				newMenuForSelection(selectedOption);
+			}
+			startSearch(selectedOption);
+		}
+		function newMenuForSelection(option) {
+			var URL = location.protocol + '//' + location.host + location.pathname;
+			var PPN = option.value;
+			var level = option.parentElement.getAttribute('level');
+			var parameters = location.search + 'tx_" . NKWGOKExtKey . "[expand]=' + PPN
+				+ '&language=" . $GLOBALS['TSFE']->lang . "&eID=" . NKWGOKExtKey . "'
+				+ '&tx_". NKWGOKExtKey . "[level]=' + level;
+
+			$(option.parentElement).nextAll().remove();
+			var emptySelect = document.createElement('select');
+			option.form.appendChild(emptySelect);
+			var emptyOption = document.createElement('option');
+			emptySelect.appendChild(emptyOption);
+			emptyOption.appendChild(document.createTextNode('Laden ...')); // localise
+			var downloadFinishedFunction = function (html) {
+				$(option.parentElement).nextAll().remove();
+				$(option.form).append(html);
+			};
+			$.get(URL, parameters, downloadFinishedFunction);
+		}
+		function startSearch (option) {
+			console.log('starting search for ' + option.getAttribute('query'));
+		}
+";
 		$scriptElement->appendChild($doc->createTextNode($js));
 
 		$cssElement = $doc->createElement('style');
@@ -455,7 +486,7 @@ class tx_nkwgok extends tx_nkwlib {
 
 
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
-			$this->appendGOKMenuChildren($row['ppn'], $doc, $form, $GLOBALS['TSFE']->lang, $conf, 2);
+			$this->appendGOKMenuChildren($row['ppn'], $doc, $form, $GLOBALS['TSFE']->lang, $conf['getVars'], 2);
 		}
 
 		$button = $doc->createElement('input');
@@ -481,12 +512,12 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @param DOMDocument $doc document used to create the resulting element
 	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $doc). Is expected to be a <select> element if the $autoExpandStep paramter is not 0 and a <form> element otherwise.
 	 * @param string $language ISO 639-1 language code
-	 * @param Array $conf settings used to create the menu
+	 * @param Array $getVars entries for keys tx_nkwgok[expand-#] for an integer # are the selected items on level #
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
 	 * @param int $level the depth in the menu hierarchy [defaults to 0]
 	 * @param int $autoExpandStep the depth of auto-expansion [defaults to 0]
 	 */
-	private function appendGOKMenuChildren($parentPPN, $doc, $container, $language, $conf, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0) {
+	private function appendGOKMenuChildren($parentPPN, $doc, $container, $language, $getVars, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0) {
 		$GOKs = $this->getChildren($parentPPN);
 
 		if (sizeof($GOKs) > 0) {
@@ -498,6 +529,8 @@ class tx_nkwgok extends tx_nkwlib {
 				$container->appendChild($select);
 				$select->setAttribute('id', 'select-' . $parentPPN);
 				$select->setAttribute('name', 'tx_' . NKWGOKExtKey . '[expand-' . $level . ']');
+				$select->setAttribute('onchange', 'GOKMenuSelectionChanged(this);return false;');
+				$select->setAttribute('level', $level);
 				// add dummy item at the beginning of the menu
 				$defaultGOK = Array('descr' => 'Themengebiet auswählen', 'ppn' => 'dummyPPN'); // localise
 				array_unshift($GOKs, $defaultGOK);
@@ -514,23 +547,47 @@ class tx_nkwgok extends tx_nkwlib {
 				$option = $doc->createElement('option');
 				$select->appendChild($option);
 				$option->setAttribute('value', $PPN);
+				$option->setAttribute('query', $GOK['search']);
 				// Careful: non-breaking spaces used here to create in-menu indentation
 				$menuItemString = str_repeat('   ', $autoExpandStep) . $this->GOKName($GOK, $language, True);
+				if ($GOK['childcount'] > 0) {
+					$menuItemString .= '…'; // localise
+					$option->setAttribute('hasChildren', 'true');
+				}
 				$option->appendChild($doc->createTextNode($menuItemString));
 
 				if ($GOK['childcount'] <= $autoExpandLevel) {
-					$this->appendGOKMenuChildren($PPN, $doc, $select, $language, $conf, $autoExpandLevel, $level, $autoExpandStep + 1);
+					$this->appendGOKMenuChildren($PPN, $doc, $select, $language, $getVars, $autoExpandLevel, $level, $autoExpandStep + 1);
 				}
 
-				if ( $PPN == $conf['getVars']['expand-' . $level] ) {
+				if ( $PPN == $getVars['expand-' . $level] ) {
 					// this item should be selected and the next menu should be added
 					$option->setAttribute('selected', 'selected');
-					$this->appendGOKMenuChildren($PPN, $doc, $container, $language, $conf, $autoExpandLevel, $level + 1);
+					$this->appendGOKMenuChildren($PPN, $doc, $container, $language, $getVars, $autoExpandLevel, $level + 1);
 					// remove the first/default item of the menu if we have a selection already
 					$select->removeChild($select->firstChild);
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * Create DOMDocument for AJAX return value and fill it with markup for the
+	 * $parentPPN, $level and $language given.
+	 *
+	 * @author Sven-S. Porst
+ 	 * @param string $parentPPN
+	 * @param int $level the depth in the menu hierarchy [defaults to 0]
+	 * @param string $language ISO 639-1 language code
+	 * @return <type>
+	 */
+	public function AJAXGOKMenuChildren ($parentPPN, $level, $language) {
+		$doc = DOMImplementation::createDocument();
+
+		$this->appendGOKMenuChildren($parentPPN, $doc, $doc, $language, Array(), 0, $level);
+
+		return $doc;
 	}
 
 }
