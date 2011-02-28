@@ -290,15 +290,23 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @return DOMElement
 	 */
 	private function OPACLinkElement ($GOKData, $doc, $language) {
-		$opacLink = $doc->createElement('a');
-		// TODO: localise
-		$opacLink->setAttribute('title', 'Bücher zu diesem Thema im Opac anzeigen');
-		// Question: Is '_blank' a good idea?
-		$opacLink->setAttribute('target', '_blank');
-		$opacLink->setAttribute('class', 'opacLink');
-		$opacLink->setAttribute('href', $this->makeOPACLink($GOKData, $language));
+		$opacLink = Null;
+		
+		$hitCount = $GOKData['hitcount'];
+		if ($hitCount > 0) {
+			$opacLink = $doc->createElement('a');
+			$opacLink->setAttribute('title', 'Bücher zu diesem Thema im Opac anzeigen'); // localise
+			$opacLink->setAttribute('href', $this->makeOPACLink($GOKData, $language));
+			// Question: Is '_blank' a good idea?
+			$opacLink->setAttribute('target', '_blank');
+			$opacLink->appendChild($doc->createTextNode($GOKData['hitcount'] . ' Treffer anzeigen')); //localise
+		}
+		else {
+			$opacLink = $doc->createElement('span');
+			$opacLink->appendChild($doc->createTextNode('keine Treffer')); // localise
+		}
 
-		$opacLink->appendChild($doc->createTextNode('Im Katalog anzeigen'));
+		$opacLink->setAttribute('class', 'opacLink');
 
 		return $opacLink;
 	}
