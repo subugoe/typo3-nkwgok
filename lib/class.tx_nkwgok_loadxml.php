@@ -64,22 +64,26 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			// Run through all files once to get a child count for each parent
 			// element in the list.
 			// $parentPPNs is a dictionary whose keys are the parent element PPNs.
-			$parentPPNs = Array(NKWGOKRootNode => 0);
+			$parentPPNs = Array(NKWGOKRootNode => Array());
 			foreach ($fileList as $xmlPath) {
 				$xml = simplexml_load_file($xmlPath);
-				$parentGOKs = $xml->xpath('/RESULT/SET/SHORTTITLE/record/datafield[@tag="038D"]/subfield[@code="9"]');
-				foreach ($parentGOKs as $parentPPN) {
-					$parentPPN = trim($parentPPN);
-					if ($parentPPNs[$parentPPN]) {
-						$parentPPNs[$parentPPN]++;
+				$records = $xml->xpath('/RESULT/SET/SHORTTITLE/record');
+				foreach ($records as $record) {
+					$PPN = trim((string)$record->xpath('datafield[@tag="003@"]/subfield[@code="0"]'));
+					$myParentPPNs = $record->xpath('datafield[@tag="038D"]/subfield[@code="9"]');
+					if (count($myParentPPNs) > 0) {
+						$parentPPN = (string)$myParentPPNs[0];
+						if ($parentPPNs[$parentPPN]) {
+							$parentPPNs[$parentPPN][] = $PPN;
+						}
+						else {
+							$parentPPNs[$parentPPN] = Array($PPN);
+						}
 					}
 					else {
-						$parentPPNs[trim($parentPPN)] = 1;
+						$parentPPNs[NKWGOKRootNode][] = $PPN;
 					}
 				}
-
-				$topLevelNodeCount = count($xml->xpath('/RESULT/SET/SHORTTITLE/record')) - count($parentGOKs);
-				$parentPPNs[NKWGOKRootNode] += $topLevelNodeCount;
 			}
 
 			// Run through the files again, read all data, add the information
@@ -130,7 +134,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					if ($PPN != '') {
 						$childCount = 0;
 						if ($parentPPNs[$PPN]) {
-							$childCount = $parentPPNs[$PPN];
+							$childCount = count($parentPPNs[$PPN]);
 						}
 						$parent = trim($GOK['038D'][9]);
 						if ($parent == '') {
@@ -180,7 +184,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				'gok' => 'XXX',
 				'crdate' => time(),
 				'tstamp' => time(),
-				'childcount' => $parentPPNs[NKWGOKRootNode]
+				'childcount' => count($parentPPNs[NKWGOKRootNode])
 			);
 
 			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
