@@ -11,6 +11,7 @@
 			<label index="tx_nkwgok_data.ppn">PPN</label>
 			<label index="tx_nkwgok_data.descr">Title (German)</label>
 			<label index="tx_nkwgok_data.descr_en">Title (English)</label>
+			<label index="tx_nkwgok_data.hitcount">Number of hits in Opac</label>
 			<label index="tx_nkwgok_data.parent">PPN of parent element</label>
 			<label index="tx_nkwgok_data.hierarchy">hierarchy</label>
 			<label index="tt_content.list_type_pi1">GOK I</label>
@@ -23,6 +24,7 @@
 			<label index="tx_nkwgok_data.ppn">PPN</label>
 			<label index="tx_nkwgok_data.descr">Titel (Deutsch)</label>
 			<label index="tx_nkwgok_data.descr_en">Titel (Englisch)</label>
+			<label index="tx_nkwgok_data.hitcount">Anzahl der Treffer im Opac</label>
 			<label index="tx_nkwgok_data.parent">PPN des Elternelements</label>
 			<label index="tx_nkwgok_data.hierarchy">hierarchy</label>
 			<label index="tt_content.list_type_pi1">GOK I</label>

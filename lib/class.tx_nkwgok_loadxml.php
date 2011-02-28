@@ -50,6 +50,9 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	 */
 	public function execute() {
 		$result = False;
+
+		$hitCounts = $this->getHitCounts();
+
 		$wantedFieldNames = array('045A', '044E', '044F', '009B', '038D', '003@', '045G', 'str');
 		$dir = PATH_site . '/fileadmin/gok/';
 		$fileList = glob($dir . '*.xml');
@@ -59,7 +62,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			$GLOBALS['TYPO3_DB']->sql_query('TRUNCATE tx_nkwgok_data');
 
 			// Run through all files once to get a child count for each parent
-			// element in the list, including the root element.
+			// element in the list.
 			// $parentPPNs is a dictionary whose keys are the parent element PPNs.
 			$parentPPNs = Array(NKWGOKRootNode => 0);
 			foreach ($fileList as $xmlPath) {
@@ -133,12 +136,13 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						if ($parent == '') {
 							$parent = NKWGOKRootNode;
 						}
+						$GOKString = trim($GOK['045A']['a']);
 						$values = array(
 							'ppn' => $PPN,
 							'parent' => $parent,
 							'hierarchy' => trim($GOK['009B']['a']),
 							'descr' => trim($GOK['044E']['a']),
-							'gok' => trim($GOK['045A']['a']),
+							'gok' => $GOKString,
 							'crdate' => time(),
 							'tstamp' => time(),
 							'search' => $search,
@@ -147,6 +151,11 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 						if ($GOK['044F']['b'] == 'eng' && $GOK['044F']['a']) {
 							$values['descr_en'] = trim($GOK['044F']['a']);
+						}
+
+						// hit keys are lowercase and include the Normdatensatz which should not be counted
+						if ($hitCounts[strtolower($GOKString)]) {
+							$values['hitcount'] = (int)$hitCounts[strtolower($GOKString)] - 1;
 						}
 
 						$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
@@ -177,7 +186,56 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		return $result;
 	}
 
+
+
+	/**
+	 * Load LKL hit counts from /fileadmin/gok/hitcounts/*.xml
+	 * These files are downloaded from the Opac by the script in
+	 * nkwgok/scripts/getHitCounts.py.
+	 *
+	 * @author Sven-S. Porst
+	 * @return array keys: LKL entries, values: hit count for the entry
+	 */
+	private function getHitCounts () {
+		$hitCounts = Array();
+
+		$fileList = glob(PATH_site . '/fileadmin/gok/hitcounts/' . '*.xml');
+		foreach ($fileList as $xmlPath) {
+			$xml = simplexml_load_file($xmlPath);
+			if ($xml) {
+				$scanlines = $xml->xpath('/RESULT/SCANLIST/SCANLINE');
+				foreach ($scanlines as $scanline) {
+					$hits = 0;
+					$description = Null;
+					foreach($scanline->attributes() as $name => $value) {
+						if ($name == 'hits') {
+							// Reduce the hit count by 1 as it includes the GOK-Normsatz.
+							$hits = (int)$value - 1;
+						}
+						else if ($name == 'description') {
+							$description = (string)$value;
+						}
+					}
+		//						t3lib_div::devLog($description, 'nkwgok', 1);
+					if ($hits > 0 && $description) {
+						$hitCounts[$description] = $hits;
+					}
+				}
+			}
+			else {
+				t3lib_div::devLog('could not load/parse XML from ' . $xmlPath, 'nkwgok', 1);
+			}
+		} // end foreach
+
+		t3lib_div::devLog('Loaded ' . count($hitCounts) . ' hit count entries.', 'nkwgok', 1);
+
+		return $hitCounts;
+	}
+
+
 }
+
+
 
 if (defined('TYPO3_MODE')
 		&& $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_loadxml.php']) {
