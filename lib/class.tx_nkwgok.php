@@ -237,7 +237,7 @@ class tx_nkwgok extends tx_nkwlib {
 .gokTreeContainer a .GOKID { display:block; float:left; width: 6em; text-align: right; color: #999; padding-right:0.2em;}
 .gokTreeContainer .GOKName { font-weight: bold; }
 .gokTreeContainer .opacLink { font-size: 71%; font-style: italic; color: #999; }
-.gokTreeContainer .opacLink:after { content: "\\002192"; padding-left: 0.2em; }
+.gokTreeContainer .opacLink:link:after { content: "\\002192"; padding-left: 0.2em; }
 .gokTreeContainer .opacLink:hover { color: #333; }
 .gokTreeContainer ul ul { margin: 0em 0em 0em 1em; }
 .gokTreeContainer .plusMinus, .gokTreeContainer .GOKID { font-family: monospace; }
