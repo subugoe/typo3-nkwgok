@@ -291,15 +291,22 @@ class tx_nkwgok extends tx_nkwlib {
 	 */
 	private function OPACLinkElement ($GOKData, $doc, $language) {
 		$opacLink = Null;
-		
 		$hitCount = $GOKData['hitcount'];
-		if ($hitCount > 0) {
+		if ($hitCount != 0 ) {
 			$opacLink = $doc->createElement('a');
-			$opacLink->setAttribute('title', 'Bücher zu diesem Thema im Opac anzeigen'); // localise
 			$opacLink->setAttribute('href', $this->makeOPACLink($GOKData, $language));
+			$opacLink->setAttribute('title', 'Bücher zu diesem Thema im Opac anzeigen'); // localise
 			// Question: Is '_blank' a good idea?
 			$opacLink->setAttribute('target', '_blank');
-			$opacLink->appendChild($doc->createTextNode($GOKData['hitcount'] . ' Treffer anzeigen')); //localise
+			if ($hitCount > 0) {
+				// we know the number of results: display it
+				$opacLink->appendChild($doc->createTextNode($GOKData['hitcount'] . ' Treffer anzeigen')); //localise
+			}
+			else {
+				// we don't know the number of results: display a general text
+				$opacLink->appendChild($doc->createTextNode('Treffer anzeigen')); //localise
+			}
+
 		}
 		else {
 			$opacLink = $doc->createElement('span');
@@ -331,7 +338,6 @@ class tx_nkwgok extends tx_nkwlib {
 	 * */
 	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $expandInfo, $expandMarker = '', $autoExpandLevel = 0) {
 		$GOKs = $this->getChildren($parentPPN);
-
 		if (sizeof($GOKs) > 0) {
 			$ul = $doc->createElement('ul');
 			$container->appendChild($ul);

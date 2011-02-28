@@ -153,9 +153,17 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							$values['descr_en'] = trim($GOK['044F']['a']);
 						}
 
-						// hit keys are lowercase and include the Normdatensatz which should not be counted
+						// Hit keys are lowercase.
+						// Set result count to 0 for all entries but those of 'str' type
+						// for which we use -1 to indicate the count is unknown.
 						if ($hitCounts[strtolower($GOKString)]) {
-							$values['hitcount'] = (int)$hitCounts[strtolower($GOKString)] - 1;
+							$values['hitcount'] = (int)$hitCounts[strtolower($GOKString)];
+						}
+						else if ($GOK['str']) {
+							$values['hitcount'] = -1;
+						}
+						else {
+							$values['hitcount'] = 0;
 						}
 
 						$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
@@ -205,7 +213,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			if ($xml) {
 				$scanlines = $xml->xpath('/RESULT/SCANLIST/SCANLINE');
 				foreach ($scanlines as $scanline) {
-					$hits = 0;
+					$hits = Null;
 					$description = Null;
 					foreach($scanline->attributes() as $name => $value) {
 						if ($name == 'hits') {
@@ -216,8 +224,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							$description = (string)$value;
 						}
 					}
-		//						t3lib_div::devLog($description, 'nkwgok', 1);
-					if ($hits > 0 && $description) {
+					if ($hits != Null && $description) {
 						$hitCounts[$description] = $hits;
 					}
 				}
