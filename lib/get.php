@@ -44,18 +44,22 @@ class tx_nkwgok_eid extends tx_nkwgok {
 	function eid_main() {
 		// initialize DB functions
 		tslib_eidtools::connectDB();
-		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
 
 		// even more get values
 		$get = t3lib_div::_GET();
-		$ppn = $get['tx_nkwgok']['expand'];
+		$nkwgokArgs = $get['tx_nkwgok'];
 
 		// and display them
 		$nkwgok = t3lib_div::makeInstance('tx_nkwgok');
-//		$display = $nkwgok->AJAXGOKTreeChildren($ppn, $get['language']);
-
-		$display = $nkwgok->AJAXGOKMenuChildren($ppn, $get['tx_nkwgok']['level'], $get['language']);
-
+		$ppn = $nkwgokArgs['expand'];
+		$display = Null;
+		if ($nkwgokArgs['style'] == 'menu') {
+			$display = $nkwgok->AJAXGOKMenuChildren($ppn, $nkwgokArgs['level'], $nkwgokArgs['language']);
+		}
+		else {
+			$display = $nkwgok->AJAXGOKTreeChildren($ppn, $nkwgokArgs['language']);
+		}
+	
 		// track action
 		if ($statsEnabled === true) {
 			$doStatistics = t3lib_div::getUserObj('EXT:ke_stats/pi1/class.tx_kestats_pi1.php:tx_kestats_pi1');

@@ -26,7 +26,7 @@ require_once(t3lib_extMgm::extPath('nkwlib') . 'class.tx_nkwlib.php');
 
 define('NKWGOKExtKey', 'nkwgok');
 define('NKWGOKQueryTable', 'tx_nkwgok_data');
-define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, childcount');
+define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, childcount, hitcount');
 
 /**
  * undocumented class
@@ -208,7 +208,7 @@ class tx_nkwgok extends tx_nkwlib {
 			" . $jQueryMarker . ".get("
 				. "'" . t3lib_div::getIndpEnv('TYPO3_SITE_URL') . "index.php',
 				{'eID': '" . NKWGOKExtKey . "', "
-				. "'language': '" . $GLOBALS['TSFE']->lang . "', "
+				. "'tx_" . NKWGOKExtKey . "[language]': '" . $GLOBALS['TSFE']->lang . "', "
 				. "'tx_" . NKWGOKExtKey . "[expand]': id },
 				function (html) {
 					plusMinus.text('[-]');
@@ -440,8 +440,9 @@ class tx_nkwgok extends tx_nkwlib {
 			var PPN = option.value;
 			var level = option.parentNode.getAttribute('level') + 1;
 			var parameters = location.search + 'tx_" . NKWGOKExtKey . "[expand]=' + PPN
-				+ '&language=" . $GLOBALS['TSFE']->lang . "&eID=" . NKWGOKExtKey . "'
-				+ '&tx_". NKWGOKExtKey . "[level]=' + level;
+				+ '&tx_" . NKWGOKExtKey . "[language]=" . $GLOBALS['TSFE']->lang . "&eID=" . NKWGOKExtKey . "'
+				+ '&tx_" . NKWGOKExtKey . "[level]=' + level
+				+ '&tx_" . NKWGOKExtKey . "[style]=menu';
 
 			$(option.parentNode).nextAll().remove();
 			var emptySelect = document.createElement('select');

@@ -8,10 +8,16 @@
 		<languageKey index="en" type="array">
 			<label index="source">Show GOK-Part</label>
 			<label index="altSource">Anzuzeigender GOK-Ausschnitt (alternativ, Angabe einer GOK, überschreibt die erste Auswahl)</label>
+			<label index="style">Display Style</label>
+			<label index="tree">Tree</label>
+			<label index="menu">Menus</label>
 		</languageKey>
-		<languageKey index="de" type="array">
+		<languageKey index="default" type="array">
 			<label index="source">Anzuzeigender GOK-Ausschnitt</label>
 			<label index="altSource">Anzuzeigender GOK-Ausschnitt (alternativ, Angabe einer GOK, überschreibt die erste Auswahl)</label>
+			<label index="style">Anzeigestil</label>
+			<label index="tree">Baum</label>
+			<label index="menu">Menüs</label>
 		</languageKey>
 	</data>
 </T3locallang>

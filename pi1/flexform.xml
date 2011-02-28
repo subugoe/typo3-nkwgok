@@ -28,6 +28,24 @@
 							</config>
 						</TCEforms>
 					</altSource>
+					<style>
+						<TCEforms>
+							<label>LLL:EXT:nkwgok/pi1/locallang.xml:style</label>
+							<config>
+								<type>radio</type>
+								<items type="array">
+									<numIndex index="0" type="array">
+										<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:tree</numIndex>
+										<numIndex index="1">tree</numIndex>
+									</numIndex>
+									<numIndex index="1" type="array">
+										<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:menu</numIndex>
+										<numIndex index="1">menu</numIndex>
+									</numIndex>
+								</items>
+							</config>
+						</TCEforms>
+					</style>
 				</el>
 			</ROOT>
 		</sDEF>
