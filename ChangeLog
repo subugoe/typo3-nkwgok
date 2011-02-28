@@ -1,3 +1,8 @@
+2011-02-28 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* provide a display style using menus
+	* download hit counts from Opac
+	* display hit counts in tree style
+
 2011-02-23 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* add child count to database (instead of yes/no information)
 
