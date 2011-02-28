@@ -78,7 +78,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					}
 				}
 
-				$topLevelNodeCount = count($xml->xpath('/RESULT/SET/SHORTTITLE/record/')) - count($parentGOKs);
+				$topLevelNodeCount = count($xml->xpath('/RESULT/SET/SHORTTITLE/record')) - count($parentGOKs);
 				$parentPPNs[NKWGOKRootNode] += $topLevelNodeCount;
 			}
 
