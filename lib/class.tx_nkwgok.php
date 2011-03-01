@@ -301,14 +301,11 @@ class tx_nkwgok extends tx_nkwlib {
 			$nameSpan->setAttribute('class', 'GOKName');
 			$nameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
 
-			$container->appendChild($doc->createTextNode(' '));
-			$container->appendChild($this->OPACLinkElement($GOK, $doc, $language));
 			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $language, $conf['getVars']['expand'], '', 1);
 		}
 
 		return $doc;
 	}
-
 
 
 
@@ -338,14 +335,8 @@ class tx_nkwgok extends tx_nkwlib {
 				// we don't know the number of results: display a general text
 				$opacLink->appendChild($doc->createTextNode($this->localise('Treffer anzeigen', $language)));
 			}
-
+			$opacLink->setAttribute('class', 'opacLink');
 		}
-		else {
-			$opacLink = $doc->createElement('span');
-			$opacLink->appendChild($doc->createTextNode($this->localise('keine Treffer', $language) ));
-		}
-
-		$opacLink->setAttribute('class', 'opacLink');
 
 		return $opacLink;
 	}
@@ -396,8 +387,11 @@ class tx_nkwgok extends tx_nkwlib {
 				$openLink->setAttribute('id', 'openCloseLink-' . $PPN);
 				$li->appendChild($openLink);
 
-				$li->appendChild($doc->createTextNode(' '));
-				$li->appendChild($this->OPACLinkElement($GOK, $doc, $language));
+				$opacLinkElement = $this->OPACLinkElement($GOK, $doc, $language);
+				if ($opacLinkElement) {
+	 				$li->appendChild($doc->createTextNode(' '));
+					$li->appendChild($opacLinkElement);
+				}
 
 				// Careful: These are three non-breaking spaces to get better alignment.
 				$buttonText = '   ';
@@ -436,11 +430,11 @@ class tx_nkwgok extends tx_nkwlib {
 					$openLink->setAttribute('title', $mainTitle);
 					$openLink->setAttribute('alttitle', $alternativeTitle);
 				}
+
 				$control = $doc->createElement('span');
 				$openLink->appendChild($control);
 				$control->setAttribute('class', 'plusMinus');
 				$control->appendChild($doc->createTextNode($buttonText));
-
 
 				$openLink->appendChild($doc->createTextNode(' '));
 				$GOKIDSpan = $doc->createElement('span');
