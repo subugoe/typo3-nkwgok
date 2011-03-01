@@ -605,9 +605,14 @@ class tx_nkwgok extends tx_nkwlib {
 					$select->appendChild($option);
 					$option->appendChild($doc->createTextNode($this->localise('Treffer aller enthaltenen Untergebiete zeigen', $language) ));
 					$option->setAttribute('value', 'withchildren');
+					if (!$getVars['expand-' . $level]) {
+						$option->setAttribute('selected', 'selected');
+					}
 
-					$optgroup = $doc->createElement('optgroup');
-					$select->appendChild($optgroup);
+					if (count($GOKs) > 0) {
+						$optgroup = $doc->createElement('optgroup');
+						$select->appendChild($optgroup);
+					}
 				}
 			}
 
