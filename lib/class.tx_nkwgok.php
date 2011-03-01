@@ -535,8 +535,6 @@ class tx_nkwgok extends tx_nkwlib {
 	private function appendGOKMenuChildren($parentPPN, $doc, $container, $language, $getVars, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0) {
 		$GOKs = $this->getChildren($parentPPN);
 
-
-
 		if (sizeof($GOKs) > 0) {
 			if ( (sizeof($GOKs) <= $autoExpandLevel) && ($level != 0) && $autoExpandStep == 0 ) {
 				// We are auto-expanded, so throw away the elements, as they are already present in the previous menu
@@ -546,7 +544,7 @@ class tx_nkwgok extends tx_nkwlib {
 			// When auto-expanding, continue using the previous <select>
 			// Element which should be passed to us as $container.
 			$select = $container;
-
+			
 			if ($autoExpandStep == 0) {
 				// Create the containing <select> when we’re not auto-expanding.
 				$select = $doc->createElement('select');
@@ -557,20 +555,26 @@ class tx_nkwgok extends tx_nkwlib {
 				$select->setAttribute('level', $level);
 
 				// add dummy items at the beginning of the menu
-				$defaultGOK = Array();
 				if ($level == 0) {
-					$defaultGOK['descr'] = 'Bitte Themengebiet auswählen';  // localise
-					$defaultGOK['ppn'] = 'blank';
-					array_unshift($GOKs, $defaultGOK);
+					$option = $doc->createElement('option');
+					$select->appendChild($option);
+					$option->appendChild($doc->createTextNode('Bitte Fachgebiet auswählen:')); // localise
+					$option->setAttribute('value', '');
 				}
 				else {
-					$defaultGOK['descr'] = 'Treffer aller enthaltenen Gebiete zeigen';  // localise
-					$defaultGOK['ppn'] = 'all';
-					array_unshift($GOKs, $defaultGOK);
-					$defaultGOK['descr'] = 'Nur Treffer für dieses Gebiet anzeigen'; // localise
-					$defaultGOK['ppn'] = 'parent';
-					array_unshift($GOKs, $defaultGOK);
-				}				
+					$option = $doc->createElement('option');
+					$select->appendChild($option);
+					$option->appendChild($doc->createTextNode('Treffer für dieses Zwischenebene zeigen')); // localise
+					$option->setAttribute('value', 'this');
+
+					$option = $doc->createElement('option');
+					$select->appendChild($option);
+					$option->appendChild($doc->createTextNode('Treffer aller enthaltenen Untergebiete zeigen')); // localise
+					$option->setAttribute('value', 'withchildren');
+
+					$optgroup = $doc->createElement('optgroup');
+					$select->appendChild($optgroup);
+				}
 			}
 
 			foreach ($GOKs as $GOK) {
