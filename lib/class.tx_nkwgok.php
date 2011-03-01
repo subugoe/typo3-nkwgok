@@ -37,6 +37,36 @@ define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, childcou
 class tx_nkwgok extends tx_nkwlib {
 
 	/**
+	 * @var Array
+	 */
+	protected $localisation;
+
+	/**
+	 * Provide our own localisation function as getLL() isn't available when
+	 * running in eID.
+	 *
+	 * @author Sven-S. Porst
+	 * @param string $key key to lool up in pi1/locallang.xml
+	 * @param string $language ISO 639-1 language code
+	 * @return string
+	 */
+	private function localise ($key, $language) {
+		// initialise the $localisation variable
+		if (!$this->localisation) {
+	        $this->localisation = t3lib_div::readLLfile('EXT:' . NKWGOKExtKey . '/pi1/locallang.xml', $language, '', 2);
+		}
+
+		$result = $this->localisation[$language][$key];
+		if (!result) {
+			$result = $this->localisation['default'][$key];
+		}
+
+		return $result;
+	}
+
+
+
+	/**
 	 * Return GOK name for display.
 	 *
 	 * Use English if the language code is 'en' and German otherwise.
@@ -108,7 +138,7 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @return Array of GOK records of the $parentPPN’s children
 	 */
 	private function getChildren($parentPPN) {
-		$whereClause = 'parent = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN);
+		$whereClause = 'parent = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, NKWGOKQueryTable);
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
 					NKWGOKQueryTable,
@@ -184,6 +214,8 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @return DOMDocument
 	 */
 	public function GOKTree ($conf) {
+		$language = $GLOBALS['TSFE']->lang;
+
 		// create Document and add JavaScript
 		$doc = DOMImplementation::createDocument();
 		$scriptElement = $doc->createElement('script');
@@ -208,7 +240,7 @@ class tx_nkwgok extends tx_nkwlib {
 			" . $jQueryMarker . ".get("
 				. "'" . t3lib_div::getIndpEnv('TYPO3_SITE_URL') . "index.php',
 				{'eID': '" . NKWGOKExtKey . "', "
-				. "'tx_" . NKWGOKExtKey . "[language]': '" . $GLOBALS['TSFE']->lang . "', "
+				. "'tx_" . NKWGOKExtKey . "[language]': '" . $language . "', "
 				. "'tx_" . NKWGOKExtKey . "[expand]': id },
 				function (html) {
 					plusMinus.text('[-]');
@@ -267,11 +299,11 @@ class tx_nkwgok extends tx_nkwlib {
 			$nameSpan = $doc->createElement('span');
 			$container->appendChild($nameSpan);
 			$nameSpan->setAttribute('class', 'GOKName');
-			$nameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $GLOBALS['TSFE']->lang, True)));
+			$nameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
 
 			$container->appendChild($doc->createTextNode(' '));
-			$container->appendChild($this->OPACLinkElement($GOK, $doc, $container));
-			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $GLOBALS['TSFE']->lang, $conf['getVars']['expand'], '', 1);
+			$container->appendChild($this->OPACLinkElement($GOK, $doc, $language));
+			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $language, $conf['getVars']['expand'], '', 1);
 		}
 
 		return $doc;
@@ -295,22 +327,22 @@ class tx_nkwgok extends tx_nkwlib {
 		if ($hitCount != 0 ) {
 			$opacLink = $doc->createElement('a');
 			$opacLink->setAttribute('href', $this->makeOPACLink($GOKData, $language));
-			$opacLink->setAttribute('title', 'Bücher zu diesem Thema im Opac anzeigen'); // localise
+			$opacLink->setAttribute('title', $this->localise('Bücher zu diesem Thema im Opac anzeigen', $language) );
 			// Question: Is '_blank' a good idea?
 			$opacLink->setAttribute('target', '_blank');
 			if ($hitCount > 0) {
 				// we know the number of results: display it
-				$opacLink->appendChild($doc->createTextNode($GOKData['hitcount'] . ' Treffer anzeigen')); //localise
+				$opacLink->appendChild($doc->createTextNode(sprintf($this->localise('%d Treffer anzeigen', $language), $GOKData['hitcount'])));
 			}
 			else {
 				// we don't know the number of results: display a general text
-				$opacLink->appendChild($doc->createTextNode('Treffer anzeigen')); //localise
+				$opacLink->appendChild($doc->createTextNode($this->localise('Treffer anzeigen', $language)));
 			}
 
 		}
 		else {
 			$opacLink = $doc->createElement('span');
-			$opacLink->appendChild($doc->createTextNode('keine Treffer')); // localise
+			$opacLink->appendChild($doc->createTextNode($this->localise('keine Treffer', $language) ));
 		}
 
 		$opacLink->setAttribute('class', 'opacLink');
@@ -372,9 +404,9 @@ class tx_nkwgok extends tx_nkwlib {
 				if ($GOK['childcount'] > 0) {
 					$JSCommand = '';
 					$noscriptLink = '#';
-					$mainTitle = $GOK['childcount'] . ' Unterkategorien anzeigen'; // localise
-					$alternativeTitle = 'Unterkategorien ausblenden'; // localise
-
+					$mainTitle = $GOK['childcount'] . ' ' . $this->localise('Unterkategorien anzeigen', $language);
+					$alternativeTitle = $this->localise('Unterkategorien ausblenden', $language);
+					
 					if ( ($expandInfo && in_array($PPN, $expandInfo))
 							|| $GOK['childcount'] <= $autoExpandLevel) {
 						$li->setAttribute('class', 'close');
@@ -393,7 +425,7 @@ class tx_nkwgok extends tx_nkwlib {
 						$li->setAttribute('class', 'open');
 						$JSCommand = 'expandGOK';
 						$buttonText = '[+]';
-						$linkTitle = $GOK['childcount'] . ' Unterkategorien anzeigen'; // localise
+						$linkTitle = $GOK['childcount'] . ' ' . $this->localise('Unterkategorien anzeigen', $language);
 						$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
 								array('tx_' . NKWGOKExtKey . '[expand]' => $expand, 'no_cache' => 1) )
 								. '#c' . $PPN;
@@ -435,6 +467,8 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @return DOMElement containing the markup for a menu
 	 */
 	public function GOKMenus ($conf) {
+		$language = $GLOBALS['TSFE']->lang;
+
 		// create Document and add JavaScript
 		$doc = DOMImplementation::createDocument();
 
@@ -454,7 +488,7 @@ class tx_nkwgok extends tx_nkwlib {
 			var PPN = option.value;
 			var level = option.parentNode.getAttribute('level') + 1;
 			var parameters = location.search + 'tx_" . NKWGOKExtKey . "[expand]=' + PPN
-				+ '&tx_" . NKWGOKExtKey . "[language]=" . $GLOBALS['TSFE']->lang . "&eID=" . NKWGOKExtKey . "'
+				+ '&tx_" . NKWGOKExtKey . "[language]=" . $language . "&eID=" . NKWGOKExtKey . "'
 				+ '&tx_" . NKWGOKExtKey . "[level]=' + level
 				+ '&tx_" . NKWGOKExtKey . "[style]=menu';
 
@@ -463,7 +497,7 @@ class tx_nkwgok extends tx_nkwlib {
 			option.form.appendChild(emptySelect);
 			var emptyOption = document.createElement('option');
 			emptySelect.appendChild(emptyOption);
-			emptyOption.appendChild(document.createTextNode('Laden ...')); // localise
+			emptyOption.appendChild(document.createTextNode('" . $this->localise('Laden ...', $language) . "'));
 			var downloadFinishedFunction = function (html) {
 				$(option.parentNode).nextAll().remove();
 				$(option.form).append(html);
@@ -484,6 +518,7 @@ class tx_nkwgok extends tx_nkwlib {
 ";
 		$cssElement->appendChild($doc->createTextNode($css));
 
+		// Create the form and insert the first menu.
 		$form = $doc->createElement('form');
 		$doc->appendChild($form);
 		$form->setAttribute('class', 'gokMenuForm');
@@ -499,9 +534,8 @@ class tx_nkwgok extends tx_nkwlib {
 					'gok ASC',
 					'');
 
-
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
-			$this->appendGOKMenuChildren($row['ppn'], $doc, $form, $GLOBALS['TSFE']->lang, $conf['getVars'], 2);
+			$this->appendGOKMenuChildren($row['ppn'], $doc, $form, $language, $conf['getVars'], 2);
 		}
 
 		$button = $doc->createElement('input');
@@ -558,18 +592,18 @@ class tx_nkwgok extends tx_nkwlib {
 				if ($level == 0) {
 					$option = $doc->createElement('option');
 					$select->appendChild($option);
-					$option->appendChild($doc->createTextNode('Bitte Fachgebiet auswählen:')); // localise
+					$option->appendChild($doc->createTextNode($this->localise('Bitte Fachgebiet auswählen:', $language) ));
 					$option->setAttribute('value', '');
 				}
 				else {
 					$option = $doc->createElement('option');
 					$select->appendChild($option);
-					$option->appendChild($doc->createTextNode('Treffer für dieses Zwischenebene zeigen')); // localise
+					$option->appendChild($doc->createTextNode($this->localise('Treffer für diese Zwischenebene zeigen', $language) ));
 					$option->setAttribute('value', 'this');
 
 					$option = $doc->createElement('option');
 					$select->appendChild($option);
-					$option->appendChild($doc->createTextNode('Treffer aller enthaltenen Untergebiete zeigen')); // localise
+					$option->appendChild($doc->createTextNode($this->localise('Treffer aller enthaltenen Untergebiete zeigen', $language) ));
 					$option->setAttribute('value', 'withchildren');
 
 					$optgroup = $doc->createElement('optgroup');
@@ -587,7 +621,7 @@ class tx_nkwgok extends tx_nkwlib {
 				// Careful: non-breaking spaces used here to create in-menu indentation
 				$menuItemString = str_repeat('   ', $autoExpandStep) . $this->GOKName($GOK, $language, True);
 				if ($GOK['childcount'] > 0) {
-					$menuItemString .= ' ...'; // localise
+					$menuItemString .= $this->localise(' ...', $language);
 					$option->setAttribute('hasChildren', $GOK['childcount']);
 				}
 				$option->appendChild($doc->createTextNode($menuItemString));
@@ -608,6 +642,7 @@ class tx_nkwgok extends tx_nkwlib {
 	}
 
 
+
 	/**
 	 * Create DOMDocument for AJAX return value and fill it with markup for the
 	 * $parentPPN, $level and $language given.
@@ -620,7 +655,6 @@ class tx_nkwgok extends tx_nkwlib {
 	 */
 	public function AJAXGOKMenuChildren ($parentPPN, $level, $language) {
 		$doc = DOMImplementation::createDocument();
-
 		$this->appendGOKMenuChildren($parentPPN, $doc, $doc, $language, Array(), 2, $level);
 
 		return $doc;

@@ -7,17 +7,63 @@
 	<data type="array">
 		<languageKey index="en" type="array">
 			<label index="source">Show GOK-Part</label>
-			<label index="altSource">Anzuzeigender GOK-Ausschnitt (alternativ, Angabe einer GOK, überschreibt die erste Auswahl)</label>
-			<label index="style">Display Style</label>
+			<label index="altSource">Ignore the menu selection and start the tree at this GOK</label>
+			<label index="style">Display as</label>
 			<label index="tree">Tree</label>
 			<label index="menu">Menus</label>
+			
+			<label index="Bücher zu diesem Thema im Opac anzeigen">Show Books on this subject in Opac</label>
+			<label index="%d Treffer anzeigen">show %d matching books</label>
+			<label index="Treffer anzeigen">show matching books</label>
+			<label index="keine Treffer">no matching books</label>
+			<label index="Unterkategorien anzeigen">Show subcategories</label>
+			<label index="Unterkategorien ausblenden">Hide subcategories</label>
+			<label index="Laden ...">Loading...</label>
+			<label index="Bitte Fachgebiet auswählen:">Please select a subject:</label>
+			<label index="Treffer für diese Zwischenebene zeigen">Show matching books for this intermediate category</label>
+			<label index="Treffer aller enthaltenen Untergebiete zeigen">Show matching books for all contained subjects</label>
+			<label index=" ...">...</label>
 		</languageKey>
+
+
+		<languageKey index="de" type="array">
+			<label index="source">GOK-Hierarchie beginnen mit</label>
+			<label index="altSource">Eigene GOK als Startknoten angeben (die Menüauswahl wird dann ignoriert)</label>
+			<label index="style">Anzeigen als</label>
+			<label index="tree">Baum</label>
+			<label index="menu">Menüs</label>
+
+			<label index="Bücher zu diesem Thema im Opac anzeigen">Bücher zu diesem Thema im Opac anzeigen</label>
+			<label index="%d Treffer anzeigen">%d Treffer anzeigen</label>
+			<label index="Treffer anzeigen">Treffer anzeigen</label>
+			<label index="keine Treffer">keine Treffer</label>
+			<label index="Unterkategorien anzeigen">Unterkategorien anzeigen</label>
+			<label index="Unterkategorien ausblenden">Unterkategorien ausblenden</label>
+			<label index="Laden ...">Laden ...</label>
+			<label index="Bitte Fachgebiet auswählen:">Bitte Fachgebiet auswählen:</label>
+			<label index="Treffer für diese Zwischenebene zeigen">Treffer für diese Zwischenebene zeigen</label>
+			<label index="Treffer aller enthaltenen Untergebiete zeigen">Treffer aller enthaltenen Untergebiete zeigen</label>
+			<label index=" ..."> ...</label>
+		</languageKey>
+
 		<languageKey index="default" type="array">
-			<label index="source">Anzuzeigender GOK-Ausschnitt</label>
-			<label index="altSource">Anzuzeigender GOK-Ausschnitt (alternativ, Angabe einer GOK, überschreibt die erste Auswahl)</label>
+			<label index="source">GOK-Hierarchie beginnen mit</label>
+			<label index="altSource">Eigene GOK als Startknoten angeben (die Menüauswahl wird dann ignoriert)</label>
 			<label index="style">Anzeigestil</label>
 			<label index="tree">Baum</label>
 			<label index="menu">Menüs</label>
+
+			<label index="Bücher zu diesem Thema im Opac anzeigen">Bücher zu diesem Thema im Opac anzeigen</label>
+			<label index="%d Treffer anzeigen">%d Treffer anzeigen</label>
+			<label index="Treffer anzeigen">Treffer anzeigen</label>
+			<label index="keine Treffer">keine Treffer</label>
+			<label index="Unterkategorien anzeigen">Unterkategorien anzeigen</label>
+			<label index="Unterkategorien ausblenden">Unterkategorien ausblenden</label>
+			<label index="Laden ...">Laden ...</label>
+			<label index="Bitte Fachgebiet auswählen:">Bitte Fachgebiet auswählen:</label>
+			<label index="Treffer für diese Zwischenebene zeigen">Treffer für diese Zwischenebene zeigen</label>
+			<label index="Treffer aller enthaltenen Untergebiete zeigen">Treffer aller enthaltenen Untergebiete zeigen</label>
+			<label index=" ..."> ...</label>
 		</languageKey>
 	</data>
 </T3locallang>
