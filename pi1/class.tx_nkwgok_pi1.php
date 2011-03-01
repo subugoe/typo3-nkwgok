@@ -80,6 +80,7 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 			$conf['getVars']['expand'] = array_unique($tmpArr);
 		}
 
+		$doc = Null;
 		if ($style == 'menu') {
 			$doc = $this->GOKMenus($conf);
 		}
