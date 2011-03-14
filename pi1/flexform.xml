@@ -10,6 +10,7 @@
 				</TCEforms>
 				<type>array</type>
 				<el>
+
 					<source>
 						<TCEforms>
 							<label>LLL:EXT:nkwgok/pi1/locallang.xml:source</label>
@@ -19,6 +20,7 @@
 							</config>
 						</TCEforms>
 					</source>
+
 					<altSource>
 						<TCEforms>
 							<label>LLL:EXT:nkwgok/pi1/locallang.xml:altSource</label>
@@ -28,6 +30,7 @@
 							</config>
 						</TCEforms>
 					</altSource>
+
 					<style>
 						<TCEforms>
 							<label>LLL:EXT:nkwgok/pi1/locallang.xml:style</label>
@@ -35,17 +38,22 @@
 								<type>radio</type>
 								<items type="array">
 									<numIndex index="0" type="array">
-										<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:tree</numIndex>
-										<numIndex index="1">tree</numIndex>
+										<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleTreeNew</numIndex>
+										<numIndex index="1">treeNew</numIndex>
 									</numIndex>
 									<numIndex index="1" type="array">
-										<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:menu</numIndex>
+										<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleTreeOld</numIndex>
+										<numIndex index="1">treeOld</numIndex>
+									</numIndex>
+									<numIndex index="2" type="array">
+										<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleMenu</numIndex>
 										<numIndex index="1">menu</numIndex>
 									</numIndex>
 								</items>
 							</config>
 						</TCEforms>
 					</style>
+
 				</el>
 			</ROOT>
 		</sDEF>

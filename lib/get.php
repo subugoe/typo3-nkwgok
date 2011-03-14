@@ -57,7 +57,7 @@ class tx_nkwgok_eid extends tx_nkwgok {
 			$display = $nkwgok->AJAXGOKMenuChildren($ppn, $nkwgokArgs['level'], $nkwgokArgs['language']);
 		}
 		else {
-			$display = $nkwgok->AJAXGOKTreeChildren($ppn, $nkwgokArgs['language']);
+			$display = $nkwgok->AJAXGOKTreeChildren($ppn, $nkwgokArgs['style'], $nkwgokArgs['language']);
 		}
 	
 		// track action

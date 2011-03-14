@@ -163,13 +163,14 @@ class tx_nkwgok extends tx_nkwlib {
 
 	 * @author Sven-S. Porst
 	 * @param string $parentPPN
+	 * @param string $style ('treeOld' or 'treeNew')
 	 * @param string $language ISO 639-1 language code
 	 * @return DOMDocument
 	 * */
-	public function AJAXGOKTreeChildren ($parentPPN, $language) {
+	public function AJAXGOKTreeChildren ($parentPPN, $style, $language) {
 		$doc = DOMImplementation::createDocument();
 
-		$this->appendGOKTreeChildren($parentPPN, $doc, $doc, $language, Array($parentPPN), '', 1)->firstChild;
+		$this->appendGOKTreeChildren($parentPPN, $doc, $doc, $language, Array($parentPPN), '', 1, $style)->firstChild;
 
 		return $doc;
 	}
@@ -205,9 +206,11 @@ class tx_nkwgok extends tx_nkwlib {
 	 * - an string element 'gok' which can either be 'all' (to display the
 	 *		complete GOK tree) or a GOK string of the node to be used as the
 	 *		root of the tree
-	 * - an array element 'getVars' with a array element 'expand'. Each of that
-	 *		array’s elements are PPNs of the GOK elements displaying their
-	 *		child elements
+	 * - an array element 'getVars' with:
+	 *   * an array element 'expand'. Each of that array’s elements are PPNs of
+	 *     the GOK elements displaying their child elements
+	 *   * an array element 'style' indicating the style (treeNew or treeOld)
+	 *     to be used
 	 *
 	 * @author Sven-S. Porst
 	 * @param Array $conf
@@ -241,7 +244,8 @@ class tx_nkwgok extends tx_nkwlib {
 				. "'" . t3lib_div::getIndpEnv('TYPO3_SITE_URL') . "index.php',
 				{'eID': '" . NKWGOKExtKey . "', "
 				. "'tx_" . NKWGOKExtKey . "[language]': '" . $language . "', "
-				. "'tx_" . NKWGOKExtKey . "[expand]': id },
+				. "'tx_" . NKWGOKExtKey . "[expand]': id, "
+				. "'tx_" . NKWGOKExtKey . "[style]': '" . $conf['getVars']['style'] . "'},
 				function (html) {
 					plusMinus.text('[-]');
 					jQuery('#c' + id).append(html);
@@ -265,13 +269,13 @@ class tx_nkwgok extends tx_nkwlib {
 		$css = '
 .gokTreeContainer a { text-decoration:none; border: 0px none; position: relative; }
 .gokTreeContainer ul { list-style-type: none; padding-left: 0em; }
-.gokTreeContainer a:link:hover { text-decoration: underline; }
-.gokTreeContainer a .GOKID { display:block; float:left; width: 6em; text-align: right; color: #999; padding-right:0.2em;}
-.gokTreeContainer .GOKName { font-weight: bold; }
-.gokTreeContainer .opacLink { font-size: 71%; font-style: italic; color: #999; }
-.gokTreeContainer .opacLink:link:after { content: "\\002192"; padding-left: 0.2em; }
-.gokTreeContainer .opacLink:hover { color: #333; }
 .gokTreeContainer ul ul { margin: 0em 0em 0em 1em; }
+.gokTreeContainer a:link:hover { text-decoration: underline; }
+.gokTreeContainer.newStyle a .GOKID { display:block; float:left; width: 6em; text-align: right; color: #999; padding-right:0.2em;}
+.gokTreeContainer.newStyle .GOKName { font-weight: bold; }
+.gokTreeContainer.newStyle .opacLink { font-size: 71%; font-style: italic; color: #999; }
+.gokTreeContainer.newStyle .opacLink:link:after { content: "\\002192"; padding-left: 0.2em; }
+.gokTreeContainer.newStyle .opacLink:hover { color: #333; }
 .gokTreeContainer .plusMinus, .gokTreeContainer .GOKID { font-family: monospace; }
 ';
 		$cssElement->appendChild($doc->createTextNode($css));
@@ -294,14 +298,19 @@ class tx_nkwgok extends tx_nkwlib {
 		foreach ($GOKs as $GOK) {
 			$container = $doc->createElement('div');
 			$doc->appendChild($container);
-			$container->setAttribute('class', 'gokTreeContainer');
-			
+			if ($conf['getVars']['style'] != 'treeOld') {
+				$container->setAttribute('class', 'gokTreeContainer newStyle');
+			}
+			else {
+				$container->setAttribute('class', 'gokTreeContainer');
+			}
+
 			$nameSpan = $doc->createElement('span');
 			$container->appendChild($nameSpan);
 			$nameSpan->setAttribute('class', 'GOKName');
 			$nameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
 
-			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $language, $conf['getVars']['expand'], '', 1);
+			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $language, $conf['getVars']['expand'], '', 1, $conf['getVars']['style']);
 		}
 
 		return $doc;
@@ -311,6 +320,7 @@ class tx_nkwgok extends tx_nkwlib {
 
 	/**
 	 * Returns DOMElement with complete markup for linking to the OPAC entry.
+	 * The link text indicates the number of results if it is known.
 	 *
 	 * @author Sven-S. Porst
 	 * @param Array $GOKData GOK record
@@ -344,8 +354,44 @@ class tx_nkwgok extends tx_nkwlib {
 
 
 	/**
-	 * Looks up child elements for the given $parentPPN, creates a list with
-	 * markup for them and adds them to the given $container element inside $doc,
+	 * Returns DOMElement with complete markup for linking to the OPAC entry.
+	 * Link text is the GOK record’s name.
+	 *
+	 * @author Sven-S. Porst
+	 * @param Array $GOKData GOK record
+	 * @param DOMDocument $doc document used to create the resulting element
+	 * @param string $language ISO 639-1 language code
+	 * @return DOMElement
+	 */
+	private function OPACLinkElementUgly ($GOKData, $doc, $language) {
+		$opacLink = $doc->createElement('a');
+		$hitCount = $GOKData['hitcount'];
+		if ($hitCount != 0 ) {
+			$opacLink->setAttribute('href', $this->makeOPACLink($GOKData, $language));
+
+			if ($hitCount > 0) {
+				// we know the number of results: display it
+				$opacLink->setAttribute('title', sprintf($this->localise('%d Treffer anzeigen', $language), $GOKData['hitcount']));
+			}
+			else {
+				// we don't know the number of results: display a general text
+				$opacLink->setAttribute('title', $this->localise('Treffer anzeigen', $language));
+			}
+
+			// Question: Is '_blank' a good idea?
+			$opacLink->setAttribute('target', '_blank');
+			$opacLink->setAttribute('class', 'opacLink');
+		}
+
+		return $opacLink;
+	}
+
+
+
+	/**
+	 * Looks up child elements for the given $parentPPN,
+	 * creates a list with markup for them
+	 * and adds them to the given $container element inside $doc,
 	 * taking into account which parent elements are configured to display their
 	 * children.
 	 *
@@ -357,9 +403,10 @@ class tx_nkwgok extends tx_nkwlib {
 	 * @param string $language ISO 639-1 language code
 	 * @param string $expandMarker list of PPNs of open parent elements, separated by '-' [defaults to '']
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
-	 * @return void
+	 * @param string $style of the tree (treeNew or treeOld) [defaults to treeNew]
+ 	 * @return void
 	 * */
-	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $expandInfo, $expandMarker = '', $autoExpandLevel = 0) {
+	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $expandInfo, $expandMarker = '', $autoExpandLevel = 0, $style = 'treeNew') {
 		$GOKs = $this->getChildren($parentPPN);
 		if (sizeof($GOKs) > 0) {
 			$ul = $doc->createElement('ul');
@@ -374,7 +421,7 @@ class tx_nkwgok extends tx_nkwlib {
 					$expand = $expandMarker . '-' . $PPN;
 				}
 
-				/* display in each list item
+				/* Display in each list item:
 				 * 1. Expand xor collapse link if there are child elements depending on the expanded state
 				 * 2. The linked name
 				 * 3. If the item has child elements and is expanded, the list of child elements
@@ -387,10 +434,42 @@ class tx_nkwgok extends tx_nkwlib {
 				$openLink->setAttribute('id', 'openCloseLink-' . $PPN);
 				$li->appendChild($openLink);
 
-				$opacLinkElement = $this->OPACLinkElement($GOK, $doc, $language);
-				if ($opacLinkElement) {
-	 				$li->appendChild($doc->createTextNode(' '));
+				$control = $doc->createElement('span');
+				$openLink->appendChild($control);
+				$control->setAttribute('class', 'plusMinus');
+
+				$GOKIDSpan = $doc->createElement('span');
+				$GOKIDSpan->setAttribute('class', 'GOKID');
+				$GOKIDSpan->appendChild($doc->createTextNode($GOK['gok']));
+
+				$GOKNameSpan = $doc->createElement('span');
+				$GOKNameSpan->setAttribute('class', 'GOKName');
+				$GOKNameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
+
+				/* Offer new and old/ugly display styles:
+				 * NEW: * Link around +/- and the GOK and the subject name for opening/closing.
+				 *      * Link to a separate element pointing to Opac results. If possible the number of hits is displayed.
+				 * OLD: * Link around +/- only for opening/closing.
+				 *      * Link around the GOK and subject name pointing to Opac results.
+				 */
+				if ($style != 'treeOld') {
+					$openLink->appendChild($doc->createTextNode(' '));
+					$openLink->appendChild($GOKIDSpan);
+					$openLink->appendChild($doc->createTextNode(' '));
+					$openLink->appendChild($GOKNameSpan);
+					$opacLinkElement = $this->OPACLinkElement($GOK, $doc, $language);
+					if ($opacLinkElement) {
+						$li->appendChild($doc->createTextNode(' '));
+						$li->appendChild($opacLinkElement);
+					}
+				}
+				else {
+					$li->appendChild($doc->createTextNode(' '));
+					$opacLinkElement = $this->OPACLinkElementUgly($GOK, $doc, $language);
 					$li->appendChild($opacLinkElement);
+					$opacLinkElement->appendChild($GOKIDSpan);
+					$opacLinkElement->appendChild($doc->createTextNode(' '));
+					$opacLinkElement->appendChild($GOKNameSpan);
 				}
 
 				// Careful: These are three non-breaking spaces to get better alignment.
@@ -410,10 +489,10 @@ class tx_nkwgok extends tx_nkwlib {
 						$mainTitle = $alternativeTitle;
 						$alternativeTitle = $tmpTitle;
 						$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
-								array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker) );
+								array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker, 'tx_' . NKWGOKExtKey . '[style]' => $style) );
 						
 						// recursively call self to get child UL
-						$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $expandInfo, $expand, $autoExpandLevel);
+						$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $expandInfo, $expand, $autoExpandLevel, $style);
 					}
 					else {
 						$li->setAttribute('class', 'open');
@@ -431,22 +510,8 @@ class tx_nkwgok extends tx_nkwlib {
 					$openLink->setAttribute('alttitle', $alternativeTitle);
 				}
 
-				$control = $doc->createElement('span');
-				$openLink->appendChild($control);
-				$control->setAttribute('class', 'plusMinus');
 				$control->appendChild($doc->createTextNode($buttonText));
 
-				$openLink->appendChild($doc->createTextNode(' '));
-				$GOKIDSpan = $doc->createElement('span');
-				$openLink->appendChild($GOKIDSpan);
-				$GOKIDSpan->setAttribute('class', 'GOKID');
-				$GOKIDSpan->appendChild($doc->createTextNode($GOK['gok']));
-
-				$openLink->appendChild($doc->createTextNode(' '));
-				$GOKNameSpan = $doc->createElement('span');
-				$openLink->appendChild($GOKNameSpan);
-				$GOKNameSpan->setAttribute('class', 'GOKName');
-				$GOKNameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
 			}
 		}
 	}

@@ -9,8 +9,9 @@
 			<label index="source">Show GOK-Part</label>
 			<label index="altSource">Ignore the menu selection and start the tree at this GOK</label>
 			<label index="style">Display as</label>
-			<label index="tree">Tree</label>
-			<label index="menu">Menus</label>
+			<label index="styleTreeNew">Tree</label>
+			<label index="styleTreeOld">Old-fashioned Tree</label>
+			<label index="styleMenu">Menus</label>
 			
 			<label index="Bücher zu diesem Thema im Opac anzeigen">Show Books on this subject in Opac</label>
 			<label index="%d Treffer anzeigen">show %d matching books</label>
@@ -30,8 +31,9 @@
 			<label index="source">GOK-Hierarchie beginnen mit</label>
 			<label index="altSource">Eigene GOK als Startknoten angeben (die Menüauswahl wird dann ignoriert)</label>
 			<label index="style">Anzeigen als</label>
-			<label index="tree">Baum</label>
-			<label index="menu">Menüs</label>
+			<label index="styleTreeNew">Baum</label>
+			<label index="styleTreeOld">unpraktischer Baum</label>
+			<label index="styleMenu">Menüs</label>
 
 			<label index="Bücher zu diesem Thema im Opac anzeigen">Bücher zu diesem Thema im Opac anzeigen</label>
 			<label index="%d Treffer anzeigen">%d Treffer anzeigen</label>
@@ -50,8 +52,9 @@
 			<label index="source">GOK-Hierarchie beginnen mit</label>
 			<label index="altSource">Eigene GOK als Startknoten angeben (die Menüauswahl wird dann ignoriert)</label>
 			<label index="style">Anzeigestil</label>
-			<label index="tree">Baum</label>
-			<label index="menu">Menüs</label>
+			<label index="styleTreeNew">Baum</label>
+			<label index="styleTreeOld">unpraktischer Baum</label>
+			<label index="styleMenu">Menüs</label>
 
 			<label index="Bücher zu diesem Thema im Opac anzeigen">Bücher zu diesem Thema im Opac anzeigen</label>
 			<label index="%d Treffer anzeigen">%d Treffer anzeigen</label>
