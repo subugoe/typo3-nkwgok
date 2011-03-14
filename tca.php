@@ -27,7 +27,7 @@ if (!defined ('TYPO3_MODE')) {
 $TCA['tx_nkwgok_data'] = array(
 	'ctrl' => $TCA['tx_nkwgok_data']['ctrl'], 
 	'interface' => array(
-		'showRecordFieldList' => 'gok,ppn,descr,parent,hierarchy'
+		'showRecordFieldList' => 'gok,search,ppn,descr,descr_en,parent,hierarchy,hitcount'
 	),
 	'feInterface' => $TCA['tx_nkwgok_data']['feInterface'],
 	'columns' => array(
@@ -37,6 +37,15 @@ $TCA['tx_nkwgok_data'] = array(
 			'config' => array(
 				'type' => 'input', 
 				'size' => '30', 
+				'eval' => 'trim',
+			)
+		),
+		'search' => array(
+			'exclude' => 0,
+			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.search',
+			'config' => array(
+				'type' => 'input',
+				'size' => '30',
 				'eval' => 'trim',
 			)
 		),
@@ -58,7 +67,7 @@ $TCA['tx_nkwgok_data'] = array(
 				'rows' => '5'
 			)
 		),
-		'descr-en' => array(
+		'descr_en' => array(
 			'exclude' => 0,
 			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.descr_en',
 			'config' => array(
@@ -86,15 +95,47 @@ $TCA['tx_nkwgok_data'] = array(
 				'eval'     => 'int', 
 				'checkbox' => '0', 
 				'range'    => array(
-					'upper' => '1000', 
-					'lower' => '10'
+					'upper' => '20',
+					'lower' => '0'
 				), 
+				'default' => 0
+			)
+		),
+		'childcount' => array(
+			'exclude' => 0,
+			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.childcount',
+			'config' => array(
+				'type'     => 'input',
+				'size'     => '4',
+				'max'      => '4',
+				'eval'     => 'int',
+				'checkbox' => '0',
+				'range'    => array(
+					'upper' => '10000',
+					'lower' => '0'
+				),
+				'default' => 0
+			)
+		),
+		'hitcount' => array(
+			'exclude' => 0,
+			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.hitcount',
+			'config' => array(
+				'type'     => 'input',
+				'size'     => '10',
+				'max'      => '10',
+				'eval'     => 'int',
+				'checkbox' => '0',
+				'range'    => array(
+					'upper' => '10000000',
+					'lower' => '-1'
+				),
 				'default' => 0
 			)
 		),
 	),
 	'types' => array(
-		'0' => array('showitem' => 'gok;;;;1-1-1, ppn, descr, parent, hierarchy')
+		'0' => array('showitem' => 'gok;;;;1-1-1, search, ppn, descr, descr_en, parent, hierarchy, hitcount')
 	),
 	'palettes' => array(
 		'1' => array('showitem' => '')
