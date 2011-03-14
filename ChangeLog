@@ -4,6 +4,7 @@
 	* remove options for different query styles
 	* simplify extension search setup: only provide a single URL
 	* move CSS into separate files
+	* remove superfluous dependency on nkwlib
 
 2011-02-28 - 0.7 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* provide a display style using menus
