@@ -244,6 +244,25 @@ class tx_nkwgok extends tx_nkwlib {
 
 
 	/**
+	 * Helper function to add our default stylesheet or the one at the path
+	 * set up in Extension Manager configuration to the page’s head.
+	 * 
+	 * @author Sven-S. Porst
+	 * @return void 
+	 */
+	private function addStylesheet () {
+		$nkwgokGlobalConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
+		$cssPath = $nkwgokGlobalConf['CSSPath'];
+		if (!$cssPath) {
+			$cssPath = 'EXT:' . $this->extKey . '/res/nkwgok.css';
+		}
+		
+		$GLOBALS['TSFE']->pSetup['includeCSS.'][$this->extKey] = $cssPath;
+	}
+
+
+
+	/**
 	 * Return DOMDocument representing the tree set up in the given configuration.
 	 *
 	 * This is the only function called to create the tree on the web page.
@@ -265,7 +284,7 @@ class tx_nkwgok extends tx_nkwlib {
 	public function GOKTree ($conf) {
 		$language = $GLOBALS['TSFE']->lang;
 
-		// create Document and add JavaScript
+		// Create Document and add JavaScript.
 		$doc = DOMImplementation::createDocument();
 		$scriptElement = $doc->createElement('script');
 		$doc->appendChild($scriptElement);
@@ -309,26 +328,10 @@ class tx_nkwgok extends tx_nkwlib {
 ";
 		$scriptElement->appendChild($doc->createTextNode($js));
 
-		$cssElement = $doc->createElement('style');
-		$doc->appendChild($cssElement);
-		$cssElement->setAttribute('type', 'text/css');
-		$css = '
-.gokTreeContainer a { text-decoration:none; border: 0px none; position: relative; }
-.gokTreeContainer ul { list-style-type: none; padding-left: 0em; }
-.gokTreeContainer ul ul { margin: 0em 0em 0em 1em; }
-.gokTreeContainer a:link:hover { text-decoration: underline; }
-.gokTreeContainer.newStyle a .GOKID { display:block; float:left; width: 6em; text-align: right; color: #999; padding-right:0.2em;}
-.gokTreeContainer.newStyle .GOKName { font-weight: bold; }
-.gokTreeContainer.newStyle .opacLink { font-size: 71%; font-style: italic; color: #999; }
-.gokTreeContainer.newStyle .opacLink:link:after { content: "\\002192"; padding-left: 0.2em; }
-.gokTreeContainer.newStyle .opacLink:hover { color: #333; }
-.gokTreeContainer .plusMinus, .gokTreeContainer .GOKID { font-family: monospace; }
-';
-		$cssElement->appendChild($doc->createTextNode($css));
+		$this->addStylesheet();
 
+		// Get start node.
 		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok'], NKWGOKQueryTable);
-
-		// run query and collect result
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
 					NKWGOKQueryTable,
@@ -487,7 +490,6 @@ class tx_nkwgok extends tx_nkwlib {
 				}
 
 				$control->appendChild($doc->createTextNode($buttonText));
-
 			}
 		}
 	}
@@ -565,13 +567,7 @@ class tx_nkwgok extends tx_nkwlib {
 ";
 		$scriptElement->appendChild($doc->createTextNode($js));
 
-		$cssElement = $doc->createElement('style');
-		$doc->appendChild($cssElement);
-		$cssElement->setAttribute('type', 'text/css');
-		$css = "
-.gokMenuForm select { width: 50%; display:block;}
-";
-		$cssElement->appendChild($doc->createTextNode($css));
+		$this->addStylesheet();
 
 		// Create the form and insert the first menu.
 		$form = $doc->createElement('form');
