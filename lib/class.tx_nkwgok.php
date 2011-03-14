@@ -163,7 +163,7 @@ class tx_nkwgok extends tx_nkwlib {
 		$hitCount = $GOKData['hitcount'];
 		if ($hitCount != 0 ) {
 			$opacLink = $doc->createElement('a');
-			$opacLink->setAttribute('href', $this->makeOPACLink($GOKData, $language));
+			$opacLink->setAttribute('href', $this->opacGOKSearchURL($GOKData, $language));
 			$opacLink->setAttribute('title', $this->localise('Bücher zu diesem Thema im Opac anzeigen', $language) );
 			// Question: Is '_blank' a good idea?
 			$opacLink->setAttribute('target', '_blank');
@@ -197,7 +197,7 @@ class tx_nkwgok extends tx_nkwlib {
 		$opacLink = $doc->createElement('a');
 		$hitCount = $GOKData['hitcount'];
 		if ($hitCount != 0 ) {
-			$opacLink->setAttribute('href', $this->makeOPACLink($GOKData, $language));
+			$opacLink->setAttribute('href', $this->opacGOKSearchURL($GOKData, $language));
 
 			if ($hitCount > 0) {
 				// we know the number of results: display it
@@ -219,30 +219,26 @@ class tx_nkwgok extends tx_nkwlib {
 	
 	
 	/**
-	 * undocumented function
+	 * Returns URL pointing to an Opac search for the given GOK for the
+	 * current language.
 	 *
-	 * @return void
-	 * @author Nils K. Windisch
-	 * */
-	private function makeOPAClink($GOKData, $language) {
+	 * @author Sven-S. Porst
+	 * @param Array $GOKData GOK record
+	 * @param string $language ISO 639-1 language code
+	 * @return string URL
+	 */
+	private function opacGOKSearchURL($GOKData, $language) {
 		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
 
-		$languageID = 0;
+		$picaLanguageCode = 'DU';
 		if ($language == 'en') {
-			$languageID= 1;
+			$picaLanguageCode = 'EN';
 		}
 
-		$defaultOpacUrl = explode(',', $conf['defaultOpacUrl']);
-		$opacUrl = $defaultOpacUrl[$languageID];
+		$GOKSearchURL = $conf['opacBaseURL'] . 'LNG=' . $picaLanguageCode 
+			. '/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=' . $GOKData['search'];
 
-		$alternativeOpacUrlTrigger = explode(',', $conf['alternativeOpacUrlTrigger']);
-		if (in_array($GOKData['gok']{0}, $alternativeOpacUrlTrigger)) {
-			$alternativeOpacUrl = explode(',', $conf['alternativeOpacUrl']);
-			$opacUrl = $alternativeOpacUrl[$languageID];
-		}
-
-		$URL = preg_replace('/PLACEHOLDER/', $GOKData['search'], $opacUrl);
-		return $URL;
+		return $GOKSearchURL;
 	}
 
 

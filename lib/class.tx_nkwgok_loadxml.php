@@ -25,6 +25,11 @@
 
 
 /**
+ * 2011-03-14: Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * - unify data model by storing complete queries in the search field and not
+ * omitting the leading LKL for pure GOK queries
+ * 2011-02-28: Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * - add Opac hit counts to data
  * 2011-02-08: Sven-S. Porst <porst@sub.uni-goettingen.de>
  * - debugged
  * - improved structure
@@ -116,30 +121,39 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							}
 						}
 					} // end of datafield loop
+
+
 					// Build complete record and insert into database.
-					if ($GOK['str']) {
-						$search = $GOK['str']['a'];
-					} elseif ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
-						$search = $GOK['045G']['C'] . '+' . $GOK['045G']['a'];
-					} else {
-						$search = $GOK['045A']['a'];
-					}
-
-					$search = preg_replace(array('/lkl/', '/\ /', '/\?/'),
-									array('LKL', '+', '%3F'),
-									trim($search));
-
-					// discard records without a PPN
+					// Discard records without a PPN.
 					$PPN = trim($GOK['003@']['0']);
 					if ($PPN != '') {
 						$childCount = 0;
 						if ($parentPPNs[$PPN]) {
 							$childCount = count($parentPPNs[$PPN]);
 						}
+
 						$parent = trim($GOK['038D'][9]);
 						if ($parent == '') {
 							$parent = NKWGOKRootNode;
 						}
+
+						// Determine the search query.
+						if ($GOK['str']) {
+							// History type GOK with the complete search term in the 'str/a' field.
+							$search = $GOK['str']['a'];
+							$search = preg_replace('/lkl/', 'LKL', $search);
+						}
+						elseif ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
+							// Maths type GOK with an MSC type search term.
+							$search = 'MSC ' . $GOK['045G']['a'];
+						}
+						else {
+							// Generic GOK search, using the LKL field.
+							$search = 'LKL ' . $GOK['045A']['a'];
+						}
+						$search = trim($search);
+						$search = urlencode($search);
+
 						$GOKString = trim($GOK['045A']['a']);
 						$values = array(
 							'ppn' => $PPN,

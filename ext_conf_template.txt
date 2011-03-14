@@ -1,13 +1,5 @@
-# cat=basic//130; type=text; label= Default OPAC URL (de,en)
-defaultOpacUrl = 
-# a reasonable value seems to be:
-# http://opac.sub.uni-goettingen.de/DB=1/LNG=DU/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=LKL+PLACEHOLDER,http://opac.sub.uni-goettingen.de/DB=1/LNG=EN/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=LKL+PLACEHOLDER
+# cat=basic//130; type=text; label=Opac Base URL with trailing /
+opacBaseURL = http://opac.sub.uni-goettingen.de/DB=1/
 
-# cat=basic//130; type=text; label= Alternative OPAC Redirect URL
-alternativeOpacUrl = 
-
-# cat=basic//130; type=text; label= Trigger for alternative OPAC Redirect URL
-alternativeOpacUrlTrigger =
-
-# cat=basic//130; type=boolean; label= Should jQuery noClonflict mode be used?
+# cat=basic//130; type=boolean; label=Should jQuery noConflict mode be used?
 jQueryNoConflict = 1
