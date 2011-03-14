@@ -103,35 +103,6 @@ class tx_nkwgok extends tx_nkwlib {
 
 
 	/**
-	 * undocumented function
-	 *
-	 * @return void
-	 * @author Nils K. Windisch
-	 * */
-	private function makeOPAClink($GOKData, $language) {
-		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
-
-		$languageID = 0;
-		if ($language == 'en') {
-			$languageID= 1;
-		}
-
-		$defaultOpacUrl = explode(',', $conf['defaultOpacUrl']);
-		$opacUrl = $defaultOpacUrl[$languageID];
-
-		$alternativeOpacUrlTrigger = explode(',', $conf['alternativeOpacUrlTrigger']);
-		if (in_array($GOKData['gok']{0}, $alternativeOpacUrlTrigger)) {
-			$alternativeOpacUrl = explode(',', $conf['alternativeOpacUrl']);
-			$opacUrl = $alternativeOpacUrl[$languageID];
-		}
-
-		$URL = preg_replace('/PLACEHOLDER/', $GOKData['search'], $opacUrl);
-		return $URL;
-	}
-
-
-
-	/**
 	 * Returns GOK records for the children of a given PPN.
 	 *
 	 * @param string $parentPPN
@@ -158,26 +129,6 @@ class tx_nkwgok extends tx_nkwlib {
 
 
 	/**
-	 * Create DOMDocument for AJAX return value and fill it with markup for the
-	 * parent PPN and language given.
-
-	 * @author Sven-S. Porst
-	 * @param string $parentPPN
-	 * @param string $style ('treeOld' or 'treeNew')
-	 * @param string $language ISO 639-1 language code
-	 * @return DOMDocument
-	 * */
-	public function AJAXGOKTreeChildren ($parentPPN, $style, $language) {
-		$doc = DOMImplementation::createDocument();
-
-		$this->appendGOKTreeChildren($parentPPN, $doc, $doc, $language, Array($parentPPN), '', 1, $style)->firstChild;
-
-		return $doc;
-	}
-
-
-
-	/**
 	 * Determine jQuery Mode
 	 * @author Nils K. Windisch
 	 * @param int $mode
@@ -193,6 +144,105 @@ class tx_nkwgok extends tx_nkwlib {
 		}
 
 		return $marker;
+	}
+
+
+
+	/**
+	 * Returns DOMElement with complete markup for linking to the OPAC entry.
+	 * The link text indicates the number of results if it is known.
+	 *
+	 * @author Sven-S. Porst
+	 * @param Array $GOKData GOK record
+	 * @param DOMDocument $doc document used to create the resulting element
+	 * @param string $language ISO 639-1 language code
+	 * @return DOMElement
+	 */
+	private function OPACLinkElement ($GOKData, $doc, $language) {
+		$opacLink = Null;
+		$hitCount = $GOKData['hitcount'];
+		if ($hitCount != 0 ) {
+			$opacLink = $doc->createElement('a');
+			$opacLink->setAttribute('href', $this->makeOPACLink($GOKData, $language));
+			$opacLink->setAttribute('title', $this->localise('Bücher zu diesem Thema im Opac anzeigen', $language) );
+			// Question: Is '_blank' a good idea?
+			$opacLink->setAttribute('target', '_blank');
+			if ($hitCount > 0) {
+				// we know the number of results: display it
+				$opacLink->appendChild($doc->createTextNode(sprintf($this->localise('%d Treffer anzeigen', $language), $GOKData['hitcount'])));
+			}
+			else {
+				// we don't know the number of results: display a general text
+				$opacLink->appendChild($doc->createTextNode($this->localise('Treffer anzeigen', $language)));
+			}
+			$opacLink->setAttribute('class', 'opacLink');
+		}
+
+		return $opacLink;
+	}
+
+
+
+	/**
+	 * Returns DOMElement with complete markup for linking to the OPAC entry.
+	 * Link text is the GOK record’s name.
+	 *
+	 * @author Sven-S. Porst
+	 * @param Array $GOKData GOK record
+	 * @param DOMDocument $doc document used to create the resulting element
+	 * @param string $language ISO 639-1 language code
+	 * @return DOMElement
+	 */
+	private function OPACLinkElementUgly ($GOKData, $doc, $language) {
+		$opacLink = $doc->createElement('a');
+		$hitCount = $GOKData['hitcount'];
+		if ($hitCount != 0 ) {
+			$opacLink->setAttribute('href', $this->makeOPACLink($GOKData, $language));
+
+			if ($hitCount > 0) {
+				// we know the number of results: display it
+				$opacLink->setAttribute('title', sprintf($this->localise('%d Treffer anzeigen', $language), $GOKData['hitcount']));
+			}
+			else {
+				// we don't know the number of results: display a general text
+				$opacLink->setAttribute('title', $this->localise('Treffer anzeigen', $language));
+			}
+
+			// Question: Is '_blank' a good idea?
+			$opacLink->setAttribute('target', '_blank');
+			$opacLink->setAttribute('class', 'opacLink');
+		}
+
+		return $opacLink;
+	}
+
+	
+	
+	/**
+	 * undocumented function
+	 *
+	 * @return void
+	 * @author Nils K. Windisch
+	 * */
+	private function makeOPAClink($GOKData, $language) {
+		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
+
+		$languageID = 0;
+		if ($language == 'en') {
+			$languageID= 1;
+		}
+
+		$defaultOpacUrl = explode(',', $conf['defaultOpacUrl']);
+		$opacUrl = $defaultOpacUrl[$languageID];
+
+		$alternativeOpacUrlTrigger = explode(',', $conf['alternativeOpacUrlTrigger']);
+		if (in_array($GOKData['gok']{0}, $alternativeOpacUrlTrigger)) {
+			$alternativeOpacUrl = explode(',', $conf['alternativeOpacUrl']);
+			$opacUrl = $alternativeOpacUrl[$languageID];
+		}
+
+		$URL = preg_replace('/PLACEHOLDER/', $GOKData['search'], $opacUrl);
+		return $URL;
 	}
 
 
@@ -281,7 +331,7 @@ class tx_nkwgok extends tx_nkwlib {
 		$cssElement->appendChild($doc->createTextNode($css));
 
 		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok'], NKWGOKQueryTable);
-		
+
 		// run query and collect result
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
@@ -314,76 +364,6 @@ class tx_nkwgok extends tx_nkwlib {
 		}
 
 		return $doc;
-	}
-
-
-
-	/**
-	 * Returns DOMElement with complete markup for linking to the OPAC entry.
-	 * The link text indicates the number of results if it is known.
-	 *
-	 * @author Sven-S. Porst
-	 * @param Array $GOKData GOK record
-	 * @param DOMDocument $doc document used to create the resulting element
-	 * @param string $language ISO 639-1 language code
-	 * @return DOMElement
-	 */
-	private function OPACLinkElement ($GOKData, $doc, $language) {
-		$opacLink = Null;
-		$hitCount = $GOKData['hitcount'];
-		if ($hitCount != 0 ) {
-			$opacLink = $doc->createElement('a');
-			$opacLink->setAttribute('href', $this->makeOPACLink($GOKData, $language));
-			$opacLink->setAttribute('title', $this->localise('Bücher zu diesem Thema im Opac anzeigen', $language) );
-			// Question: Is '_blank' a good idea?
-			$opacLink->setAttribute('target', '_blank');
-			if ($hitCount > 0) {
-				// we know the number of results: display it
-				$opacLink->appendChild($doc->createTextNode(sprintf($this->localise('%d Treffer anzeigen', $language), $GOKData['hitcount'])));
-			}
-			else {
-				// we don't know the number of results: display a general text
-				$opacLink->appendChild($doc->createTextNode($this->localise('Treffer anzeigen', $language)));
-			}
-			$opacLink->setAttribute('class', 'opacLink');
-		}
-
-		return $opacLink;
-	}
-
-
-
-	/**
-	 * Returns DOMElement with complete markup for linking to the OPAC entry.
-	 * Link text is the GOK record’s name.
-	 *
-	 * @author Sven-S. Porst
-	 * @param Array $GOKData GOK record
-	 * @param DOMDocument $doc document used to create the resulting element
-	 * @param string $language ISO 639-1 language code
-	 * @return DOMElement
-	 */
-	private function OPACLinkElementUgly ($GOKData, $doc, $language) {
-		$opacLink = $doc->createElement('a');
-		$hitCount = $GOKData['hitcount'];
-		if ($hitCount != 0 ) {
-			$opacLink->setAttribute('href', $this->makeOPACLink($GOKData, $language));
-
-			if ($hitCount > 0) {
-				// we know the number of results: display it
-				$opacLink->setAttribute('title', sprintf($this->localise('%d Treffer anzeigen', $language), $GOKData['hitcount']));
-			}
-			else {
-				// we don't know the number of results: display a general text
-				$opacLink->setAttribute('title', $this->localise('Treffer anzeigen', $language));
-			}
-
-			// Question: Is '_blank' a good idea?
-			$opacLink->setAttribute('target', '_blank');
-			$opacLink->setAttribute('class', 'opacLink');
-		}
-
-		return $opacLink;
 	}
 
 
@@ -514,6 +494,26 @@ class tx_nkwgok extends tx_nkwlib {
 
 			}
 		}
+	}
+
+
+
+	/**
+	 * Create DOMDocument for AJAX return value and fill it with markup for the
+	 * parent PPN and language given.
+
+	 * @author Sven-S. Porst
+	 * @param string $parentPPN
+	 * @param string $style ('treeOld' or 'treeNew')
+	 * @param string $language ISO 639-1 language code
+	 * @return DOMDocument
+	 * */
+	public function AJAXGOKTreeChildren ($parentPPN, $style, $language) {
+		$doc = DOMImplementation::createDocument();
+
+		$this->appendGOKTreeChildren($parentPPN, $doc, $doc, $language, Array($parentPPN), '', 1, $style)->firstChild;
+
+		return $doc;
 	}
 
 
