@@ -17,7 +17,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'author' => 'Nils K. Windisch',
 	'author_email' => 'windisch@sub.uni-goettingen.de',
 	'shy' => '',
-	'dependencies' => 'nkwlib,ke_stats,t3jquery',
+	'dependencies' => 'ke_stats,t3jquery',
 	'conflicts' => '',
 	'priority' => '',
 	'module' => '',
@@ -32,7 +32,6 @@ $EM_CONF[$_EXTKEY] = array(
 	'version' => '0.7.0',
 	'constraints' => array(
 		'depends' => array(
-			'nkwlib' => '',
 			'ke_stats' => '',
 			't3jquery' => '1.8.15-0.0.0',
 		),

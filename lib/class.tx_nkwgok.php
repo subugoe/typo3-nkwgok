@@ -22,7 +22,6 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
-require_once(t3lib_extMgm::extPath('nkwlib') . 'class.tx_nkwlib.php');
 
 define('NKWGOKExtKey', 'nkwgok');
 define('NKWGOKQueryTable', 'tx_nkwgok_data');
@@ -34,7 +33,7 @@ define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, childcou
  * @package default
  * @author Nils K. Windisch
  * */
-class tx_nkwgok extends tx_nkwlib {
+class tx_nkwgok extends tslib_pibase {
 
 	/**
 	 * @var Array
