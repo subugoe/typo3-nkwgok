@@ -25,10 +25,23 @@ if (!defined ('TYPO3_MODE')) {
 	die ('Access denied.');
 }
 t3lib_extMgm::addPItoST43($_EXTKEY, 'pi1/class.tx_nkwgok_pi1.php', '_pi1', 'list_type', 1);
+
+// Scheduler task for downloading LKL data from Opac
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadFromOpac'] = array(
+	'extension'        => $_EXTKEY,
+	'title'            => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadFromOpac.name',
+	'description'      => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadFromOpac.description',
+);
+
+// Scheduler task for importing GOK XML files into Typo3 database
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadxml'] = array(
 	'extension'        => $_EXTKEY,
 	'title'            => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadxml.name',
 	'description'      => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadxml.description',
 );
+
+
+
+
 $TYPO3_CONF_VARS['FE']['eID_include']['nkwgok'] = 'EXT:nkwgok/lib/get.php';
 ?>

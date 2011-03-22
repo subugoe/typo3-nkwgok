@@ -59,7 +59,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		$hitCounts = $this->getHitCounts();
 
 		$wantedFieldNames = array('045A', '044E', '044F', '009B', '038D', '003@', '045G', 'str');
-		$dir = PATH_site . '/fileadmin/gok/';
+		$dir = PATH_site . '/fileadmin/gok/lkl/';
 		$fileList = glob($dir . '*.xml');
 
 		if (count($fileList) > 0) {
@@ -248,7 +248,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				}
 			}
 			else {
-				t3lib_div::devLog('could not load/parse XML from ' . $xmlPath, 'nkwgok', 1);
+				t3lib_div::devLog('could not load/parse XML from ' . $xmlPath, 'nkwgok', 3);
 			}
 		} // end foreach
 

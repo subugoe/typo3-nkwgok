@@ -21,5 +21,8 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
-return array('tx_nkwgok_loadxml' => t3lib_extMgm::extPath('nkwgok', 'lib/class.tx_nkwgok_loadxml.php'));
+return array(
+	'tx_nkwgok_loadxml' => t3lib_extMgm::extPath('nkwgok', 'lib/class.tx_nkwgok_loadxml.php'),
+	'tx_nkwgok_loadfromopac' => t3lib_extMgm::extPath('nkwgok', 'lib/class.tx_nkwgok_loadfromopac.php')
+);
 ?>
