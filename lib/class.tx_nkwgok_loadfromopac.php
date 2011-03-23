@@ -115,12 +115,14 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 	private function downloadHitCountsFromOpacToFolder($opacBaseURL, $folderPath) {
 		$success = True;
 		$scanNext = 'a'; // begin scanning the index at LKL a
+		$index = 0;
 
 		while ($scanNext && $success) {
+			$index++;
 			$URL = $opacBaseURL . $scanNext;
 			$opacDownload = file_get_contents($URL);
 			if ($opacDownload) {
-				$targetFilePath = $folderPath . $scanNext . '.xml';
+				$targetFilePath = $folderPath . $index . '.xml';
 				$targetFile = fopen($targetFilePath, 'w');
 				if ($targetFile) {
 					fwrite($targetFile, $opacDownload);
