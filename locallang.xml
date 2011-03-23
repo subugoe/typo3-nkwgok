@@ -10,7 +10,7 @@
 			<label index="scheduler.loadFromOpac.description">Scheduler task to load PicaXML records from Opac.</label>
 
 			<label index="scheduler.loadHistory.name">Load and convert History CSV data</label>
-			<label index="scheduler.loadHistory.description">Scheduler task to download and convert the CSV files with local classification information for Histor to Pica XML which can be imported to the database.</label>
+			<label index="scheduler.loadHistory.description">Scheduler task to download and convert the CSV files with local classification information for History to Pica XML which can be imported to the database.</label>
 
 			<label index="scheduler.loadxml.name">Import GOK XML</label>
 			<label index="scheduler.loadxml.description">Scheduler task to import LKL XML data from GOK into the Typo3 database.</label>
