@@ -7,10 +7,13 @@
 	<data type="array">
 		<languageKey index="default" type="array">
 			<label index="scheduler.loadFromOpac.name">Load GOK Data from Opac</label>
-			<label index="scheduler.loadFromOpac.description">A scheduler task to load PicaXML records from Opac.</label>
+			<label index="scheduler.loadFromOpac.description">Scheduler task to load PicaXML records from Opac.</label>
+
+			<label index="scheduler.loadHistory.name">Load and convert History CSV data</label>
+			<label index="scheduler.loadHistory.description">Scheduler task to download and convert the CSV files with local classification information for Histor to Pica XML which can be imported to the database.</label>
 
 			<label index="scheduler.loadxml.name">Import GOK XML</label>
-			<label index="scheduler.loadxml.description">A scheduler task to import LKL XML data from GOK into the Typo3 database.</label>
+			<label index="scheduler.loadxml.description">Scheduler task to import LKL XML data from GOK into the Typo3 database.</label>
 			<label index="scheduler.loadxml.label.pageid">Page id</label>
 			<label index="scheduler.loadxml.flashmessage.invalid_pid">The value for page id is not valid. Only positive integer allowed.</label>
 		</languageKey>

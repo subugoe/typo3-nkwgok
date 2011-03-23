@@ -33,6 +33,13 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadF
 	'description'      => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadFromOpac.description',
 );
 
+// Scheduler task for downloading LKL data from Opac
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadHistory'] = array(
+	'extension'        => $_EXTKEY,
+	'title'            => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadHistory.name',
+	'description'      => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadHistory.description',
+);
+
 // Scheduler task for importing GOK XML files into Typo3 database
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadxml'] = array(
 	'extension'        => $_EXTKEY,
