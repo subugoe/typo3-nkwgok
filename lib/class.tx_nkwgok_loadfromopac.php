@@ -35,11 +35,23 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 		$opacLKLURL = $opacBaseURL . 'CMD?ACT=SRCHA/IKT=8600/TRM=tev+not+LKL+p%3F/REC=2/PRS=XML/NORND=1';
 		$LKLDir = $baseDir . 'lkl/';
 		mkdir($LKLDir);
+		// Remove all files in the lkl folder whose names begin with a digit.
+		// (Simple heuristic to delete all the files we downloaded and keep
+		// the history file whose name begins witha letter.)
+		$fileList = glob($LKLDir . '[0-9]*');
+		foreach ($fileList as $file) {
+			unlink($file);
+		}
 		$success = $this->downloadLKLDataFromOpacToFolder($opacLKLURL, $LKLDir);
 		
 		$opacHitCountURL = $opacBaseURL . 'CMD?ACT=BRWS&SCNST=' . NKWGOKImportChunkSize . '/TRM=lkl+';
 		$hitCountDir = $baseDir . 'hitcounts/';
 		mkdir($hitCountDir);
+		// Delete all files in the hitcounts folder.
+		$fileList = glob($hitCountDir . '*');
+		foreach ($fileList as $file) {
+			unlink($file);
+		}
 		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, $hitCountDir);
 
 		return $success;
