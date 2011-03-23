@@ -27,6 +27,8 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
+		set_time_limit(300);
+
 		$opacBaseURL = 'http://opac.sub.uni-goettingen.de/DB=1/XML=1/';
 		$baseDir = PATH_site. 'fileadmin/gok/';
 
