@@ -10,10 +10,6 @@
  */
 
 
-require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok_loadfromopac.php');
-require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok_loadhistory.php');
-require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok_loadxml.php');
-
 /**
  * Class tx_nkwgok_importAll provides task procedures
  *
@@ -28,19 +24,19 @@ class tx_nkwgok_importAll extends tx_scheduler_Task {
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
-		$loadFromOpacTask = new tx_nkwgok_loadFromOpac;
+		$loadFromOpacTask = t3lib_div::makeInstance('tx_nkwgok_loadFromOpac');
 		$success = $loadFromOpacTask->execute();
 		if (!$success) {
 			t3lib_div::devLog('importALL Scheduler Task: could not load Opac data. Stopping.' , 'nkwgok', 3);
 		}
 		else {
-			$loadHistoryTask = new tx_nkwgok_loadHistory;
+			$loadHistoryTask = t3lib_div::makeInstance('tx_nkwgok_loadHistory');
 			$success = $loadHistoryTask->execute();
 			if (!$success) {
 				t3lib_div::devLog('importAll Scheduler Task: could not convert History CSV. Stopping.' , 'nkwgok', 3);
 			}
 			else {
-				$loadxmlTask = new tx_nkwgok_loadxml;
+				$loadxmlTask = t3lib_div::makeInstance('tx_nkwgok_loadxml');
 				$success = $loadxmlTask->execute();
 				if (!$success) {
 					t3lib_div::devLog('importAll Scheduler Task: could not import XML to Typo3 database.' , 'nkwgok', 3);
