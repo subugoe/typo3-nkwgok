@@ -103,7 +103,7 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 						}
 					}
 				}
-				else {
+				else if (count($fields) != 0) {
 					t3lib_div::devLog('loadHistory Scheduler Task: Line "' . implode(';', $fields) . 'contains less than 5 fields.', 'nkwgok', 3);
 				}
 			}
@@ -156,9 +156,7 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 			$subfield->appendChild($doc->createTextNode($content));
 		}
 		else {
-					t3lib_div::devLog($fieldName . '--' . $subfieldName . '-- ' . $content  , 'nkwgok', 3);
-
-
+			t3lib_div::devLog('loadHistory Scheduler Task: Some parameter was Null in appendFieldForDataTo' , 'nkwgok', 3);
 		}
 	}
 
