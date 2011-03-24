@@ -203,10 +203,10 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
 
-			t3lib_div::devLog('Loading of GOK XML completed', 'nkwgok', 1);
+			t3lib_div::devLog('loadXML Scheduler Task: Import of GOK XML to Typo3 database completed', 'nkwgok', 1);
 			$result = True;
 		} else {
-			t3lib_div::devLog('No "*.xml" files found in ' . $dir, 'nkwgok', 3);
+			t3lib_div::devLog('loadXML Scheduler Task: No "*.xml" files found in ' . $dir, 'nkwgok', 3);
 		}
 
 		return $result;
@@ -216,8 +216,8 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 	/**
 	 * Load LKL hit counts from /fileadmin/gok/hitcounts/*.xml
-	 * These files are downloaded from the Opac by the script in
-	 * nkwgok/scripts/getHitCounts.py.
+	 * These files are downloaded from the Opac by the loadFromOpac
+	 * Scheduler task.
 	 *
 	 * @author Sven-S. Porst
 	 * @return array keys: LKL entries, values: hit count for the entry
@@ -248,11 +248,11 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				}
 			}
 			else {
-				t3lib_div::devLog('could not load/parse XML from ' . $xmlPath, 'nkwgok', 3);
+				t3lib_div::devLog('loadXML Scheduler Task: could not load/parse XML from ' . $xmlPath, 'nkwgok', 3);
 			}
 		} // end foreach
 
-		t3lib_div::devLog('Loaded ' . count($hitCounts) . ' hit count entries.', 'nkwgok', 1);
+		t3lib_div::devLog('loadXML Scheduler Task: Loaded ' . count($hitCounts) . ' hit count entries.', 'nkwgok', 1);
 
 		return $hitCounts;
 	}
