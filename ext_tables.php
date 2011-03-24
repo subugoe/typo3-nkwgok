@@ -28,7 +28,7 @@ if (!defined('TYPO3_MODE')) {
 $TCA['tx_nkwgok_data'] = array(
 	'ctrl' => array(
 		'title' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data',
-		'label' => 'uid',
+		'label' => 'gok',
 		'tstamp' => 'tstamp',
 		'crdate' => 'crdate',
 		'cruser_id' => 'cruser_id',
