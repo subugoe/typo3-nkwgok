@@ -7,16 +7,31 @@
 	<data type="array">
 		<languageKey index="default" type="array">
 			<label index="scheduler.loadFromOpac.name">Load GOK Data from Opac</label>
-			<label index="scheduler.loadFromOpac.description">Scheduler task to load PicaXML records from Opac.</label>
+			<label index="scheduler.loadFromOpac.description">Load Pica-XML GOK records from Opac.</label>
 
 			<label index="scheduler.loadHistory.name">Load and convert History CSV data</label>
-			<label index="scheduler.loadHistory.description">Scheduler task to download and convert the CSV files with local classification information for History to Pica XML which can be imported to the database.</label>
+			<label index="scheduler.loadHistory.description">Downloads and converts the CSV files with local classification information for History to Pica-XML which can be imported to the database.</label>
 
 			<label index="scheduler.loadxml.name">Import GOK XML</label>
-			<label index="scheduler.loadxml.description">Scheduler task to import LKL XML data from GOK into the Typo3 database.</label>
+			<label index="scheduler.loadxml.description">Import LKL XML data for GOK-records into the Typo3 database.</label>
 
-			<label index="scheduler.importAll.name">Download convert and import LKL data</label>
-			<label index="scheduler.importAll.description">Scheduler task to download LKL Opac data as well as convert the CSV files with local classification information for History to Pica XML and them import all of them into the Typo3 database.</label>
+			<label index="scheduler.importAll.name">Download, convert and import LKL data</label>
+			<label index="scheduler.importAll.description">Downloads LKL Opac data, converts the CSV files with local classification information for History to Pica XML and them imports all of them into the Typo3 database (i.e. executes the three other nkwgok Scheduler tasks in the correct order).</label>
 		</languageKey>
+		
+		<languageKey index="de" type="array">
+			<label index="scheduler.loadFromOpac.name">GOK Daten aus Opac laden</label>
+			<label index="scheduler.loadFromOpac.description">Lädt Pica-XML Daten aus dem Opac.</label>
+			
+			<label index="scheduler.loadHistory.name">CSV Daten für Geschichte laden und konvertieren</label>
+			<label index="scheduler.loadHistory.description">Lädt und konvertiert die CSV-Datei mit GOK Informationen für Geschichte nach Pica-XML, so daß sie in die Datenbank importiert werden können.</label>
+
+			<label index="scheduler.loadxml.name">GOK XML-Daten importieren</label>
+			<label index="scheduler.loadxml.description">Importiert GOK Pica-XML-Datensätze in die Typo3-Datenbank.</label>
+
+			<label index="scheduler.importAll.name">GOK Daten laden, konvertieren und importieren</label>
+			<label index="scheduler.importAll.description">Lädt und konvertiert alle benötigten GOK Daten und importiert sie in die Typo3-Datenbank (die drei anderen nkwgok Scheduler-Tasks werden in der nötigen Reihenfolge nacheinander ausgeführt).</label>
+		</languageKey>
+		
 	</data>
 </T3locallang>
