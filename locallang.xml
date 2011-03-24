@@ -14,8 +14,9 @@
 
 			<label index="scheduler.loadxml.name">Import GOK XML</label>
 			<label index="scheduler.loadxml.description">Scheduler task to import LKL XML data from GOK into the Typo3 database.</label>
-			<label index="scheduler.loadxml.label.pageid">Page id</label>
-			<label index="scheduler.loadxml.flashmessage.invalid_pid">The value for page id is not valid. Only positive integer allowed.</label>
+
+			<label index="scheduler.importAll.name">Download convert and import LKL data</label>
+			<label index="scheduler.importAll.description">Scheduler task to download LKL Opac data as well as convert the CSV files with local classification information for History to Pica XML and them import all of them into the Typo3 database.</label>
 		</languageKey>
 	</data>
 </T3locallang>
