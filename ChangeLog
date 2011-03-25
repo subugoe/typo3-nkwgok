@@ -1,3 +1,9 @@
+2011-03-24 0.9 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* Add loading of Opac data as a scheduler job
+	* Add conversion of History CSV data as a scheduler job
+	* Add a scheduler job to perform all data fetching/conversion/import in one go
+	* improve documentation
+
 2011-03-14 0.8 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* introduce two display styles (old vs. improved) for the tree
 	* store all search queries _completely_ in the database

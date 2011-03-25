@@ -20,7 +20,7 @@
 class tx_nkwgok_importAll extends tx_scheduler_Task {
 
 	/**
-	 * Function executed from the Scheduler.
+	 * Function executed by the Scheduler.
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
