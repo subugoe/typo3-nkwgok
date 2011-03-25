@@ -76,14 +76,13 @@ korrekt darstellen. Darum wäre ein Ausführen dieses Tasks nachts sinnvoll.
 
 
 == Grundeinstellungen ==
-Wird das Plug-In im Typo3 Extension-Manager ausgewählt, gibt es drei
+Wird das Plug-In im Typo3 Extension-Manager ausgewählt, gibt es zwei
 Grundeinstellungen:
 
 # Opac Base URL with trailing /: Aus dieser URL werden die Links in den Opac
 gebaut. [Standardwert: http://opac.sub.uni-goettingen.de/DB=1/]
 # replace included CSS with path: Pfad einer eigenen CSS-Datei für die Baum-
 und Menüdarstellung [Standardwert: leer, die CSS-Datei des Plug-Ins wird genutzt)
-# Use jQuery noConflict mode: verwendet 'jQuery' statt '$' in jQuery Aufrufen.
 
 
 == Einstellungen ==

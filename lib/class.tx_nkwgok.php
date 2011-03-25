@@ -128,26 +128,6 @@ class tx_nkwgok extends tslib_pibase {
 
 
 	/**
-	 * Determine jQuery Mode
-	 * @author Nils K. Windisch
-	 * @param int $mode
-	 * @return string
-	 */
-	private function getJqueryMode($mode) {
-		$marker = null;
-
-		if ($mode === 1) {
-			$marker = 'jQuery';
-		} else {
-			$marker = '$';
-		}
-
-		return $marker;
-	}
-
-
-
-	/**
 	 * Returns DOMElement with complete markup for linking to the OPAC entry.
 	 * The link text indicates the number of results if it is known.
 	 *
@@ -344,23 +324,22 @@ class tx_nkwgok extends tslib_pibase {
 		$scriptElement->setAttribute('type', 'text/javascript');
 
 		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][NKWGOKExtKey]);
-		$jQueryMarker =  $this->getJqueryMode(intval($extConf['jQueryNoConflict']));
 
 		$js = "
 		function swapTitles (element) {
-			var jQElement = " . $jQueryMarker . "(element);
+			var jQElement = jQuery(element);
 			var otherTitle = jQElement.attr('alttitle');
 			jQElement.attr('alttitle', jQElement.attr('title'));
 			jQElement.attr('title', otherTitle);
 		}
 		function expandGOK (id) {
-			var link = " . $jQueryMarker . "('#openCloseLink-' + id);
-			var plusMinus = $('.plusMinus', link);
+			var link = jQuery('#openCloseLink-' + id);
+			var plusMinus = jQuery('.plusMinus', link);
 			swapTitles(link);
 			plusMinus.text('[*]');
 			var functionText = 'hideGOK(\"' + id + '\");return false;';
 		link[0].onclick = new Function(functionText);
-			" . $jQueryMarker . ".get("
+			jQuery.get("
 				. "'" . t3lib_div::getIndpEnv('TYPO3_SITE_URL') . "index.php',
 				{'eID': '" . NKWGOKExtKey . "', "
 				. "'tx_" . NKWGOKExtKey . "[language]': '" . $language . "', "
@@ -373,9 +352,9 @@ class tx_nkwgok extends tslib_pibase {
 			);
 		};
 		function hideGOK (id) {
-			" . $jQueryMarker . "('#ul-' + id).remove();
-			var link = " . $jQueryMarker . "('#openCloseLink-' + id);
-			$('.plusMinus', link).text('[+]');
+			jQuery('#ul-' + id).remove();
+			var link = jQuery('#openCloseLink-' + id);
+			jQuery('.plusMinus', link).text('[+]');
 			swapTitles(link);
 			var	functionText = 'expandGOK(\"' + id + '\");return false;';
 			link[0].onclick = new Function(functionText);
@@ -613,17 +592,17 @@ class tx_nkwgok extends tslib_pibase {
 				+ '&tx_" . NKWGOKExtKey . "[level]=' + level
 				+ '&tx_" . NKWGOKExtKey . "[style]=menu';
 
-			$(option.parentNode).nextAll().remove();
+			jQuery(option.parentNode).nextAll().remove();
 			var emptySelect = document.createElement('select');
 			option.form.appendChild(emptySelect);
 			var emptyOption = document.createElement('option');
 			emptySelect.appendChild(emptyOption);
 			emptyOption.appendChild(document.createTextNode('" . $this->localise('Laden ...', $language) . "'));
 			var downloadFinishedFunction = function (html) {
-				$(option.parentNode).nextAll().remove();
-				$(option.form).append(html);
+				jQuery(option.parentNode).nextAll().remove();
+				jQuery(option.form).append(html);
 			};
-			$.get(URL, parameters, downloadFinishedFunction);
+			jQuery.get(URL, parameters, downloadFinishedFunction);
 		}
 		function startSearch (option) {
 			console.log('starting search for ' + option.getAttribute('query'));

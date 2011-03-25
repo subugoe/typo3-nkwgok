@@ -3,6 +3,3 @@ opacBaseURL = http://opac.sub.uni-goettingen.de/DB=1/
 
 # cat=basic//130; type=text; label=replace included CSS with path
 CSSPath =
-
-# cat=basic//130; type=boolean; label=Use jQuery noConflict mode
-jQueryNoConflict = 1
