@@ -54,10 +54,10 @@ class tx_nkwgok_eid extends tx_nkwgok {
 		$ppn = $nkwgokArgs['expand'];
 		$display = Null;
 		if ($nkwgokArgs['style'] == 'menu') {
-			$display = $nkwgok->AJAXGOKMenuChildren($ppn, $nkwgokArgs['level'], $nkwgokArgs['language']);
+			$display = $nkwgok->AJAXGOKMenuChildren($ppn, (int)$nkwgokArgs['level'], $nkwgokArgs['language'], $nkwgokArgs['objectID']);
 		}
 		else {
-			$display = $nkwgok->AJAXGOKTreeChildren($ppn, $nkwgokArgs['style'], $nkwgokArgs['language']);
+			$display = $nkwgok->AJAXGOKTreeChildren($ppn, $nkwgokArgs['style'], $nkwgokArgs['language'], $nkwgokArgs['objectID']);
 		}
 	
 		// track action
