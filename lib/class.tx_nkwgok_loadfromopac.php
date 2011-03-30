@@ -29,7 +29,8 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 	public function execute() {
 		set_time_limit(300);
 
-		$opacBaseURL = 'http://opac.sub.uni-goettingen.de/DB=1/XML=1/';
+		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
+		$opacBaseURL = $conf['opacBaseURL'] . 'XML=1/';
 		$baseDir = PATH_site. 'fileadmin/gok/';
 
 		$opacLKLURL = $opacBaseURL . 'CMD?ACT=SRCHA/IKT=8600/TRM=tev+not+LKL+p%3F/REC=2/PRS=XML/NORND=1';
