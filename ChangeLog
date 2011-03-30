@@ -1,3 +1,7 @@
+2011-03-30 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* Add ID of containing Typo3 object to DOM IDs, so we can use several 
+		GOK-displays on the same web page
+
 2011-03-24 0.9 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Add loading of Opac data as a scheduler job
 	* Add conversion of History CSV data as a scheduler job

@@ -262,9 +262,10 @@ class tx_nkwgok extends tslib_pibase {
 	 */
 	public function GOKTree ($conf) {
 		$language = $GLOBALS['TSFE']->lang;
+		$objectID = $this->cObj->data['uid'];
 
 		$doc = DOMImplementation::createDocument();
-		$this->addGOKTreeJSToElement($doc, $doc, $conf['getVars']['style'], $language);
+		$this->addGOKTreeJSToElement($doc, $doc, $conf['getVars']['style'], $language, $objectID);
 
 		$this->addStylesheet();
 
@@ -297,7 +298,7 @@ class tx_nkwgok extends tslib_pibase {
 			$nameSpan->setAttribute('class', 'GOKName');
 			$nameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
 
-			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $language, $conf['getVars']['expand'], '', 1, $conf['getVars']['style']);
+			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $language, $objectID, $conf['getVars']['expand'], '', 1, $conf['getVars']['style']);
 		}
 
 		return $doc;
@@ -317,8 +318,9 @@ class tx_nkwgok extends tslib_pibase {
 	 * @param DOMDocument $doc the containing document
 	 * @param string $style the display style to use ('treeNew' or 'treeOld')
 	 * @param string $language ISO 369-1 language code
+	 * @param string $objectID ID of Typo3 content object
 	 */
-	private function addGOKTreeJSToElement ($element, $doc, $style, $language) {
+	private function addGOKTreeJSToElement ($element, $doc, $style, $language, $objectID) {
 		$scriptElement = $doc->createElement('script');
 		$doc->appendChild($scriptElement);
 		$scriptElement->setAttribute('type', 'text/javascript');
@@ -326,37 +328,38 @@ class tx_nkwgok extends tslib_pibase {
 		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][NKWGOKExtKey]);
 
 		$js = "
-		function swapTitles (element) {
+		function swapTitles" . $objectID . " (element) {
 			var jQElement = jQuery(element);
 			var otherTitle = jQElement.attr('alttitle');
 			jQElement.attr('alttitle', jQElement.attr('title'));
 			jQElement.attr('title', otherTitle);
 		}
-		function expandGOK (id) {
-			var link = jQuery('#openCloseLink-' + id);
+		function expandGOK" . $objectID . " (id) {
+			var link = jQuery('#openCloseLink-" . $objectID ."-' + id);
 			var plusMinus = jQuery('.plusMinus', link);
-			swapTitles(link);
+			swapTitles" . $objectID . "(link);
 			plusMinus.text('[*]');
-			var functionText = 'hideGOK(\"' + id + '\");return false;';
-		link[0].onclick = new Function(functionText);
+			var functionText = 'hideGOK" . $objectID . "(\"' + id + '\");return false;';
+			link[0].onclick = new Function(functionText);
 			jQuery.get("
 				. "'" . t3lib_div::getIndpEnv('TYPO3_SITE_URL') . "index.php',
 				{'eID': '" . NKWGOKExtKey . "', "
 				. "'tx_" . NKWGOKExtKey . "[language]': '" . $language . "', "
 				. "'tx_" . NKWGOKExtKey . "[expand]': id, "
-				. "'tx_" . NKWGOKExtKey . "[style]': '" . $style . "'},
+				. "'tx_" . NKWGOKExtKey . "[style]': '" . $style . "', "
+				. "'tx_" . NKWGOKExtKey . "[objectID]': '" . $objectID . "'},
 				function (html) {
 					plusMinus.text('[-]');
-					jQuery('#c' + id).append(html);
+					jQuery('#c" . $objectID . "-' + id).append(html);
 				}
 			);
 		};
-		function hideGOK (id) {
-			jQuery('#ul-' + id).remove();
-			var link = jQuery('#openCloseLink-' + id);
+		function hideGOK". $objectID . " (id) {
+			jQuery('#ul-" . $objectID . "-' + id).remove();
+			var link = jQuery('#openCloseLink-" . $objectID . "-' + id);
 			jQuery('.plusMinus', link).text('[+]');
-			swapTitles(link);
-			var	functionText = 'expandGOK(\"' + id + '\");return false;';
+			swapTitles" . $objectID . "(link);
+			var	functionText = 'expandGOK" . $objectID . "(\"' + id + '\");return false;';
 			link[0].onclick = new Function(functionText);
 		};
 ";
@@ -378,17 +381,18 @@ class tx_nkwgok extends tslib_pibase {
 	 * @param DOMDocument $doc document used to create the resulting element
 	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $doc)
 	 * @param string $language ISO 639-1 language code
+	 * @param string $objectID ID of Typo3 content object
 	 * @param string $expandMarker list of PPNs of open parent elements, separated by '-' [defaults to '']
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
 	 * @param string $style of the tree (treeNew or treeOld) [defaults to treeNew]
  	 * @return void
 	 * */
-	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $expandInfo, $expandMarker = '', $autoExpandLevel = 0, $style = 'treeNew') {
+	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $objectID, $expandInfo, $expandMarker = '', $autoExpandLevel = 0, $style = 'treeNew') {
 		$GOKs = $this->getChildren($parentPPN);
 		if (sizeof($GOKs) > 0) {
 			$ul = $doc->createElement('ul');
 			$container->appendChild($ul);
-			$ul->setAttribute('id', 'ul-' . $parentPPN);
+			$ul->setAttribute('id', 'ul-' . $objectID . '-' . $parentPPN);
 
 			foreach ($GOKs as $GOK) {
 				$PPN = $GOK['ppn'];
@@ -405,10 +409,10 @@ class tx_nkwgok extends tslib_pibase {
 				 */
 				$li = $doc->createElement('li');
 				$ul->appendChild($li);
-				$li->setAttribute('id', 'c' . $PPN);
+				$li->setAttribute('id', 'c' . $objectID . '-' . $PPN);
 
 				$openLink = $doc->createElement('a');
-				$openLink->setAttribute('id', 'openCloseLink-' . $PPN);
+				$openLink->setAttribute('id', 'openCloseLink-' . $objectID . '-' . $PPN);
 				$li->appendChild($openLink);
 
 				$control = $doc->createElement('span');
@@ -460,7 +464,7 @@ class tx_nkwgok extends tslib_pibase {
 					if ( ($expandInfo && in_array($PPN, $expandInfo))
 							|| $GOK['childcount'] <= $autoExpandLevel) {
 						$li->setAttribute('class', 'close');
-						$JSCommand = 'hideGOK';
+						$JSCommand = 'hideGOK' . $objectID;
 						$buttonText = '[-]';
 						$tmpTitle = $mainTitle;
 						$mainTitle = $alternativeTitle;
@@ -469,11 +473,11 @@ class tx_nkwgok extends tslib_pibase {
 								array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker, 'tx_' . NKWGOKExtKey . '[style]' => $style) );
 						
 						// recursively call self to get child UL
-						$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $expandInfo, $expand, $autoExpandLevel, $style);
+						$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $objectID, $expandInfo, $expand, $autoExpandLevel, $style);
 					}
 					else {
 						$li->setAttribute('class', 'open');
-						$JSCommand = 'expandGOK';
+						$JSCommand = 'expandGOK' . $objectID;
 						$buttonText = '[+]';
 						$linkTitle = $GOK['childcount'] . ' ' . $this->localise('Unterkategorien anzeigen', $language);
 						$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
@@ -502,12 +506,13 @@ class tx_nkwgok extends tslib_pibase {
 	 * @param string $parentPPN
 	 * @param string $style ('treeOld' or 'treeNew')
 	 * @param string $language ISO 639-1 language code
+	 * @param string $objectID ID of Typo3 content object
 	 * @return DOMDocument
 	 * */
-	public function AJAXGOKTreeChildren ($parentPPN, $style, $language) {
+	public function AJAXGOKTreeChildren ($parentPPN, $style, $language, $objectID) {
 		$doc = DOMImplementation::createDocument();
-
-		$this->appendGOKTreeChildren($parentPPN, $doc, $doc, $language, Array($parentPPN), '', 1, $style)->firstChild;
+		
+		$this->appendGOKTreeChildren($parentPPN, $doc, $doc, $language, $objectID, Array($parentPPN), '', 1, $style)->firstChild;
 
 		return $doc;
 	}
@@ -523,9 +528,10 @@ class tx_nkwgok extends tslib_pibase {
 	 */
 	public function GOKMenus ($conf) {
 		$language = $GLOBALS['TSFE']->lang;
-
+		$objectID = $this->cObj->data['uid'];
+		
 		$doc = DOMImplementation::createDocument();
-		$this->addGOKMenuJSToElement($doc, $doc, $language);
+		$this->addGOKMenuJSToElement($doc, $doc, $language, $objectID);
 
 		$this->addStylesheet();
 
@@ -546,7 +552,7 @@ class tx_nkwgok extends tslib_pibase {
 					'');
 
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
-			$this->appendGOKMenuChildren($row['ppn'], $doc, $form, $language, $conf['getVars'], 2);
+			$this->appendGOKMenuChildren($row['ppn'], $doc, $form, $language, $objectID, $conf['getVars'], 2);
 		}
 
 		$button = $doc->createElement('input');
@@ -569,28 +575,30 @@ class tx_nkwgok extends tslib_pibase {
 	 * @param DOMElement $element the <script> tag is inserted into
 	 * @param DOMDocument $doc the containing document
 	 * @param string $language ISO 369-1 language code
+	 * @param string $objectID ID of Typo3 content object
 	 */
-	private function addGOKMenuJSToElement ($element, $doc, $language) {
+	private function addGOKMenuJSToElement ($element, $doc, $language, $objectID) {
 		$scriptElement = $doc->createElement('script');
 		$element->appendChild($scriptElement);
 		$scriptElement->setAttribute('type', 'text/javascript');
 
 		$js = "
-		function GOKMenuSelectionChanged (menu) {
+		function GOKMenuSelectionChanged" . $objectID . " (menu) {
 			var selectedOption = menu.options[menu.selectedIndex];
 			if (selectedOption.hasAttribute('haschildren')) {
-				newMenuForSelection(selectedOption);
+				newMenuForSelection" . $objectID . "(selectedOption);
 			}
-			startSearch(selectedOption);
+			startSearch" . $objectID . "(selectedOption);
 		}
-		function newMenuForSelection(option) {
+		function newMenuForSelection" . $objectID . " (option) {
 			var URL = location.protocol + '//' + location.host + location.pathname;
 			var PPN = option.value;
 			var level = option.parentNode.getAttribute('level') + 1;
 			var parameters = location.search + 'tx_" . NKWGOKExtKey . "[expand]=' + PPN
 				+ '&tx_" . NKWGOKExtKey . "[language]=" . $language . "&eID=" . NKWGOKExtKey . "'
 				+ '&tx_" . NKWGOKExtKey . "[level]=' + level
-				+ '&tx_" . NKWGOKExtKey . "[style]=menu';
+				+ '&tx_" . NKWGOKExtKey . "[style]=menu'
+				+ '&tx_" . NKWGOKExtKey . "[objectID]=" . $objectID . "';
 
 			jQuery(option.parentNode).nextAll().remove();
 			var emptySelect = document.createElement('select');
@@ -604,7 +612,7 @@ class tx_nkwgok extends tslib_pibase {
 			};
 			jQuery.get(URL, parameters, downloadFinishedFunction);
 		}
-		function startSearch (option) {
+		function startSearch" . $objectID . " (option) {
 			console.log('starting search for ' + option.getAttribute('query'));
 		}
 ";
@@ -627,14 +635,14 @@ class tx_nkwgok extends tslib_pibase {
 	 * @param DOMDocument $doc document used to create the resulting element
 	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $doc). Is expected to be a <select> element if the $autoExpandStep paramter is not 0 and a <form> element otherwise.
 	 * @param string $language ISO 639-1 language code
+	 * @param string $objectID ID of Typo3 content object
 	 * @param Array $getVars entries for keys tx_nkwgok[expand-#] for an integer # are the selected items on level #
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
 	 * @param int $level the depth in the menu hierarchy [defaults to 0]
 	 * @param int $autoExpandStep the depth of auto-expansion [defaults to 0]
 	 */
-	private function appendGOKMenuChildren($parentPPN, $doc, $container, $language, $getVars, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0) {
+	private function appendGOKMenuChildren($parentPPN, $doc, $container, $language, $objectID, $getVars, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0) {
 		$GOKs = $this->getChildren($parentPPN);
-
 		if (sizeof($GOKs) > 0) {
 			if ( (sizeof($GOKs) <= $autoExpandLevel) && ($level != 0) && $autoExpandStep == 0 ) {
 				// We are auto-expanded, so throw away the elements, as they are already present in the previous menu
@@ -649,9 +657,9 @@ class tx_nkwgok extends tslib_pibase {
 				// Create the containing <select> when we’re not auto-expanding.
 				$select = $doc->createElement('select');
 				$container->appendChild($select);
-				$select->setAttribute('id', 'select-' . $parentPPN);
+				$select->setAttribute('id', 'select-' . $objectID . '-' . $parentPPN);
 				$select->setAttribute('name', 'tx_' . NKWGOKExtKey . '[expand-' . $level . ']');
-				$select->setAttribute('onchange', 'GOKMenuSelectionChanged(this);return false;');
+				$select->setAttribute('onchange', 'GOKMenuSelectionChanged' . $objectID . '(this);return false;');
 				$select->setAttribute('level', $level);
 
 				// add dummy items at the beginning of the menu
@@ -696,16 +704,15 @@ class tx_nkwgok extends tslib_pibase {
 					$option->setAttribute('hasChildren', $GOK['childcount']);
 				}
 				$option->appendChild($doc->createTextNode($menuItemString));
-
 				if ($GOK['childcount'] <= $autoExpandLevel) {
 					$option->setAttribute('isAutoExpanded', '');
-					$this->appendGOKMenuChildren($PPN, $doc, $select, $language, $getVars, $autoExpandLevel, $level, $autoExpandStep + 1);
+					$this->appendGOKMenuChildren($PPN, $doc, $select, $language, $objectID, $getVars, $autoExpandLevel, $level, $autoExpandStep + 1);
 				}
 
 				if ( $PPN == $getVars['expand-' . $level] ) {
 					// this item should be selected and the next menu should be added
 					$option->setAttribute('selected', 'selected');
-					$this->appendGOKMenuChildren($PPN, $doc, $container, $language, $getVars, $autoExpandLevel, $level + 1);
+					$this->appendGOKMenuChildren($PPN, $doc, $container, $language, $objectID, $getVars, $autoExpandLevel, $level + 1);
 					// remove the first/default item of the menu if we have a selection already
 				}
 			}
@@ -722,11 +729,12 @@ class tx_nkwgok extends tslib_pibase {
  	 * @param string $parentPPN
 	 * @param int $level the depth in the menu hierarchy [defaults to 0]
 	 * @param string $language ISO 639-1 language code
+	 * @param string $objectID ID of Typo3 content object
 	 * @return <type>
 	 */
-	public function AJAXGOKMenuChildren ($parentPPN, $level, $language) {
+	public function AJAXGOKMenuChildren ($parentPPN, $level, $language, $objectID) {
 		$doc = DOMImplementation::createDocument();
-		$this->appendGOKMenuChildren($parentPPN, $doc, $doc, $language, Array(), 2, $level);
+		$this->appendGOKMenuChildren($parentPPN, $doc, $doc, $language, $objectID, Array(), 2, $level);
 
 		return $doc;
 	}
