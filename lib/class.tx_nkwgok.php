@@ -593,7 +593,7 @@ class tx_nkwgok extends tslib_pibase {
 		function newMenuForSelection" . $objectID . " (option) {
 			var URL = location.protocol + '//' + location.host + location.pathname;
 			var PPN = option.value;
-			var level = option.parentNode.getAttribute('level') + 1;
+			var level = parseInt(option.parentNode.getAttribute('level')) + 1;
 			var parameters = location.search + 'tx_" . NKWGOKExtKey . "[expand]=' + PPN
 				+ '&tx_" . NKWGOKExtKey . "[language]=" . $language . "&eID=" . NKWGOKExtKey . "'
 				+ '&tx_" . NKWGOKExtKey . "[level]=' + level
