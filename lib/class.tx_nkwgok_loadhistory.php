@@ -91,7 +91,7 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 			$result->appendChild($set);
 
 			foreach ($lines as $line) {
-				$fields = str_getcsv($line, ';');
+				$fields = explode(';', $line);
 
 				if (count($fields) >= 5) {
 					// GOK name is in field 5, so ignore lines with less fields.
