@@ -68,10 +68,21 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 	private function processCSVFile ($csvPath) {
 		$success = False;
 		$doc = Null;
-		// ini_set('auto_detect_line_endings', TRUE);
-		$fileHandle = fopen($csvPath, 'r');
+		$csvString = file_get_contents($csvPath);
 
-		if ($fileHandle !== False) {
+		// Handle UTF-8, ISO, and Windows files. We expect the latter as the CSV is written by Excel.
+		$stringEncoding = mb_detect_encoding($csvString, Array('UTF-8', 'ISO-8859-1', 'windows-1252'));
+		if ($stringEncoding != 'UTF-8') {
+			$csvString = mb_convert_encoding($csvString, 'UTF-8', $stringEncoding);
+		}
+
+		// Deal with potential DOS-style line endings by dropping the CR.
+		preg_replace("\r", '', $csvString);
+
+		// Split the CSV lines at LF and the columns at ;.
+		// We don’t have quotation mark-type things specified or in use.
+		$lines = explode("\n", $csvString);
+		if ($lines.count < 2) {
 			// Set up XML document.
 			$doc = DOMImplementation::createDocument();
 			$result = $doc->createElement('RESULT');
@@ -79,10 +90,10 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 			$set = $doc->createElement('SET');
 			$result->appendChild($set);
 
-			while (!feof($fileHandle)) {
-				$fields = fgetcsv($fileHandle, 500, ';');
+			foreach ($lines as $line) {
+				$fields = str_getcsv($line, ';');
 
-			if (count($fields) >= 5) {
+				if (count($fields) >= 5) {
 					// GOK name is in field 5, so ignore lines with less fields.
 					$shorttitle = $doc->createElement('SHORTTITLE');
 					$set->appendChild($shorttitle);
@@ -107,7 +118,6 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 					t3lib_div::devLog('loadHistory Scheduler Task: Line "' . implode(';', $fields) . 'contains less than 5 fields.', 'nkwgok', 3);
 				}
 			}
-			fclose ($fileHandle);
 
 			// Write XML file
 			$csvPathParts = explode('/', $csvPath);
