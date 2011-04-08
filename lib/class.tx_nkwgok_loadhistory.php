@@ -77,13 +77,14 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 			$csvString = mb_convert_encoding($csvString, 'UTF-8', $stringEncoding);
 		}
 
-		// Deal with potential DOS-style line endings by dropping the CR.
-		preg_replace("\r", '', $csvString);
-
-		// Split the CSV lines at LF and the columns at ;.
-		// We don’t have quotation mark-type things specified or in use.
-		$lines = explode("\n", $csvString);
-		if ($lines.count < 2) {
+		// Put our text in a file handle, so we can use fgetcsv on it.
+		// (SLES 11 only supports PHP 5.2 and using str_getcsv requires PHP 5.3)
+		// http://php.net/manual/de/function.str-getcsv.php#100579
+		$fileHandle = fopen("php://memory", "rw");
+		if ($fileHandle) {
+			fwrite($fileHandle, $csvString);
+			fseek($fileHandle, 0);
+		
 			// Set up XML document.
 			$doc = DOMImplementation::createDocument();
 			$result = $doc->createElement('RESULT');
@@ -91,9 +92,7 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 			$set = $doc->createElement('SET');
 			$result->appendChild($set);
 
-			foreach ($lines as $line) {
-				$fields = explode(';', $line);
-
+			while (($fields = fgetcsv($fileHandle, 4096, ';', '"')) !== false) { 
 				if (count($fields) >= 5) {
 					// GOK name is in field 5, so ignore lines with less fields.
 					$shorttitle = $doc->createElement('SHORTTITLE');
@@ -132,9 +131,10 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 										
 				}	
 				else if (count($fields) != 0) {
-					t3lib_div::devLog('loadHistory Scheduler Task: Line "' . $line . 'contains less than 5 fields.', 'nkwgok', 2);
+					t3lib_div::devLog('loadHistory Scheduler Task: Line "' . implode(';', $fields) . 'contains less than 5 fields.', 'nkwgok', 2);
 				}
 			}
+			fclose($fileHandle); 
 
 			// Write XML file
 			$csvPathParts = explode('/', $csvPath);
