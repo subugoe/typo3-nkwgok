@@ -96,11 +96,11 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			foreach ($fileList as $xmlPath) {
 				$xml = simplexml_load_file($xmlPath);
 
-				foreach ($xml->SET->SHORTTITLE AS $GOKElement) {
+				foreach ($xml->xpath('/RESULT/SET/SHORTTITLE') as $GOKElement) {
 					$previousFieldName = Null;
 					$GOK = Array();
 
-					foreach ($GOKElement->record->datafield AS $field) {
+					foreach ($GOKElement->xpath('record/datafield') as $field) {
 						$fieldName = trim((string) $field->attributes());
 
 						// Only read the desired fields
@@ -112,7 +112,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							$previousFieldName = $fieldName;
 
 							// Get subfields
-							foreach ($field->subfield as $subfield) {
+							foreach ($field->xpath('subfield') as $subfield) {
 								$subfieldName = (string) $subfield['code'];
 								$subfieldContent = trim((string) $subfield);
 								if ($subfieldContent) {
@@ -137,11 +137,12 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							$parent = NKWGOKRootNode;
 						}
 
+						$search = '';
 						// Determine the search query.
 						if ($GOK['str']) {
 							// History type GOK with the complete search term in the 'str/a' field.
 							$search = $GOK['str']['a'];
-							$search = preg_replace('/lkl/', 'LKL', $search);
+							$search = str_replace('lkl', 'LKL', $search);
 						}
 						elseif ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
 							// Maths type GOK with an MSC type search term.
