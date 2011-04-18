@@ -112,7 +112,13 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 
 						if (count($fields) >6) {
 							// English GOK Name
-							$this->appendFieldForDataTo('044F', 'a', trim($fields[6]), $record, $doc);
+							$englishTitleField = $this->appendFieldForDataTo('044F', 'a', trim($fields[6]), $record, $doc);
+							if ($englishTitleField) {
+								$subfield = $doc->createElement('subfield');
+								$subfield->setAttribute('code', 'b');
+								$englishTitleField->appendChild($subfield);
+								$subfield->appendChild($doc->createTextNode('eng'));
+							}
 						}
 					}
 					
@@ -168,8 +174,11 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 	 * @param string $content text put into the subfield
 	 * @param DOMElement $container the datafield is appended to
 	 * @param DOMDocument $doc of $container
+	 * @return DOMElement|Null The datafield tha was inserted
 	 */
 	private function appendFieldForDataTo ($fieldName, $subfieldName, $content, $container, $doc) {
+		$datafield = Null;
+		
 		if ($fieldName !== Null && $subfieldName !== Null
 				&& $content !== Null && $container !== Null && $doc !== Null) {
 			$datafield = $doc->createElement('datafield');
@@ -185,6 +194,8 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 		else {
 			t3lib_div::devLog('loadHistory Scheduler Task: Some parameter was Null in appendFieldForDataTo' , 'nkwgok', 3);
 		}
+		
+		return $datafield;
 	}
 
 
