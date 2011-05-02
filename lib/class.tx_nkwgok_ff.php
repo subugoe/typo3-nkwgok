@@ -49,6 +49,13 @@ class tx_nkwgok_ff {
 
 
 
+	/**
+	 * Queries the database for all records having the $parentGOK parameter as their parent element
+	 *  and returns the query result.
+	 *
+	 * @param string $parentGOK
+	 * @return array
+	 */
 	private function queryForChildrenOf ($parentGOK) {
 		$queryResults = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 			'*',
