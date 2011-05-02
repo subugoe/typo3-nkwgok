@@ -12,7 +12,8 @@
 			<label index="styleTreeNew">Tree</label>
 			<label index="styleTreeOld">Old-fashioned Tree</label>
 			<label index="styleMenu">Menus</label>
-			
+			<label index="showGOKID">Display GOK-ID (e.g. IA 663)</label>
+
 			<label index="Bücher zu diesem Thema im Opac anzeigen">Show Books on this subject in Opac</label>
 			<label index="%d Treffer anzeigen">show %d matching books</label>
 			<label index="Treffer anzeigen">show matching books</label>
@@ -34,6 +35,7 @@
 			<label index="styleTreeNew">Baum</label>
 			<label index="styleTreeOld">unpraktischer Baum</label>
 			<label index="styleMenu">Menüs</label>
+			<label index="showGOKID">GOK-ID (z.B. IA 663) anzeigen</label>
 
 			<label index="Bücher zu diesem Thema im Opac anzeigen">Bücher zu diesem Thema im Opac anzeigen</label>
 			<label index="%d Treffer anzeigen">%d Treffer anzeigen</label>
@@ -55,6 +57,7 @@
 			<label index="styleTreeNew">Baum</label>
 			<label index="styleTreeOld">unpraktischer Baum</label>
 			<label index="styleMenu">Menüs</label>
+			<label index="showGOKID">GOK-ID (z.B. IA 663) anzeigen</label>
 
 			<label index="Bücher zu diesem Thema im Opac anzeigen">Bücher zu diesem Thema im Opac anzeigen</label>
 			<label index="%d Treffer anzeigen">%d Treffer anzeigen</label>

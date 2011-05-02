@@ -255,6 +255,7 @@ class tx_nkwgok extends tslib_pibase {
 	 *     the GOK elements displaying their child elements
 	 *   * an array element 'style' indicating the style (treeNew or treeOld)
 	 *     to be used
+	 *   * an array element 'showGOKID' indicating whether GOK IDs are shown or hidden
 	 *
 	 * @author Sven-S. Porst
 	 * @param Array $conf
@@ -286,12 +287,16 @@ class tx_nkwgok extends tslib_pibase {
 		foreach ($GOKs as $GOK) {
 			$container = $doc->createElement('div');
 			$doc->appendChild($container);
+
+			$containerClasses = Array('gokTreeContainer');
 			if ($conf['getVars']['style'] != 'treeOld') {
-				$container->setAttribute('class', 'gokTreeContainer newStyle');
+				$containerClasses[] = 'newStyle';
 			}
-			else {
-				$container->setAttribute('class', 'gokTreeContainer');
+
+			if (!$conf['getVars']['showGOKID']) {
+				$containerClasses[] = 'hideGOKID';
 			}
+			$container->setAttribute('class', implode(' ', $containerClasses));
 
 			$nameSpan = $doc->createElement('span');
 			$container->appendChild($nameSpan);

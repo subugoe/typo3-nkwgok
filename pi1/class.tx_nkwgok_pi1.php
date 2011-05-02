@@ -90,6 +90,7 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 		}
 		else {
 			$conf['getVars']['style'] = $style;
+			$conf['getVars']['showGOKID'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'showGOKID');
 			$doc = $this->GOKTree($conf);
 		}
 		

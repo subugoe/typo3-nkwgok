@@ -54,6 +54,16 @@
 						</TCEforms>
 					</style>
 
+					<showGOKID>
+						<TCEforms>
+							<label>LLL:EXT:nkwgok/pi1/locallang.xml:showGOKID</label>
+							<config>
+								<type>check</type>
+								<default>1</default>
+							</config>
+						</TCEforms>
+					</showGOKID>
+
 				</el>
 			</ROOT>
 		</sDEF>

@@ -59,6 +59,9 @@ Styles for the GOK Tree
 	font-family: monospace;
 }
 
+.gokTreeContainer.hideGOKID li .GOKID {
+	display:none;
+}
 
 
 /*
