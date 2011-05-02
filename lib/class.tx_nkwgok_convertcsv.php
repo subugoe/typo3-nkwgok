@@ -118,50 +118,57 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 			while (($fields = fgetcsv($fileHandle, 4096, ';', '"')) !== false) {
 				if (count($fields) >= 5) {
 					// GOK name is in field 5, so ignore lines with less fields.
-					$shorttitle = $doc->createElement('SHORTTITLE');
-					$set->appendChild($shorttitle);
-					$record = $doc->createElement('record');
-					$shorttitle->appendChild($record);
 					$PPN = trim($fields[0]);
-					$parentPPN = trim($fields[3]);
-					$this->appendFieldForDataTo('003@', '0', $PPN, $record, $doc);
-					$this->appendFieldForDataTo('009B', 'a', trim($fields[1]), $record, $doc);
-					$this->appendFieldForDataTo('045A', 'a', trim($fields[2]), $record, $doc);
-					$this->appendFieldForDataTo('038D', '9', $parentPPN, $record, $doc);
-					$this->appendFieldForDataTo('044E', 'a', trim($fields[4]), $record, $doc);
-					if (count($fields) > 5) {
-						// Search query
-						$this->appendFieldForDataTo('str', 'a', trim($fields[5]), $record, $doc);
 
-						if (count($fields) >6) {
-							// English GOK Name
-							$englishTitleField = $this->appendFieldForDataTo('044F', 'a', trim($fields[6]), $record, $doc);
-							if ($englishTitleField) {
-								$subfield = $doc->createElement('subfield');
-								$subfield->setAttribute('code', 'b');
-								$englishTitleField->appendChild($subfield);
-								$subfield->appendChild($doc->createTextNode('eng'));
+					if ($PPN != '') {
+						// The record is required to have a non-empty PPN.
+						$shorttitle = $doc->createElement('SHORTTITLE');
+						$set->appendChild($shorttitle);
+						$record = $doc->createElement('record');
+						$shorttitle->appendChild($record);
+						$parentPPN = trim($fields[3]);
+						$this->appendFieldForDataTo('003@', '0', $PPN, $record, $doc);
+						$this->appendFieldForDataTo('009B', 'a', trim($fields[1]), $record, $doc);
+						$this->appendFieldForDataTo('045A', 'a', trim($fields[2]), $record, $doc);
+						$this->appendFieldForDataTo('038D', '9', $parentPPN, $record, $doc);
+						$this->appendFieldForDataTo('044E', 'a', trim($fields[4]), $record, $doc);
+						if (count($fields) > 5) {
+							// Search query
+							$this->appendFieldForDataTo('str', 'a', trim($fields[5]), $record, $doc);
+
+							if (count($fields) >6) {
+								// English GOK Name
+								$englishTitleField = $this->appendFieldForDataTo('044F', 'a', trim($fields[6]), $record, $doc);
+								if ($englishTitleField) {
+									$subfield = $doc->createElement('subfield');
+									$subfield->setAttribute('code', 'b');
+									$englishTitleField->appendChild($subfield);
+									$subfield->appendChild($doc->createTextNode('eng'));
+								}
 							}
 						}
-					}
-					
-					// Warn if the parent PPN doesn’t exist yet.
-					if ($parentPPN != '' && !$PPNList[$parentPPN]) {
-						t3lib_div::devLog('loadHistory Scheduler Task: Parent PPN ' . $parentPPN . ' not defined when reading child record ' . $PPN, 'nkwgok', 2);
-					}
 
-					// Warn if there are duplicate PPNs.
-					if ($PPNList[$PPN]) {
-						t3lib_div::devLog('loadHistory Scheduler Task: Duplicate PPN ' . $PPN, 'nkwgok', 2);
+						// Warn about a few strange situations. These are not fatal, but they may be
+						// the result of a problem with the data structures.
+						if ($parentPPN != '' && !$PPNList[$parentPPN]) {
+							t3lib_div::devLog('convertCSV Scheduler Task: Parent PPN ' . $parentPPN . ' not defined when reading child record ' . $PPN . ' of file ' . $csvPath, 'nkwgok', 2);
+						}
+
+						if ($PPNList[$PPN]) {
+							t3lib_div::devLog('convertCSV Scheduler Task: Duplicate PPN ' . $PPN. ' in file ' . $csvPath, 'nkwgok', 2);
+						}
+
+						// Add current PPN to PPN list.
+						$PPNList[$PPN] = True;
 					}
-					
-					// Add current PPN to PPN list.
-					$PPNList[$PPN] = True;
-										
+					else {
+						t3lib_div::devLog('convertCSV Scheduler Task: Blank PPN  in line: "' . implode(';', $fields) .'" of file ' . $csvPath, 'nkwgok', 2);
+
+					} // if ($PPN != '')
 				}	
 				else if (count($fields) > 1) {
-					t3lib_div::devLog('loadHistory Scheduler Task: Line "' . implode(';', $fields) . 'contains less than 5 fields.', 'nkwgok', 2);
-				}
+					t3lib_div::devLog('convertCSV Scheduler Task: Line "' . implode(';', $fields) . '" of file ' . $csvPath . ' contains less than 5 fields.', 'nkwgok', 2);
+				} // (count($fields) >= 5)
 			}
 			
 			// Undo locale change required by fgetcsv() bug [see above].
