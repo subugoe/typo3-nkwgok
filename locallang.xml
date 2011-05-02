@@ -9,8 +9,8 @@
 			<label index="scheduler.loadFromOpac.name">Load GOK Data from Opac</label>
 			<label index="scheduler.loadFromOpac.description">Load Pica-XML GOK records from Opac.</label>
 
-			<label index="scheduler.loadHistory.name">Load and convert History CSV data</label>
-			<label index="scheduler.loadHistory.description">Downloads and converts the CSV files with local classification information for History to Pica-XML which can be imported to the database.</label>
+			<label index="scheduler.convertCSV.name">Convert CSV data to XML</label>
+			<label index="scheduler.convertCSV.description">Converts the CSV files with local classification information to Pica-XML which can be imported to the database.</label>
 
 			<label index="scheduler.loadxml.name">Import GOK XML</label>
 			<label index="scheduler.loadxml.description">Import LKL XML data for GOK-records into the Typo3 database.</label>
@@ -23,8 +23,8 @@
 			<label index="scheduler.loadFromOpac.name">GOK Daten aus Opac laden</label>
 			<label index="scheduler.loadFromOpac.description">Lädt Pica-XML Daten aus dem Opac.</label>
 			
-			<label index="scheduler.loadHistory.name">CSV Daten für Geschichte laden und konvertieren</label>
-			<label index="scheduler.loadHistory.description">Lädt und konvertiert die CSV-Datei mit GOK Informationen für Geschichte nach Pica-XML, so daß sie in die Datenbank importiert werden können.</label>
+			<label index="scheduler.convertCSV.name">CSV Daten zu XML konvertieren</label>
+			<label index="scheduler.convertCSV.description">Konvertiert CSV-Dateien mit GOK Informationen in Pica-XML, so daß sie in die Datenbank importiert werden können.</label>
 
 			<label index="scheduler.loadxml.name">GOK XML-Daten importieren</label>
 			<label index="scheduler.loadxml.description">Importiert GOK Pica-XML-Datensätze in die Typo3-Datenbank.</label>

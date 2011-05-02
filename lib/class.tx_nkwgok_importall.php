@@ -30,10 +30,10 @@ class tx_nkwgok_importAll extends tx_scheduler_Task {
 			t3lib_div::devLog('importALL Scheduler Task: could not load Opac data. Stopping.' , 'nkwgok', 3);
 		}
 		else {
-			$loadHistoryTask = t3lib_div::makeInstance('tx_nkwgok_loadHistory');
-			$success = $loadHistoryTask->execute();
+			$convertCSVTask = t3lib_div::makeInstance('tx_nkwgok_convertCSV');
+			$success = $convertCSVTask->execute();
 			if (!$success) {
-				t3lib_div::devLog('importAll Scheduler Task: could not convert History CSV. Stopping.' , 'nkwgok', 3);
+				t3lib_div::devLog('importAll Scheduler Task: Problem during conversion of CSV files. Stopping.' , 'nkwgok', 3);
 			}
 			else {
 				$loadxmlTask = t3lib_div::makeInstance('tx_nkwgok_loadxml');

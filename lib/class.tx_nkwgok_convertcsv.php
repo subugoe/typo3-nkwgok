@@ -1,7 +1,6 @@
 <?php
 /**
- * Typo3 Scheduler task to download and process the CSV file with
- * local classification information used for history subjects.
+ * Typo3 Scheduler task to process CSV files with subject tree information.
  *
  * The file format is described in the processCSVFile function.
  *
@@ -10,13 +9,13 @@
 
 
 /**
- * Class tx_nkwgok_loadHistory provides task procedures
+ * Class tx_nkwgok_convertCSV
  *
  * @author		Sven-S. Porst <porst@sub.uni-goettingen.de>
  * @package		TYPO3
  * @subpackage	tx_nkwgok
  */
-class tx_nkwgok_loadHistory extends tx_scheduler_Task {
+class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 	/**
 	 * Function executed from the Scheduler.
@@ -177,15 +176,15 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 			$XMLFileName = $originalFileNameParts[0] . '.xml';
 			$resultPath = PATH_site. 'fileadmin/gok/xml/' . $XMLFileName ;
 			if ($doc->save($resultPath) === False) {
-				t3lib_div::devLog('loadHistory Scheduler Task: Failed to write XML file' . $resultPath , 'nkwgok', 3);
+				t3lib_div::devLog('convertCSV Scheduler Task: Failed to write XML file' . $resultPath , 'nkwgok', 3);
 			}
 			else {
-				t3lib_div::devLog('loadHistory Scheduler Task: Successfully wrote XML file ' . $resultPath , 'nkwgok', 1);
+				t3lib_div::devLog('convertCSV Scheduler Task: Successfully wrote XML file ' . $resultPath , 'nkwgok', 1);
 				$success = True;
 			}
 		}
 		else {
-			t3lib_div::devLog('loadHistory Scheduler Task: Could not open file ' . $csvPath , 'nkwgok', 3);
+			t3lib_div::devLog('convertCSV Scheduler Task: Could not open file ' . $csvPath , 'nkwgok', 3);
 		}
 
 		return $success;
@@ -220,7 +219,7 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 			$subfield->appendChild($doc->createTextNode($content));
 		}
 		else {
-			t3lib_div::devLog('loadHistory Scheduler Task: Some parameter was Null in appendFieldForDataTo' , 'nkwgok', 3);
+			t3lib_div::devLog('convertCSV Scheduler Task: Some parameter was Null in appendFieldForDataTo' , 'nkwgok', 3);
 		}
 		
 		return $datafield;
@@ -232,7 +231,7 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 
 
 if (defined('TYPO3_MODE')
-		&& $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_loadhistory.php']) {
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_loadhistory.php']);
+		&& $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_convertcsv.php']) {
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_convertcsv.php']);
 }
 ?>
