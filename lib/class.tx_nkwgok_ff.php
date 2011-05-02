@@ -27,20 +27,39 @@
  */
 class tx_nkwgok_ff {
 	function addFields($config) {
-		$res0 = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-			'*', 
-			'tx_nkwgok_data', 
-			"parent = 'Root'",
-			'', 
-			'gok ASC', 
-			'');
-		$optionList = array();
-		$optionList[0] = array(0 => 'All', 1 => 'XXX');
-		while($row0 = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res0)) {
-			$optionList[] = array(0 => '(' . $row0['gok'] . ') ' . $row0['descr'] , 1 => $row0['gok']);
+		$rootNodes = $this->queryForChildrenOf('Root');
+
+		$options = array();
+		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($rootNodes)) {
+			$optionTitle = '[' . $row['gok'] . '] ' . $row['descr'];
+			$optionValue = $row['gok'];
+			$options[] = array($optionTitle , $optionValue);
+
+			$childNodes = $this->queryForChildrenOf($optionValue);
+			while($childRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($childNodes)) {
+				$childOptionTitle = '—[' . $childRow['gok'] . '] ' . $childRow['descr'];
+				$childOptionValue = $childRow['gok'];
+				$options[] = array($childOptionTitle , $childOptionValue);
+			}
 		}
-		$config['items'] = array_merge($config['items'], $optionList);
+
+		$config['items'] = array_merge($config['items'], $options);
 		return $config;
 	}
+
+
+
+	private function queryForChildrenOf ($parentGOK) {
+		$queryResults = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+			'*',
+			'tx_nkwgok_data',
+			"parent = '" . $parentGOK . "'",
+			'',
+			'gok ASC',
+			'');
+
+		return $queryResults;
+	}
+
 }
 ?>
