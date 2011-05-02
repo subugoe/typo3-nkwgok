@@ -175,7 +175,7 @@ class tx_nkwgok_loadHistory extends tx_scheduler_Task {
 			$originalFileName = $csvPathParts[count($csvPathParts) - 1];
 			$originalFileNameParts = explode('.', $originalFileName);
 			$XMLFileName = $originalFileNameParts[0] . '.xml';
-			$resultPath = PATH_site. 'fileadmin/gok/lkl/' . $XMLFileName ;
+			$resultPath = PATH_site. 'fileadmin/gok/xml/' . $XMLFileName ;
 			if ($doc->save($resultPath) === False) {
 				t3lib_div::devLog('loadHistory Scheduler Task: Failed to write XML file' . $resultPath , 'nkwgok', 3);
 			}
