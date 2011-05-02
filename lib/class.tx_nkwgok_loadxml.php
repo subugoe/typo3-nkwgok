@@ -60,7 +60,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 		$hitCounts = $this->getHitCounts();
 
-		$wantedFieldNames = array('045A', '044E', '044F', '009B', '038D', '003@', '045G', 'str');
+		$wantedFieldNames = array('045A', '044E', '044F', '009B', '038D', '003@', '045G', 'str', 'tags');
 		$dir = PATH_site . 'fileadmin/gok/xml/';
 		$fileList = glob($dir . '*.xml');
 
@@ -181,7 +181,8 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							'crdate' => time(),
 							'tstamp' => time(),
 							'search' => $search,
-							'childcount' => $childCount
+							'childcount' => $childCount,
+							'tags' => $GOK['tags']['a']
 						);
 
 						if ($GOK['044F']['b'] == 'eng' && $GOK['044F']['a']) {
