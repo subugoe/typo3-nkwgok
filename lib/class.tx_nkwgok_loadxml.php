@@ -141,9 +141,9 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						}
 
 						$parent = trim($GOK['038D'][9]);
-	
+
 						$search = '';
-						if ($GOK['str']) {
+						if ($GOK['str']['a']) {
 							// GOK coming from CSV file with the complete search term in the 'str/a' field.
 							$search = $GOK['str']['a'];
 							$search = str_replace('lkl', 'LKL', $search);
@@ -157,7 +157,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 								// Maths type GOK with an MSC type search term.
 								$search = 'MSC ' . $GOK['045G']['a'];
 							}
-							else {
+							else if ($GOK['045A']['a']) {
 								// Generic GOK search, using the LKL field.
 								$search = 'LKL ' . $GOK['045A']['a'];
 							}
