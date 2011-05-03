@@ -1,3 +1,11 @@
+2011-05-02 0.9.5 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* rename 'Convert history' scheduler task to 'Convert CSV'
+	* store XML files in 'xml' subfolder of fileadmin/gok instead of 'lkl' subfolder
+	* change data tree, so we can have other trees besides the main GOK tree (e.g. for
+		special Neuerwerbungen or Guide subject lists
+	* add backend configuration for hiding GOK-IDs in tree view
+	* add 'tags' field from column 8 in CSV files
+
 2011-03-30 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Add ID of containing Typo3 object to DOM IDs, so we can use several 
 		GOK-displays on the same web page
