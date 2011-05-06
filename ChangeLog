@@ -1,3 +1,7 @@
+2011-05-05 0.9.6 Sven-S. Porst <porst@sub.uni-goettigen.de>
+	* Change the query format in the search column of the data table from
+		URL-escaped Pica Opac queries to non-escaped CCL-queries
+
 2011-05-02 0.9.5 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* rename 'Convert history' scheduler task to 'Convert CSV'
 	* store XML files in 'xml' subfolder of fileadmin/gok instead of 'lkl' subfolder
