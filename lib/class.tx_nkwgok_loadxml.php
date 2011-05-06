@@ -123,7 +123,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							foreach ($field->xpath('subfield') as $subfield) {
 								$subfieldName = (string) $subfield['code'];
 								$subfieldContent = trim((string) $subfield);
-								if ($subfieldContent) {
+								if ($subfieldContent !== Null) {
 									$GOK[$fieldName][$subfieldName] = $subfieldContent;
 								}
 							}
@@ -143,10 +143,9 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						$parent = trim($GOK['038D'][9]);
 
 						$search = '';
-						if ($GOK['str']['a']) {
-							// GOK coming from CSV file with the complete search term in the 'str/a' field.
+						if ($GOK['str']['a'] !== Null) {
+							// GOK coming from CSV file with a CCL search query in the 'str/a' field.
 							$search = $GOK['str']['a'];
-							$search = str_replace('lkl', 'LKL', $search);
 							if ($parent == '') {
 								$parent = NKWGOKRootNode;
 							}
@@ -155,11 +154,11 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							// GOK coming from standard Opac record.
 							if ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
 								// Maths type GOK with an MSC type search term.
-								$search = 'MSC ' . $GOK['045G']['a'];
+								$search = 'MSC=' . $GOK['045G']['a'];
 							}
 							else if ($GOK['045A']['a']) {
 								// Generic GOK search, using the LKL field.
-								$search = 'LKL ' . $GOK['045A']['a'];
+								$search = 'LKL=' . $GOK['045A']['a'];
 							}
 							
 							// Set parent element to GOK-Root if it, i.e. '038D/9', is blank.
@@ -169,7 +168,6 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						}
 
 						$search = trim($search);
-						$search = urlencode($search);
 
 						$GOKString = trim($GOK['045A']['a']);
 						$values = array(

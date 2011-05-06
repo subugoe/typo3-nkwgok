@@ -140,9 +140,10 @@ class tx_nkwgok extends tslib_pibase {
 	private function OPACLinkElement ($GOKData, $doc, $language) {
 		$opacLink = Null;
 		$hitCount = $GOKData['hitcount'];
-		if ($hitCount != 0 ) {
+		$URL = $this->opacGOKSearchURL($GOKData, $language);
+		if ($hitCount != 0 && $URL) {
 			$opacLink = $doc->createElement('a');
-			$opacLink->setAttribute('href', $this->opacGOKSearchURL($GOKData, $language));
+			$opacLink->setAttribute('href', $URL);
 			$opacLink->setAttribute('title', $this->localise('Bücher zu diesem Thema im Opac anzeigen', $language) );
 			// Question: Is '_blank' a good idea?
 			$opacLink->setAttribute('target', '_blank');
@@ -175,8 +176,9 @@ class tx_nkwgok extends tslib_pibase {
 	private function OPACLinkElementUgly ($GOKData, $doc, $language) {
 		$opacLink = $doc->createElement('a');
 		$hitCount = $GOKData['hitcount'];
-		if ($hitCount != 0 ) {
-			$opacLink->setAttribute('href', $this->opacGOKSearchURL($GOKData, $language));
+		$URL = $this->opacGOKSearchURL($GOKData, $language);
+		if ($hitCount != 0 && $URL) {
+			$opacLink->setAttribute('href', $URL);
 
 			if ($hitCount > 0) {
 				// we know the number of results: display it
@@ -198,25 +200,32 @@ class tx_nkwgok extends tslib_pibase {
 	
 	
 	/**
-	 * Returns URL pointing to an Opac search for the given GOK for the
-	 * current language.
+	 * Returns URL string pointing to an Opac search in the current language
+	 * for the given GOK record or Null if there is no search query.
 	 *
 	 * @author Sven-S. Porst
 	 * @param Array $GOKData GOK record
 	 * @param string $language ISO 639-1 language code
-	 * @return string URL
+	 * @return string|Null URL
 	 */
 	private function opacGOKSearchURL($GOKData, $language) {
-		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
+		$GOKSearchURL = Null;
 
-		$picaLanguageCode = 'DU';
-		if ($language == 'en') {
-			$picaLanguageCode = 'EN';
+		if ($GOKData['search']) {
+			// Convert CCL string to Opac-style search string and escape.
+			$searchString = urlencode(str_replace('=', ' ', $GOKData['search']));
+
+			$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
+
+			$picaLanguageCode = 'DU';
+			if ($language == 'en') {
+				$picaLanguageCode = 'EN';
+			}
+
+			$GOKSearchURL = $conf['opacBaseURL'] . 'LNG=' . $picaLanguageCode
+				. '/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=' . $searchString;
 		}
-
-		$GOKSearchURL = $conf['opacBaseURL'] . 'LNG=' . $picaLanguageCode 
-			. '/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=' . $GOKData['search'];
-
+		
 		return $GOKSearchURL;
 	}
 
@@ -543,7 +552,7 @@ class tx_nkwgok extends tslib_pibase {
 		// Create the form and insert the first menu.
 		$form = $doc->createElement('form');
 		$doc->appendChild($form);
-		$form->setAttribute('class', 'gokMenuForm');
+		$form->setAttribute('class', 'gokMenuForm no-JS');
 		$form->setAttribute('method', 'get');
 		$form->setAttribute('action', t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'));
 		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok'], NKWGOKQueryTable);
@@ -579,7 +588,7 @@ class tx_nkwgok extends tslib_pibase {
 	 * @author Sven-S. Porst
 	 * @param DOMElement $element the <script> tag is inserted into
 	 * @param DOMDocument $doc the containing document
-	 * @param string $language ISO 369-1 language code
+	 * @param string $language ISO 639-1 language code
 	 * @param string $objectID ID of Typo3 content object
 	 */
 	private function addGOKMenuJSToElement ($element, $doc, $language, $objectID) {
@@ -588,6 +597,10 @@ class tx_nkwgok extends tslib_pibase {
 		$scriptElement->setAttribute('type', 'text/javascript');
 
 		$js = "
+		jQuery(document).ready(function() {
+			jQuery('.gokMenuForm input[type=\'submit\']').hide();
+		});
+		
 		function GOKMenuSelectionChanged" . $objectID . " (menu) {
 			var selectedOption = menu.options[menu.selectedIndex];
 			if (selectedOption.hasAttribute('haschildren')) {
@@ -618,7 +631,7 @@ class tx_nkwgok extends tslib_pibase {
 			jQuery.get(URL, parameters, downloadFinishedFunction);
 		}
 		function startSearch" . $objectID . " (option) {
-			console.log('starting search for ' + option.getAttribute('query'));
+			nkwgokMenuSelected(option);
 		}
 ";
 		$scriptElement->appendChild($doc->createTextNode($js));
@@ -725,7 +738,7 @@ class tx_nkwgok extends tslib_pibase {
 	}
 
 
-
+	
 	/**
 	 * Create DOMDocument for AJAX return value and fill it with markup for the
 	 * $parentPPN, $level and $language given.

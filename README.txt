@@ -66,7 +66,11 @@ Jede Zeile muß mindestens 5 Spalten enthalten:
 3. GOK (045A $a)
 4. PPN der Eltern-GOK (038D $9)
 5. deutscher Name der GOK (044E $a)
-6. Opac Suchabfrage für diesen Eintrag [möglicherweise leer/nicht vorhanden]
+6. CCL Suchabfrage für diesen Eintrag [möglicherweise leer/nicht vorhanden]
+	Stücke dieser Suchabfragen haben die Form Suchschlüssel=Begriff*. Sie können
+	geklammert und mit 'and' bzw. 'or' verbunden werden. Es ist wichtig, für die
+	Suchschlüssel dieselbe Groß- und Kleinschreibung wie in den pazpar2 Einstellungen
+	zu verwenden (unsere Konvention: Kleinbuchstaben).
 7. englischer Name der GOK (044F $a) [möglicherweise leer/nicht vorhanden]
 8. komma-separierte Liste von Tags zur beliebigen Nutzung
 
