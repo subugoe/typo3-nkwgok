@@ -27,7 +27,7 @@ if (!defined ('TYPO3_MODE')) {
 $TCA['tx_nkwgok_data'] = array(
 	'ctrl' => $TCA['tx_nkwgok_data']['ctrl'], 
 	'interface' => array(
-		'showRecordFieldList' => 'gok,search,ppn,descr,descr_en,parent,hierarchy,hitcount'
+		'showRecordFieldList' => 'gok,search,ppn,descr,descr_en,parent,hierarchy,hitcount,tags'
 	),
 	'feInterface' => $TCA['tx_nkwgok_data']['feInterface'],
 	'columns' => array(
@@ -133,9 +133,18 @@ $TCA['tx_nkwgok_data'] = array(
 				'default' => 0
 			)
 		),
+		'tags' => array(
+			'exclude' => 0, 
+			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.tags', 
+			'config' => array(
+				'type' => 'text', 
+				'cols' => '30', 
+				'rows' => '5'
+			)
+		),
 	),
 	'types' => array(
-		'0' => array('showitem' => 'gok;;;;1-1-1, search, ppn, descr, descr_en, parent, hierarchy, hitcount')
+		'0' => array('showitem' => 'gok;;;;1-1-1, search, ppn, descr, descr_en, parent, hierarchy, hitcount, tags')
 	),
 	'palettes' => array(
 		'1' => array('showitem' => '')
