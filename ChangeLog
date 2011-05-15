@@ -1,3 +1,6 @@
+2011-05-15 0.9.7 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
+	* Added TCA definition for the new Tag field
+
 2011-05-05 0.9.6 Sven-S. Porst <porst@sub.uni-goettigen.de>
 	* Change the query format in the search column of the data table from
 		URL-escaped Pica Opac queries to non-escaped CCL-queries
