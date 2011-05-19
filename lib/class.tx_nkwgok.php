@@ -25,7 +25,7 @@
 
 define('NKWGOKExtKey', 'nkwgok');
 define('NKWGOKQueryTable', 'tx_nkwgok_data');
-define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, childcount, hitcount');
+define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, childcount, hitcount, fromopac');
 
 /**
  * undocumented class
@@ -702,8 +702,8 @@ class tx_nkwgok extends tslib_pibase {
 					 * hierarchy and one searching for records matching exactly the subject selected.
 					 * The latter case is only expected to happen for subjects coming from Opac GOK
 					 * records.
-					 */					
-					if ($GOKs[0]['fromOpac']) {
+					 */
+					if ($GOKs[0]['fromopac']) {
 						$option = $doc->createElement('option');
 						$select->appendChild($option);
 						$option->appendChild($doc->createTextNode($this->localise('Treffer für diese Zwischenebene zeigen', $language) ));
