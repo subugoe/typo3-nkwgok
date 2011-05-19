@@ -8,26 +8,26 @@ Stylesheet for GOK tree used in nkwgok Typo3 plug-in.
 /*
 Styles for the GOK Tree
 */
-.gokTreeContainer a {
+.gokContainer.tree a {
 	text-decoration: none;
 	border: 0px none;
 	position: relative;
 }
 
-.gokTreeContainer ul {
+.gokContainer.tree ul {
 	list-style-type: none;
 	padding-left: 0em;
 }
 
-.gokTreeContainer ul ul {
+.gokContainer.tree ul ul {
 	margin: 0em 0em 0em 1em;
 }
 
-.gokTreeContainer a:link:hover {
+.gokContainer.tree a:link:hover {
 	text-decoration: underline;
 }
 
-.gokTreeContainer.newStyle a .GOKID {
+.gokContainer.tree.newStyle a .GOKID {
 	display:block;
 	float:left;
 	width: 6em;
@@ -36,30 +36,30 @@ Styles for the GOK Tree
 	padding-right:0.2em;
 }
 
-.gokTreeContainer.newStyle .GOKName {
+.gokContainer.tree.newStyle .GOKName {
 	font-weight: bold;
 }
 
-.gokTreeContainer.newStyle .opacLink {
+.gokContainer.tree.newStyle .opacLink {
 	font-size: 71%;
 	font-style: italic;
 	color: #999;
 }
 
-.gokTreeContainer.newStyle .opacLink:link:after {
+.gokContainer.tree.newStyle .opacLink:link:after {
 	content: "\002192";
 	padding-left: 0.2em;
 }
 
-.gokTreeContainer.newStyle .opacLink:hover {
+.gokContainer.tree.newStyle .opacLink:hover {
 	color: #333;
 }
 
-.gokTreeContainer .plusMinus, .gokTreeContainer .GOKID {
+.gokContainer.tree .plusMinus, .gokTreeContainer .GOKID {
 	font-family: monospace;
 }
 
-.gokTreeContainer.hideGOKID li .GOKID {
+.gokContainer.tree.hideGOKID li .GOKID {
 	display:none;
 }
 

@@ -297,7 +297,7 @@ class tx_nkwgok extends tslib_pibase {
 			$container = $doc->createElement('div');
 			$doc->appendChild($container);
 
-			$containerClasses = Array('gokTreeContainer');
+			$containerClasses = Array('gokContainer', 'tree');
 			if ($conf['getVars']['style'] != 'treeOld') {
 				$containerClasses[] = 'newStyle';
 			}
@@ -550,8 +550,11 @@ class tx_nkwgok extends tslib_pibase {
 		$this->addStylesheet();
 
 		// Create the form and insert the first menu.
+		$container = $doc->createElement('div');
+		$doc->appendChild($container);
+		$container->setAttribute('class', 'gokContainer menu');
 		$form = $doc->createElement('form');
-		$doc->appendChild($form);
+		$container->appendChild($form);
 		$form->setAttribute('class', 'gokMenuForm no-JS');
 		$form->setAttribute('method', 'get');
 		$form->setAttribute('action', t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'));
