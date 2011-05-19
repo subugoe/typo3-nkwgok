@@ -16,7 +16,7 @@
 			<label index="tx_nkwgok_data.parent">PPN of parent element</label>
 			<label index="tx_nkwgok_data.hierarchy">GOK hierarchy Level</label>
 			<label index="tx_nkwgok_data.tags">Tags</label>
-			<label index="tx_nkwgok_data.fromOpac">from Opac</label>
+			<label index="tx_nkwgok_data.fromopac">from Opac</label>
 			<label index="tt_content.list_type_pi1">GOK</label>
 			<label index="flexform.gok">GOK</label>
 			<label index="flexform.url">URL</label>
@@ -32,7 +32,7 @@
 			<label index="tx_nkwgok_data.parent">PPN des Elternelements</label>
 			<label index="tx_nkwgok_data.hierarchy">Stufe in der GOK Hierarchie</label>
 			<label index="tx_nkwgok_data.tags">Tags</label>
-			<label index="tx_nkwgok_data.fromOpac">aus dem Opac</label>
+			<label index="tx_nkwgok_data.fromopac">aus dem Opac</label>
 			<label index="tt_content.list_type_pi1">GOK</label>
 			<label index="flexform.gok">GOK</label>
 			<label index="flexform.url">URL</label>

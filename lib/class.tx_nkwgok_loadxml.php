@@ -183,7 +183,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							'search' => $search,
 							'childcount' => $childCount,
 							'tags' => $GOK['tags']['a'],
-							'fromOpac' => $fromOpac
+							'fromopac' => $fromOpac
 						);
 
 						if ($GOK['044F']['b'] == 'eng' && $GOK['044F']['a']) {
@@ -219,7 +219,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				'crdate' => time(),
 				'tstamp' => time(),
 				'childcount' => count($parentPPNs[NKWGOKGOKRootNode]),
-				'fromOpac' => True
+				'fromopac' => True
 			);
 
 			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);

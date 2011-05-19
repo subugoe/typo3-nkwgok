@@ -13,7 +13,7 @@ CREATE TABLE tx_nkwgok_data (
 	descr text,
 	descr_en text,
 	tags text,
-	fromOpac BOOL,
+	fromopac BOOL,
 	parent varchar(255) DEFAULT '' NOT NULL,
 	hierarchy int(11) DEFAULT '0' NOT NULL,
 	childcount int(11) DEFAULT '0' NOT NULL,

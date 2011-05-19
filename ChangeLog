@@ -1,5 +1,5 @@
 2011-05-19 0.9.8 Sven-S. Porst <porst@sub.uni-goettingen.de>
-	* add field fromOpac to database to reliably spot records originating
+	* add field fromopac to database to reliably spot records originating
 		from the Opac
 	* use lowercase 'lkl' search key instead of 'LKL' for Opac GOK records
 
