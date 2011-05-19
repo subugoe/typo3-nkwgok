@@ -606,7 +606,10 @@ class tx_nkwgok extends tslib_pibase {
 		
 		function GOKMenuSelectionChanged" . $objectID . " (menu) {
 			var selectedOption = menu.options[menu.selectedIndex];
-			if (selectedOption.hasAttribute('haschildren')) {
+			if (selectedOption.value == 'withchildren') {
+				jQuery(menu).nextAll().remove();
+			}
+			else if (selectedOption.hasAttribute('haschildren')) {
 				newMenuForSelection" . $objectID . "(selectedOption);
 			}
 			startSearch" . $objectID . "(selectedOption);
@@ -629,12 +632,15 @@ class tx_nkwgok extends tslib_pibase {
 			emptyOption.appendChild(document.createTextNode('" . $this->localise('Laden ...', $language) . "'));
 			var downloadFinishedFunction = function (html) {
 				jQuery(option.parentNode).nextAll().remove();
-				jQuery(option.form).append(html);
+				var form =  jQuery(option.form);
+				form.append(html);
+				jQuery('select:last-child option:first-child', form)[0].setAttribute('query', option.getAttribute('query'));
 			};
 			jQuery.get(URL, parameters, downloadFinishedFunction);
 		}
 		function startSearch" . $objectID . " (option) {
 			nkwgokMenuSelected(option);
+			console.log(option.getAttribute('query'));
 		}
 ";
 		$scriptElement->appendChild($doc->createTextNode($js));
