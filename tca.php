@@ -142,9 +142,16 @@ $TCA['tx_nkwgok_data'] = array(
 				'rows' => '5'
 			)
 		),
+		'fromOpac' => array(
+			'exclude' => 0,
+			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.fromOpac',
+			'config' => array(
+				'type' => 'check',
+			)
+		),
 	),
 	'types' => array(
-		'0' => array('showitem' => 'gok;;;;1-1-1, search, ppn, descr, descr_en, parent, hierarchy, hitcount, tags')
+		'0' => array('showitem' => 'gok;;;;1-1-1, search, ppn, descr, descr_en, parent, hierarchy, hitcount, tags, fromOpac')
 	),
 	'palettes' => array(
 		'1' => array('showitem' => '')

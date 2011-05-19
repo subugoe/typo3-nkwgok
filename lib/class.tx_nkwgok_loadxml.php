@@ -143,6 +143,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						$parent = trim($GOK['038D'][9]);
 
 						$search = '';
+						$fromOpac = False;
 						if ($GOK['str']['a'] !== Null) {
 							// GOK coming from CSV file with a CCL search query in the 'str/a' field.
 							$search = $GOK['str']['a'];
@@ -152,6 +153,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						}
 						else {
 							// GOK coming from standard Opac record.
+							$fromOpac = True;
 							if ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
 								// Maths type GOK with an MSC type search term.
 								$search = 'MSC=' . $GOK['045G']['a'];
@@ -180,7 +182,8 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							'tstamp' => time(),
 							'search' => $search,
 							'childcount' => $childCount,
-							'tags' => $GOK['tags']['a']
+							'tags' => $GOK['tags']['a'],
+							'fromOpac' => $fromOpac
 						);
 
 						if ($GOK['044F']['b'] == 'eng' && $GOK['044F']['a']) {
@@ -215,7 +218,8 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				'gok' => NKWGOKGOKRootNode,
 				'crdate' => time(),
 				'tstamp' => time(),
-				'childcount' => count($parentPPNs[NKWGOKGOKRootNode])
+				'childcount' => count($parentPPNs[NKWGOKGOKRootNode]),
+				'fromOpac' => True
 			);
 
 			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);

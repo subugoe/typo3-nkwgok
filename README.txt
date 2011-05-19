@@ -13,7 +13,8 @@ Das Plug-In kann aus zwei Quellen GOK Normdaten importieren:
 Hierfür gibt es verschiedene Typo3 Scheduler Tasks, die die notwendigen
 Schritte durchführen.
 
-Von den Tasks entdeckte Fehler werden im Typo3 Developer Log abgelegt.
+Beim Ausführen der Tasks aufgetretene Fehler werden in das Typo3 Developer
+Log geschrieben.
 
 
 === GOK Daten laden, konvertieren und importieren ===

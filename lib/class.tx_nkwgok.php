@@ -688,10 +688,18 @@ class tx_nkwgok extends tslib_pibase {
 					$option->setAttribute('value', '');
 				}
 				else {
-					$option = $doc->createElement('option');
-					$select->appendChild($option);
-					$option->appendChild($doc->createTextNode($this->localise('Treffer für diese Zwischenebene zeigen', $language) ));
-					$option->setAttribute('value', 'this');
+					/* Add general menu item(s).
+					 * A menu item searching for all subjects beneath the selected one in the 
+					 * hierarchy and one searching for records matching exactly the subject selected.
+					 * The latter case is only expected to happen for subjects coming from Opac GOK
+					 * records.
+					 */					
+					if ($GOKs[0]['fromOpac']) {
+						$option = $doc->createElement('option');
+						$select->appendChild($option);
+						$option->appendChild($doc->createTextNode($this->localise('Treffer für diese Zwischenebene zeigen', $language) ));
+						$option->setAttribute('value', 'this');
+					}
 
 					$option = $doc->createElement('option');
 					$select->appendChild($option);
