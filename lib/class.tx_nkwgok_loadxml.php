@@ -160,7 +160,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							}
 							else if ($GOK['045A']['a']) {
 								// Generic GOK search, using the LKL field.
-								$search = 'LKL=' . $GOK['045A']['a'];
+								$search = 'lkl=' . $GOK['045A']['a'];
 							}
 							
 							// Set parent element to GOK-Root if it, i.e. '038D/9', is blank.

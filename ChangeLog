@@ -1,6 +1,7 @@
 2011-05-19 0.9.8 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* add field fromOpac to database to reliably spot records originating
 		from the Opac
+	* use lowercase 'lkl' search key instead of 'LKL' for Opac GOK records
 
 2011-05-15 0.9.7 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
 	* Added TCA definition for the new Tag field
