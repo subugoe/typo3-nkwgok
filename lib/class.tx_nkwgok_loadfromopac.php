@@ -31,29 +31,32 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 
 		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
 		$opacBaseURL = $conf['opacBaseURL'] . 'XML=1/';
-		$baseDir = PATH_site. 'fileadmin/gok/';
+		$baseDir = PATH_site . 'fileadmin/gok/';
 
 		$opacLKLURL = $opacBaseURL . 'CMD?ACT=SRCHA/IKT=8600/TRM=tev+not+LKL+p%3F/REC=2/PRS=XML/NORND=1';
-		$LKLDir = $baseDir . 'xml/';
-		mkdir($LKLDir);
+		t3lib_div::mkdir_deep(PATH_site, 'fileadmin/gok/xml');
+		
 		// Remove all files in the lkl folder whose names begin with a digit.
 		// (Simple heuristic to delete all the files we downloaded and keep
-		// the history file whose name begins witha letter.)
+		// the CSV files whose names begin with a letter.)
+		$LKLDir = $baseDir . 'xml/';
 		$fileList = glob($LKLDir . '[0-9]*');
 		foreach ($fileList as $file) {
 			unlink($file);
 		}
 		$success = $this->downloadLKLDataFromOpacToFolder($opacLKLURL, $LKLDir);
 		
-		$opacHitCountURL = $opacBaseURL . 'CMD?ACT=BRWS&SCNST=' . NKWGOKImportChunkSize . '/TRM=lkl+';
-		$hitCountDir = $baseDir . 'hitcounts/';
-		mkdir($hitCountDir);
+		t3lib_div::mkdir(PATH_site, 'fileadmin/gok/hitcounts');
 		// Delete all files in the hitcounts folder.
+		$hitCountDir = $baseDir . 'hitcounts/';
 		$fileList = glob($hitCountDir . '*');
 		foreach ($fileList as $file) {
 			unlink($file);
 		}
-		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, $hitCountDir);
+
+		$opacHitCountURL = $opacBaseURL . 'CMD?ACT=BRWS&SCNST=' . NKWGOKImportChunkSize;
+		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, 'lkl', $hitCountDir);
+		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, 'msc', $hitCountDir);
 
 		return $success;
 	}
@@ -106,24 +109,25 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 
 
 	/**
-	 * Downloads hit counts for all LKL index entries by browsing the index.
+	 * Downloads hit counts for all entries of the $indexName index by browsing.
 	 * Stores the resulting XML files into the hitcounts folder.
 	 *
-	 * @param string $opacBaseURL
+	 * @param string $opacScanURL
+	 * @param string $indexName
 	 * @param string $folderPath
 	 * @return boolean success status of the download
 	 */
-	private function downloadHitCountsFromOpacToFolder($opacBaseURL, $folderPath) {
+	private function downloadHitCountsFromOpacToFolder($opacScanURL, $indexName, $folderPath) {
 		$success = True;
 		$scanNext = 'a'; // begin scanning the index at LKL a
 		$index = 0;
 
 		while ($scanNext && $success) {
 			$index++;
-			$URL = $opacBaseURL . $scanNext;
+			$URL = $opacScanURL . '/TRM=' . $indexName . '+' . $scanNext;
 			$opacDownload = file_get_contents($URL);
 			if ($opacDownload) {
-				$targetFilePath = $folderPath . $index . '.xml';
+				$targetFilePath = $folderPath . $indexName . '-' . $index . '.xml';
 				$targetFile = fopen($targetFilePath, 'w');
 				if ($targetFile) {
 					fwrite($targetFile, $opacDownload);

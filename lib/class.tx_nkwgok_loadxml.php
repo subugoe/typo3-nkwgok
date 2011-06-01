@@ -193,7 +193,10 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						// Hit keys are lowercase.
 						// Set result count to 0 for all entries but those of 'str' type
 						// for which we use -1 to indicate the count is unknown.
-						if ($hitCounts[strtolower($GOKString)]) {
+						if ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
+							$values['hitcount'] = (int)$hitCounts[$GOK['045G']['a']];
+						}
+						else if ($hitCounts[strtolower($GOKString)]) {
 							$values['hitcount'] = (int)$hitCounts[strtolower($GOKString)];
 						}
 						else if ($GOK['str']) {
