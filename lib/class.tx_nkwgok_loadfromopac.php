@@ -33,21 +33,21 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 		$opacBaseURL = $conf['opacBaseURL'] . 'XML=1/';
 		$baseDir = PATH_site . 'fileadmin/gok/';
 
-		$opacLKLURL = $opacBaseURL . 'CMD?ACT=SRCHA/IKT=8600/TRM=tev+not+LKL+p%3F/REC=2/PRS=XML/NORND=1';
 		t3lib_div::mkdir_deep(PATH_site, 'fileadmin/gok/xml');
-		
-		// Remove all files in the lkl folder whose names begin with a digit.
-		// (Simple heuristic to delete all the files we downloaded and keep
+		// Create lkl folder if necessary and remove all files whose names begin with a digit.
+		// (This is a simple heuristic to delete all the files we downloaded and keep
 		// the CSV files whose names begin with a letter.)
 		$LKLDir = $baseDir . 'xml/';
 		$fileList = glob($LKLDir . '[0-9]*');
 		foreach ($fileList as $file) {
 			unlink($file);
 		}
+
+		$opacLKLURL = $opacBaseURL . 'CMD?ACT=SRCHA/IKT=8600/TRM=tev+not+LKL+p%3F/REC=2/PRS=XML/NORND=1';
 		$success = $this->downloadLKLDataFromOpacToFolder($opacLKLURL, $LKLDir);
-		
+
+		// Create the hitcounts folder if necessary and delete all files inside it if it exists.
 		t3lib_div::mkdir(PATH_site, 'fileadmin/gok/hitcounts');
-		// Delete all files in the hitcounts folder.
 		$hitCountDir = $baseDir . 'hitcounts/';
 		$fileList = glob($hitCountDir . '*');
 		foreach ($fileList as $file) {
@@ -119,10 +119,15 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 	 */
 	private function downloadHitCountsFromOpacToFolder($opacScanURL, $indexName, $folderPath) {
 		$success = True;
-		$scanNext = 'a'; // begin scanning the index at LKL a
+		/* Begin scanning the index at 0, except for LKL (which only start at a and have a lot of
+			junk entries starting with digits. */
+		$scanNext = '0';
+		if ($indexName == 'lkl') {
+			$scanNext = 'a';
+		}
 		$index = 0;
 
-		while ($scanNext && $success) {
+		while ($scanNext !== Null && $success) {
 			$index++;
 			$URL = $opacScanURL . '/TRM=' . $indexName . '+' . $scanNext;
 			$opacDownload = file_get_contents($URL);
