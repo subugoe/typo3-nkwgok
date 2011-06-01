@@ -606,11 +606,12 @@ class tx_nkwgok extends tslib_pibase {
 		
 		function GOKMenuSelectionChanged" . $objectID . " (menu) {
 			var selectedOption = menu.options[menu.selectedIndex];
-			if (selectedOption.value == 'withchildren') {
-				jQuery(menu).nextAll().remove();
-			}
-			else if (selectedOption.hasAttribute('haschildren')) {
+			jQuery(menu).nextAll().remove();
+			if (selectedOption.hasAttribute('haschildren') && !selectedOption.hasAttribute('isautoexpanded')) {
 				newMenuForSelection" . $objectID . "(selectedOption);
+			}
+			if (selectedOption.value != 'pleaseselect') {
+				jQuery('option[value=\"pleaseselect\"]', menu).remove();
 			}
 			startSearch" . $objectID . "(selectedOption);
 		}
@@ -618,7 +619,7 @@ class tx_nkwgok extends tslib_pibase {
 			var URL = location.protocol + '//' + location.host + location.pathname;
 			var PPN = option.value;
 			var level = parseInt(option.parentNode.getAttribute('level')) + 1;
-			var parameters = location.search + 'tx_" . NKWGOKExtKey . "[expand]=' + PPN
+			var parameters = location.search.replace(/^\?/, '') + '&tx_" . NKWGOKExtKey . "[expand]=' + PPN
 				+ '&tx_" . NKWGOKExtKey . "[language]=" . $language . "&eID=" . NKWGOKExtKey . "'
 				+ '&tx_" . NKWGOKExtKey . "[level]=' + level
 				+ '&tx_" . NKWGOKExtKey . "[style]=menu'
@@ -640,7 +641,6 @@ class tx_nkwgok extends tslib_pibase {
 		}
 		function startSearch" . $objectID . " (option) {
 			nkwgokMenuSelected(option);
-			console.log(option.getAttribute('query'));
 		}
 ";
 		$scriptElement->appendChild($doc->createTextNode($js));
@@ -689,12 +689,12 @@ class tx_nkwgok extends tslib_pibase {
 				$select->setAttribute('onchange', 'GOKMenuSelectionChanged' . $objectID . '(this);return false;');
 				$select->setAttribute('level', $level);
 
-				// add dummy items at the beginning of the menu
+				// add dummy item at the beginning of the menu
 				if ($level == 0) {
 					$option = $doc->createElement('option');
 					$select->appendChild($option);
 					$option->appendChild($doc->createTextNode($this->localise('Bitte Fachgebiet auswählen:', $language) ));
-					$option->setAttribute('value', '');
+					$option->setAttribute('value', 'pleaseselect');
 				}
 				else {
 					/* Add general menu item(s).
@@ -703,16 +703,16 @@ class tx_nkwgok extends tslib_pibase {
 					 * The latter case is only expected to happen for subjects coming from Opac GOK
 					 * records.
 					 */
-					if ($GOKs[0]['fromopac']) {
-						$option = $doc->createElement('option');
-						$select->appendChild($option);
-						$option->appendChild($doc->createTextNode($this->localise('Treffer für diese Zwischenebene zeigen', $language) ));
-						$option->setAttribute('value', 'this');
-					}
-
 					$option = $doc->createElement('option');
 					$select->appendChild($option);
-					$option->appendChild($doc->createTextNode($this->localise('Treffer aller enthaltenen Untergebiete zeigen', $language) ));
+					$label = '';
+					if ($GOKs[0]['fromopac']) {
+						$label = 'Treffer für diese Zwischenebene zeigen';
+					}
+					else {
+						$label = 'Treffer aller enthaltenen Untergebiete zeigen';
+					}
+					$option->appendChild($doc->createTextNode($this->localise($label, $language)));
 					$option->setAttribute('value', 'withchildren');
 					if (!$getVars['expand-' . $level]) {
 						$option->setAttribute('selected', 'selected');
