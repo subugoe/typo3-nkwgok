@@ -22,8 +22,8 @@
 			<label index="Unterkategorien ausblenden">Hide subcategories</label>
 			<label index="Laden ...">Loading...</label>
 			<label index="Bitte Fachgebiet auswählen:">Please select a subject:</label>
-			<label index="Treffer für diese Zwischenebene zeigen">Show books on this subject</label>
-			<label index="Treffer aller enthaltenen Untergebiete zeigen">Show books on all contained subjects</label>
+			<label index="Treffer für diese Zwischenebene zeigen">Show results for this subject</label>
+			<label index="Treffer aller enthaltenen Untergebiete zeigen">Show results for all contained subjects</label>
 			<label index=" ...">...</label>
 		</languageKey>
 
@@ -45,8 +45,8 @@
 			<label index="Unterkategorien ausblenden">Unterkategorien ausblenden</label>
 			<label index="Laden ...">Laden ...</label>
 			<label index="Bitte Fachgebiet auswählen:">Bitte Fachgebiet auswählen:</label>
-			<label index="Treffer für diese Zwischenebene zeigen">Bücher zu diesem Thema zeigen</label>
-			<label index="Treffer aller enthaltenen Untergebiete zeigen">Bücher aller enthaltenen Untergebiete zeigen</label>
+			<label index="Treffer für diese Zwischenebene zeigen">Treffer zu diesem Thema zeigen</label>
+			<label index="Treffer aller enthaltenen Untergebiete zeigen">Treffer aller enthaltenen Untergebiete zeigen</label>
 			<label index=" ..."> ...</label>
 		</languageKey>
 
