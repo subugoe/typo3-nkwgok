@@ -10,24 +10,31 @@ Das Plug-In kann aus zwei Quellen GOK Normdaten importieren:
 * Durch Auslesen der Tev-Sätze im XML-Format aus dem Opac
 * Über CSV-Dateien mit den zu importierenden Informationen
 
-Hierfür gibt es verschiedene Typo3 Scheduler Tasks, die die notwendigen
+Hierfür gibt es verschiedene TYPO3 Scheduler Tasks, die die notwendigen
 Schritte durchführen.
 
-Beim Ausführen der Tasks aufgetretene Fehler werden in das Typo3 Developer
+Beim Ausführen der Tasks aufgetretene Fehler werden in das TYPO3 Developer
 Log geschrieben.
 
 
-=== GOK Daten laden, konvertieren und importieren ===
+=== 1+2+3: GOK Daten laden, konvertieren und importieren ===
 Dieser Scheduler Task führt die anderen drei Scheduler Tasks in der benötigten
 Reihenfolge aus:
 
-1. GOK XML-Daten importieren
-2. CSV Daten zu XML konvertieren
-3. GOK XML Daten importieren
+1. GOK Daten aus Opac laden
+2. CSV Dateien zu XML konvertieren
+3. GOK XML Dateien importieren
 
 Er sollte im regulären Betrieb nachts ausgeführt werden, da die GOK Daten
-während des Neuimports (ca. 30 Sekunden) nicht verfügbar sind. In der Regel
-sollte nur die Nutzung dieses Tasks notwendig sein.
+während des Neuimports in Schritt 3 (ca. 30 Sekunden) nicht verfügbar sind.
+
+
+=== 2+3: CSV Dateien konvertieren und alle XML Dateien neu importieren ===
+Dieser Scheduler Task führt nur die bei einer Aktualisierung der CSV Dateien
+nötigen Schritte aus:
+
+1. CSV Dateien zu XML konvertieren
+2. GOK XML Dateien importieren
 
 
 === GOK XML-Daten importieren ===
@@ -79,15 +86,15 @@ Ausgabedateien: fileadmin/gok/xml/*.xml
 
 
 === GOK XML Daten importieren ===
-Dieser Scheduler Task leert zunächst die GOK Tabelle in der Typo3-Datenbank und
+Dieser Scheduler Task leert zunächst die GOK Tabelle in der TYPO3-Datenbank und
 füllt sie dann mit den Daten aus den XML-Dateien in fileadmin/gok/xml/*.xml.
 
-Der Vorgang dauert 15-30 Sekunden. Während dieser Zeit kann Typo3 den Baum nicht
+Der Vorgang dauert 15-30 Sekunden. Während dieser Zeit kann TYPO3 den Baum nicht
 korrekt darstellen. Darum wäre ein Ausführen dieses Tasks nachts sinnvoll.
 
 
 == Grundeinstellungen ==
-Wird das Plug-In im Typo3 Extension-Manager ausgewählt, gibt es zwei
+Wird die Extension im TYPO3 Extension-Manager ausgewählt, gibt es zwei
 Grundeinstellungen:
 
 # Opac Base URL with trailing /: Aus dieser URL werden die Links in den Opac

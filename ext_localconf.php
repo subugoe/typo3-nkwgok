@@ -47,6 +47,13 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadx
 	'description'      => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadxml.description',
 );
 
+// Scheduler task for converting the CSV files and reimporting the database.
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_updateCSV'] = array(
+	'extension'        => $_EXTKEY,
+	'title'            => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.updateCSV.name',
+	'description'      => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.updateCSV.description',
+);
+
 // Scheduler task for running our 3 other Scheduler tasks in the correct order.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_importAll'] = array(
 	'extension'        => $_EXTKEY,
