@@ -557,7 +557,14 @@ class tx_nkwgok extends tslib_pibase {
 		$container->appendChild($form);
 		$form->setAttribute('class', 'gokMenuForm no-JS');
 		$form->setAttribute('method', 'get');
-		$form->setAttribute('action', t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'));
+		$form->setAttribute('action', $this->pi_getPageLink($GLOBALS['TSFE']->id));
+		
+		$pageID = $doc->createElement('input');
+		$form->appendChild($pageID);
+		$pageID->setAttribute('type', 'hidden');
+		$pageID->setAttribute('name', 'id');
+		$pageID->setAttribute('value', $GLOBALS['TSFE']->id);
+		
 		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok'], NKWGOKQueryTable);
 		// run query and collect result
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
