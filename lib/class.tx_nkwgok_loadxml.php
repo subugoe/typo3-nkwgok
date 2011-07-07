@@ -60,7 +60,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 		$hitCounts = $this->getHitCounts();
 
-		$wantedFieldNames = array('045A', '044E', '044F', '009B', '038D', '003@', '045G', 'str', 'tags');
+		$wantedFieldNames = array('045A', '044E', '044K', '009B', '038D', '003@', '045G', 'str', 'tags');
 		$dir = PATH_site . 'fileadmin/gok/xml/';
 		$fileList = glob($dir . '*.xml');
 
@@ -186,8 +186,10 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							'fromopac' => $fromOpac
 						);
 
-						if ($GOK['044F']['b'] == 'eng' && $GOK['044F']['a']) {
-							$values['descr_en'] = trim($GOK['044F']['a']);
+						// English translation of the GOK’s name is in field 044K $a.
+						// This field is designated for the _English_ version.
+						if ($GOK['044K']['a']) {
+							$values['descr_en'] = trim($GOK['044K']['a']);
 						}
 
 						// Hit keys are lowercase.

@@ -60,7 +60,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * 4:	parent PPN -> 038D $9
 	 * 5:	GOK name (German) -> 044E $a
 	 * 6:	search query -> str $a
-	 * 7:	GOK name (English) -> 044F $a
+	 * 7:	GOK name (English) -> 044K $a
 	 * 8:	Tags (comma-separated list of strings) -> tags $a
 	 *
 	 * @param string $csvPath path to CSV file whose name should end in .csv and contain no other dots
@@ -139,13 +139,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 							if (count($fields) > 6) {
 								// English GOK Name
-								$englishTitleField = $this->appendFieldForDataTo('044F', 'a', trim($fields[6]), $record, $doc);
-								if ($englishTitleField) {
-									$subfield = $doc->createElement('subfield');
-									$subfield->setAttribute('code', 'b');
-									$englishTitleField->appendChild($subfield);
-									$subfield->appendChild($doc->createTextNode('eng'));
-								}
+								$englishTitleField = $this->appendFieldForDataTo('044K', 'a', trim($fields[6]), $record, $doc);
 
 								if (count($fields > 7)) {
 									$this->appendFieldForDataTo('tags', 'a', trim($fields[7]), $record, $doc);

@@ -79,7 +79,7 @@ Jede Zeile muß mindestens 5 Spalten enthalten:
 	geklammert und mit 'and' bzw. 'or' verbunden werden. Es ist wichtig, für die
 	Suchschlüssel dieselbe Groß- und Kleinschreibung wie in den pazpar2 Einstellungen
 	zu verwenden (unsere Konvention: Kleinbuchstaben).
-7. englischer Name der GOK (044F $a) [möglicherweise leer/nicht vorhanden]
+7. englischer Name der GOK (044K $a) [möglicherweise leer/nicht vorhanden]
 8. komma-separierte Liste von Tags zur beliebigen Nutzung
 
 Ausgabedateien: fileadmin/gok/xml/*.xml
