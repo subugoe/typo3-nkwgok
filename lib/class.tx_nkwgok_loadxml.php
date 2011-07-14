@@ -56,6 +56,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
+		set_time_limit(300);
 		$result = False;
 
 		$hitCounts = $this->getHitCounts();
