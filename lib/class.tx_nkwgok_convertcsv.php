@@ -23,49 +23,42 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
-		$fileArray = $this->fetchFileList();
-		
-		if (count($fileArray) > 0) {
+		$this->downloadFiles();
 
-			foreach ($fileArray as $key => $CSVPath) {
-				$success = $this->processCSVFile($CSVPath);
-
-				if (!$success) break;
-			}
+		$success = true;
+		$fileList = glob(PATH_site . 'fileadmin/gok/csv/*.csv');
+		foreach ($fileList as $CSVPath) {
+			$success = $this->processCSVFile($CSVPath);
+			if (!$success) break;
 		}
-
 		return $success;
 	}
 
 
 
 	/**
-	 * Fetches a filelist from the Extension configuration
-	 * 
-	 * @return Boolean success status
+	 * Uses file list from the extension configuration and downloads the
+	 * files to fileadmin/gok/csv.
 	 */
-	private function fetchFileList() {
-
-			//get Configuration for nkwgok
+	private function downloadFiles() {
+		//get Configuration for nkwgok
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
 		$urlListConf = $this->extConf['urlList'];
+		// Split it up by linebreaks
+		$urlList = explode("\n", $urlListConf);
 
-			// Split it up by linebreaks
-		$urlListArray = explode("\n", $urlListConf);
-
-		$urlList = array();
-
-
-		if (count($urlListArray) > 0){
-				//iterate over the found values and push them onto an array
-			foreach ($urlListArray as $urlKeyVal){
-				$urlListSplitter = explode(":", $urlKeyVal, 2);
-				$urlList[''.$urlListSplitter[0].''] = $urlListSplitter[1];
+		$filePaths = array();
+		foreach ($urlList as $URL) {
+			$URLPathComponents = explode('/', parse_url($URL, PHP_URL_PATH));
+			$fileName = $URLPathComponents[count($URLPathComponents)-1];
+			$filePath = PATH_site. 'fileadmin/gok/csv/' . $fileName;
+			if (file_put_contents($filePath, file_get_contents($URL))) {
+				$filePaths[] = $filePath;
 			}
-
+			else {
+				t3lib_div::devLog('convertCSV Scheduler Task: failed to download ' . $URL . ' to ' . $filePath . '.', 'nkwgok', 2);
+			}
 		}
-
-		return $urlList;
 	}
 
 
@@ -74,7 +67,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * Loads CSV file at the given path and processes it to Opac XML format
 	 * with Pica Tev fields for the corresponding Normdatensatz.
 	 *
-	 * The file’s text encoding is expected to be UTF-8.
+	 * The file’s text encoding is expected to be UTF-8 or ISO/Windows Latin-1.
 	 *
 	 * Columns in the file are:
 	 * 1:	PPN -> 003@ $0
@@ -93,7 +86,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 		$success = False;
 		$doc = Null;
 
-		$csvString = t3lib_div::getUrl($csvPath);
+		$csvString = file_get_contents($csvPath);
 		// Handle UTF-8, ISO, and Windows files. We expect the latter as the CSV is written by Excel.
 		$stringEncoding = mb_detect_encoding($csvString, Array('UTF-8', 'ISO-8859-1', 'windows-1252'));
 		if ($stringEncoding != 'UTF-8') {
