@@ -1,0 +1,4 @@
+TCAdefaults.tx_nkwgok_downloadUrl {
+	geschichte = http://www.ssp.de/geschichte.csv
+ 	anglistik = http://www.ssp.de/anglistik.csv
+}
