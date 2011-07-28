@@ -19,15 +19,17 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 	/**
 	 * Function executed from the Scheduler.
+	 * 
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
-		$success = $this->fetchHistoryCSV();
+		$fileArray = $this->fetchFileList();
+		
+		if (count($fileArray) > 0) {
 
-		if ($success) {
-			$fileList = glob(PATH_site . 'fileadmin/gok/csv/*.csv');
-			foreach ($fileList as $CSVPath) {
+			foreach ($fileArray as $key => $CSVPath) {
 				$success = $this->processCSVFile($CSVPath);
+
 				if (!$success) break;
 			}
 		}
@@ -38,11 +40,32 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 
 	/**
-	 * TODO: implement download of history file once the server is set up.
+	 * Fetches a filelist from the Extension configuration
+	 * 
 	 * @return Boolean success status
 	 */
-	private function fetchHistoryCSV() {
-		return True;
+	private function fetchFileList() {
+
+			//get Configuration for nkwgok
+		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
+		$urlListConf = $this->extConf['urlList'];
+
+			// Split it up by linebreaks
+		$urlListArray = explode("\n", $urlListConf);
+
+		$urlList = array();
+
+
+		if (count($urlListArray) > 0){
+				//iterate over the found values and push them onto an array
+			foreach ($urlListArray as $urlKeyVal){
+				$urlListSplitter = explode(":", $urlKeyVal, 2);
+				$urlList[''.$urlListSplitter[0].''] = $urlListSplitter[1];
+			}
+
+		}
+
+		return $urlList;
 	}
 
 
@@ -70,7 +93,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 		$success = False;
 		$doc = Null;
 
-		$csvString = file_get_contents($csvPath);
+		$csvString = t3lib_div::getUrl($csvPath);
 		// Handle UTF-8, ISO, and Windows files. We expect the latter as the CSV is written by Excel.
 		$stringEncoding = mb_detect_encoding($csvString, Array('UTF-8', 'ISO-8859-1', 'windows-1252'));
 		if ($stringEncoding != 'UTF-8') {
