@@ -223,7 +223,7 @@ class tx_nkwgok extends tslib_pibase {
 			}
 
 			$GOKSearchURL = $conf['opacBaseURL'] . 'LNG=' . $picaLanguageCode
-				. '/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=' . $searchString;
+				. '/REC=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=' . $searchString;
 		}
 		
 		return $GOKSearchURL;

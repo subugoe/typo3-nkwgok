@@ -2,8 +2,6 @@
 	<meta>
 		<langDisable>1</langDisable>
 	</meta>
-	<sheets>
-		<sDEF>
 			<ROOT>
 				<TCEforms>
 					<sheetTitle>LLL:EXT:nkwlib/locallang_db.xml:flexform.options</sheetTitle>
@@ -66,6 +64,4 @@
 
 				</el>
 			</ROOT>
-		</sDEF>
-	</sheets>
 </T3DataStructure>

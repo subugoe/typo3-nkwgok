@@ -19,17 +19,20 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 	/**
 	 * Function executed from the Scheduler.
-	 * 
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
-		$fileArray = $this->fetchFileList();
+
+		$nkwGokConfig = $this->getPluginConfiguration();
+
+		$this->downloadFiles($nkwGokConfig);
 		
-		if (count($fileArray) > 0) {
+		$success = $this->fetchHistoryCSV();
 
-			foreach ($fileArray as $key => $CSVPath) {
+		if ($success) {
+			$fileList = glob(PATH_site . 'fileadmin/gok/csv/*.csv');
+			foreach ($fileList as $CSVPath) {
 				$success = $this->processCSVFile($CSVPath);
-
 				if (!$success) break;
 			}
 		}
@@ -37,35 +40,81 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 		return $success;
 	}
 
+	/**
+	 * Uses file list from the extension configuration and downloads the
+	 * files to fileadmin/gok/csv.
+	 *
+	 * @param array $nkwGokConfig
+	 */
+	private function downloadFiles($nkwGokConfig) {
+					
+		$filePaths = array();
+		foreach ($nkwGokConfig as $key => $URL) {
+			$URLPathComponents = explode('/', parse_url($URL, PHP_URL_PATH));
+			$fileName = $URLPathComponents[count($URLPathComponents)-1];
+			$filePath = PATH_site. 'fileadmin/gok/csv/' . $fileName;
+			if (file_put_contents($filePath, file_get_contents($URL))) {
+				$filePaths[] = $filePath;
+			}
+			else {
+				t3lib_div::devLog('convertCSV Scheduler Task: failed to download ' . $URL . ' to ' . $filePath . '.', 'nkwgok', 2);
+			}
+		}
+	}
 
 
 	/**
-	 * Fetches a filelist from the Extension configuration
-	 * 
+	 * Frontend initialization and making TypoScript Configuration available
+	 *
+	 * @param int $pageUid
+	 * @param bool $overrule
+	 * @return array
+	 */
+	protected function getPluginConfiguration($pageUid = 3, $overrule = FALSE) {
+		// declare
+	$temp_TSFEclassName = t3lib_div::makeInstanceClassName('tslib_fe');
+
+		// begin
+	if (!is_object($GLOBALS['TT']) || $overrule === TRUE) {
+		$GLOBALS['TT'] = new t3lib_timeTrack;
+		$GLOBALS['TT']->start();
+	}
+
+	if ((!is_object($GLOBALS['TSFE']) || $overrule === TRUE) && is_int($pageUid))
+{
+			// builds TSFE object
+		$GLOBALS['TSFE'] = new $temp_TSFEclassName($GLOBALS['TYPO3_CONF_VARS'], $pageUid, $type=0, $no_cache=0, $cHash='', $jumpurl='', $MP='', $RDCT='');
+
+			// builds rootline
+		$GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
+		$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($pageUid);
+
+			// init template
+		$GLOBALS['TSFE']->tmpl = t3lib_div::makeInstance('t3lib_tsparser_ext');
+			// Do not log time-performance information
+		$GLOBALS['TSFE']->tmpl->tt_track = 0;
+		$GLOBALS['TSFE']->tmpl->init();
+
+			// this generates the constants/config + hierarchy info for the template.
+		$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine, $start_template_uid = 0);
+		$GLOBALS['TSFE']->tmpl->generateConfig();
+		$GLOBALS['TSFE']->tmpl->loaded = 1;
+
+			// get config array and other init from pagegen
+		$GLOBALS['TSFE']->getConfigArray();
+
+		$nkwGokConfig = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['downloadUrl.'];
+
+		return $nkwGokConfig;
+	}
+}
+
+	/**
+	 * TODO: implement download of history file once the server is set up.
 	 * @return Boolean success status
 	 */
-	private function fetchFileList() {
-
-			//get Configuration for nkwgok
-		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
-		$urlListConf = $this->extConf['urlList'];
-
-			// Split it up by linebreaks
-		$urlListArray = explode("\n", $urlListConf);
-
-		$urlList = array();
-
-
-		if (count($urlListArray) > 0){
-				//iterate over the found values and push them onto an array
-			foreach ($urlListArray as $urlKeyVal){
-				$urlListSplitter = explode(":", $urlKeyVal, 2);
-				$urlList[''.$urlListSplitter[0].''] = $urlListSplitter[1];
-			}
-
-		}
-
-		return $urlList;
+	private function fetchHistoryCSV() {
+		return True;
 	}
 
 
@@ -93,7 +142,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 		$success = False;
 		$doc = Null;
 
-		$csvString = t3lib_div::getUrl($csvPath);
+		$csvString = file_get_contents($csvPath);
 		// Handle UTF-8, ISO, and Windows files. We expect the latter as the CSV is written by Excel.
 		$stringEncoding = mb_detect_encoding($csvString, Array('UTF-8', 'ISO-8859-1', 'windows-1252'));
 		if ($stringEncoding != 'UTF-8') {

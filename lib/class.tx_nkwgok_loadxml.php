@@ -194,8 +194,10 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						}
 
 						// Hit keys are lowercase.
-						// Set result count to 0 for all entries but those of 'str' type
-						// for which we use -1 to indicate the count is unknown.
+						// Set result count information:
+						// * for GOK and MSC-type records: try to use hitcount
+						// * for CSV-type records: if only one LKL query, try to use hitcount, else use -1
+						// * otherwise: use 0
 						if ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
 							$values['hitcount'] = (int)$hitCounts[strtolower($GOK['045G']['a'])];
 						}
@@ -203,7 +205,16 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							$values['hitcount'] = (int)$hitCounts[strtolower($GOKString)];
 						}
 						else if ($GOK['str']) {
-							$values['hitcount'] = -1;
+							$foundGOKs = array();
+							$pattern = '/lkl=([a-zA-Z]*\s?[.X0-9]*)$/';
+							preg_match($pattern, $GOK['str']['a'], $foundGOKs);
+
+							if (count($foundGOKs) > 1 && strtolower($foundGOKs[1]) && $hitCounts[strtolower($foundGOKs[1])]) {
+								$values['hitcount'] = (int)$hitCounts[strtolower($foundGOKs[1])];
+							}
+							else {
+								$values['hitcount'] = -1;
+							}
 						}
 						else {
 							$values['hitcount'] = 0;
