@@ -1,7 +1,7 @@
 plugin.tx_nkwgok_pi1{
+	# Add URLs like in the following example
 	downloadUrl {
-		allgemein =
- 		bibwiss = 
+		# link1 = http://www.sub.uni-goettingen.de/download/library.csv
+		# link2 = http://www.sub.uni-goettingen.de/download/geography.csv
 	}
-	hitCountDisplay = 1
 }
