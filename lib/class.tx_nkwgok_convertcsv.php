@@ -19,37 +19,78 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 	/**
 	 * Function executed from the Scheduler.
-	 * @return	boolean	TRUE if success, otherwise FALSE
+	 * 
+	 * @return boolean TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
+		$URLList = $this->getNkwgokDownloadURLs();
+		$this->downloadURLs($URLList);
 
-		$nkwGokConfig = $this->getPluginConfiguration();
-
-		$this->downloadFiles($nkwGokConfig);
-		
-		$success = $this->fetchHistoryCSV();
-
-		if ($success) {
-			$fileList = glob(PATH_site . 'fileadmin/gok/csv/*.csv');
-			foreach ($fileList as $CSVPath) {
-				$success = $this->processCSVFile($CSVPath);
-				if (!$success) break;
-			}
+		$success = true;
+		$fileList = glob(PATH_site . 'fileadmin/gok/csv/*.csv');
+		foreach ($fileList as $CSVPath) {
+			$success = $this->processCSVFile($CSVPath);
+			if (!$success) break;
 		}
-
 		return $success;
 	}
 
+	
+	
 	/**
-	 * Uses file list from the extension configuration and downloads the
-	 * files to fileadmin/gok/csv.
+	 * Frontend initialization and making TypoScript Configuration available.
 	 *
-	 * @param array $nkwGokConfig
+	 * @param int $pageUid
+	 * @return array
 	 */
-	private function downloadFiles($nkwGokConfig) {
-					
+	protected function getNkwgokDownloadURLs($pageUid = 3) {
+		// declare
+		$temp_TSFEclassName = t3lib_div::makeInstanceClassName('tslib_fe');
+
+		// begin
+		if (!is_object($GLOBALS['TT'])) {
+			$GLOBALS['TT'] = new t3lib_timeTrack;
+			$GLOBALS['TT']->start();
+		}
+
+		if ((!is_object($GLOBALS['TSFE'])) && is_int($pageUid)) {
+			// builds TSFE object
+			$GLOBALS['TSFE'] = new $temp_TSFEclassName($GLOBALS['TYPO3_CONF_VARS'], $pageUid, $type=0, $no_cache=0, $cHash='', $jumpurl='', $MP='', $RDCT='');
+
+			// builds rootline
+			$GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
+			$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($pageUid);
+
+			// init template
+			$GLOBALS['TSFE']->tmpl = t3lib_div::makeInstance('t3lib_tsparser_ext');
+			// Do not log time-performance information
+			$GLOBALS['TSFE']->tmpl->tt_track = 0;
+			$GLOBALS['TSFE']->tmpl->init();
+
+			// this generates the constants/config + hierarchy info for the template.
+			$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine, $start_template_uid = 0);
+			$GLOBALS['TSFE']->tmpl->generateConfig();
+			$GLOBALS['TSFE']->tmpl->loaded = 1;
+
+			// get config array and other init from pagegen
+			$GLOBALS['TSFE']->getConfigArray();
+
+			$nkwgokConfig = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['downloadUrl.'];
+
+			return $nkwgokConfig;
+		}
+	}
+
+	
+
+	/**
+	 * Downloads files from passed array
+	 *
+	 * @param array $nkwgokConfig
+	 */
+	private function downloadURLs($URLList) {
 		$filePaths = array();
-		foreach ($nkwGokConfig as $key => $URL) {
+		foreach ($URLList as $URL) {
 			$URLPathComponents = explode('/', parse_url($URL, PHP_URL_PATH));
 			$fileName = $URLPathComponents[count($URLPathComponents)-1];
 			$filePath = PATH_site. 'fileadmin/gok/csv/' . $fileName;
@@ -63,58 +104,30 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	}
 
 
-	/**
-	 * Frontend initialization and making TypoScript Configuration available
-	 *
-	 * @param int $pageUid
-	 * @param bool $overrule
-	 * @return array
-	 */
-	protected function getPluginConfiguration($pageUid = 3, $overrule = FALSE) {
-		// declare
-	$temp_TSFEclassName = t3lib_div::makeInstanceClassName('tslib_fe');
-
-		// begin
-	if (!is_object($GLOBALS['TT']) || $overrule === TRUE) {
-		$GLOBALS['TT'] = new t3lib_timeTrack;
-		$GLOBALS['TT']->start();
-	}
-
-	if ((!is_object($GLOBALS['TSFE']) || $overrule === TRUE) && is_int($pageUid))
-{
-			// builds TSFE object
-		$GLOBALS['TSFE'] = new $temp_TSFEclassName($GLOBALS['TYPO3_CONF_VARS'], $pageUid, $type=0, $no_cache=0, $cHash='', $jumpurl='', $MP='', $RDCT='');
-
-			// builds rootline
-		$GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
-		$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($pageUid);
-
-			// init template
-		$GLOBALS['TSFE']->tmpl = t3lib_div::makeInstance('t3lib_tsparser_ext');
-			// Do not log time-performance information
-		$GLOBALS['TSFE']->tmpl->tt_track = 0;
-		$GLOBALS['TSFE']->tmpl->init();
-
-			// this generates the constants/config + hierarchy info for the template.
-		$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine, $start_template_uid = 0);
-		$GLOBALS['TSFE']->tmpl->generateConfig();
-		$GLOBALS['TSFE']->tmpl->loaded = 1;
-
-			// get config array and other init from pagegen
-		$GLOBALS['TSFE']->getConfigArray();
-
-		$nkwGokConfig = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['downloadUrl.'];
-
-		return $nkwGokConfig;
-	}
-}
 
 	/**
-	 * TODO: implement download of history file once the server is set up.
-	 * @return Boolean success status
+	 * Uses file list from the extension configuration and downloads the
+	 * files to fileadmin/gok/csv.
 	 */
-	private function fetchHistoryCSV() {
-		return True;
+	private function downloadFiles() {
+		//get Configuration for nkwgok
+		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
+		$urlListConf = $this->extConf['urlList'];
+		// Split it up by linebreaks
+		$urlList = explode("\n", $urlListConf);
+
+		$filePaths = array();
+		foreach ($urlList as $URL) {
+			$URLPathComponents = explode('/', parse_url($URL, PHP_URL_PATH));
+			$fileName = $URLPathComponents[count($URLPathComponents)-1];
+			$filePath = PATH_site. 'fileadmin/gok/csv/' . $fileName;
+			if (file_put_contents($filePath, file_get_contents($URL))) {
+				$filePaths[] = $filePath;
+			}
+			else {
+				t3lib_div::devLog('convertCSV Scheduler Task: failed to download ' . $URL . ' to ' . $filePath . '.', 'nkwgok', 2);
+			}
+		}
 	}
 
 
@@ -123,7 +136,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * Loads CSV file at the given path and processes it to Opac XML format
 	 * with Pica Tev fields for the corresponding Normdatensatz.
 	 *
-	 * The file’s text encoding is expected to be UTF-8.
+	 * The file’s text encoding is expected to be UTF-8 or ISO/Windows Latin-1.
 	 *
 	 * Columns in the file are:
 	 * 1:	PPN -> 003@ $0

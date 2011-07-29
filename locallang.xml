@@ -20,6 +20,8 @@
 
 			<label index="scheduler.importAll.name">1+2+3: Download, convert and import LKL data</label>
 			<label index="scheduler.importAll.description">Downloads Pica-XML GOK records from Opac, converts CSV files in fileadmin/gok/csv/ with subject tree information information to Pica-XML and then imports all of them into the Typo3 database.</label>
+
+			<label index="tx_nkwgok.urlList">Url list where to download csv files</label>
 		</languageKey>
 		
 		<languageKey index="de" type="array">
@@ -37,6 +39,9 @@
 
 			<label index="scheduler.importAll.name">1+2+3: GOK Daten laden, konvertieren und importieren</label>
 			<label index="scheduler.importAll.description">Lädt und konvertiert alle benötigten GOK Daten und importiert sie in die TYPO3-Datenbank</label>
+
+			<label index="tx_nkwgok.urlList">Urlliste der CSV Dateien</label>
+
 		</languageKey>
 		
 	</data>

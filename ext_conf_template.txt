@@ -3,3 +3,6 @@ opacBaseURL = http://opac.sub.uni-goettingen.de/DB=1/
 
 # cat=basic//130; type=text; label=replace included CSS with path
 CSSPath =
+
+# cat=basic; type=user[EXT:nkwgok/tools/FlexForm.php:tx_Nkwgok_Tools_FlexForm->display]; label=
+configuration =
