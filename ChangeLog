@@ -1,3 +1,7 @@
+2011-05-29 0.9.9 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
+	* Added hitcounts for various fields
+	* Added configuration for Scheduler Tasks in TypoScript
+
 2011-05-19 0.9.8 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* add field fromopac to database to reliably spot records originating
 		from the Opac

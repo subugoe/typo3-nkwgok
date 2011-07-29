@@ -1,0 +1,6 @@
+plugin.tx_nkwgok_pi1{
+	downloadUrl {
+		allgemein = http://w3d.local/fileadmin/gok/csv/1-nel.csv
+ 		bibwiss = http://w3d.local/fileadmin/gok/csv/a-bibwiss.csv
+	}
+}

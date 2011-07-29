@@ -2,70 +2,66 @@
 	<meta>
 		<langDisable>1</langDisable>
 	</meta>
-	<sheets>
-		<sDEF>
-			<ROOT>
+	<ROOT>
+		<TCEforms>
+			<sheetTitle>LLL:EXT:nkwlib/locallang_db.xml:flexform.options</sheetTitle>
+		</TCEforms>
+		<type>array</type>
+		<el>
+
+			<source>
 				<TCEforms>
-					<sheetTitle>LLL:EXT:nkwlib/locallang_db.xml:flexform.options</sheetTitle>
+					<label>LLL:EXT:nkwgok/pi1/locallang.xml:source</label>
+					<config>
+						<type>select</type>
+						<itemsProcFunc>tx_nkwgok_ff->addFields</itemsProcFunc>
+					</config>
 				</TCEforms>
-				<type>array</type>
-				<el>
+			</source>
 
-					<source>
-						<TCEforms>
-							<label>LLL:EXT:nkwgok/pi1/locallang.xml:source</label>
-							<config>
-								<type>select</type>
-								<itemsProcFunc>tx_nkwgok_ff->addFields</itemsProcFunc>
-							</config>
-						</TCEforms>
-					</source>
+			<altSource>
+				<TCEforms>
+					<label>LLL:EXT:nkwgok/pi1/locallang.xml:altSource</label>
+					<config>
+						<type>input</type>
+						<size>30</size>
+					</config>
+				</TCEforms>
+			</altSource>
 
-					<altSource>
-						<TCEforms>
-							<label>LLL:EXT:nkwgok/pi1/locallang.xml:altSource</label>
-							<config>
-								<type>input</type>
-								<size>30</size>
-							</config>
-						</TCEforms>
-					</altSource>
+			<style>
+				<TCEforms>
+					<label>LLL:EXT:nkwgok/pi1/locallang.xml:style</label>
+					<config>
+						<type>radio</type>
+						<items type="array">
+							<numIndex index="0" type="array">
+								<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleTreeNew</numIndex>
+								<numIndex index="1">treeNew</numIndex>
+							</numIndex>
+							<numIndex index="1" type="array">
+								<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleTreeOld</numIndex>
+								<numIndex index="1">treeOld</numIndex>
+							</numIndex>
+							<numIndex index="2" type="array">
+								<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleMenu</numIndex>
+								<numIndex index="1">menu</numIndex>
+							</numIndex>
+						</items>
+					</config>
+				</TCEforms>
+			</style>
 
-					<style>
-						<TCEforms>
-							<label>LLL:EXT:nkwgok/pi1/locallang.xml:style</label>
-							<config>
-								<type>radio</type>
-								<items type="array">
-									<numIndex index="0" type="array">
-										<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleTreeNew</numIndex>
-										<numIndex index="1">treeNew</numIndex>
-									</numIndex>
-									<numIndex index="1" type="array">
-										<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleTreeOld</numIndex>
-										<numIndex index="1">treeOld</numIndex>
-									</numIndex>
-									<numIndex index="2" type="array">
-										<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleMenu</numIndex>
-										<numIndex index="1">menu</numIndex>
-									</numIndex>
-								</items>
-							</config>
-						</TCEforms>
-					</style>
+			<showGOKID>
+				<TCEforms>
+					<label>LLL:EXT:nkwgok/pi1/locallang.xml:showGOKID</label>
+					<config>
+						<type>check</type>
+						<default>1</default>
+					</config>
+				</TCEforms>
+			</showGOKID>
 
-					<showGOKID>
-						<TCEforms>
-							<label>LLL:EXT:nkwgok/pi1/locallang.xml:showGOKID</label>
-							<config>
-								<type>check</type>
-								<default>1</default>
-							</config>
-						</TCEforms>
-					</showGOKID>
-
-				</el>
-			</ROOT>
-		</sDEF>
-	</sheets>
+		</el>
+	</ROOT>
 </T3DataStructure>

@@ -25,7 +25,8 @@
 if (!defined('TYPO3_MODE')) {
 	die('Access denied.');
 }
-t3lib_extMgm::addPageTSConfig('<INCLUDE_TYPOSCRIPT: source="FILE:EXT:nkwgok/static/setup/.txt">');
+// Add TypoScript to Configuration
+t3lib_extMgm::addStaticFile($_EXTKEY, 'static/', 'GOK');
 
 $TCA['tx_nkwgok_data'] = array(
 	'ctrl' => array(
