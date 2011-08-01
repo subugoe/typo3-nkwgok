@@ -23,7 +23,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * @return boolean TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
-		$URLList = $this->getNkwgokDownloadURLs();
+		$URLList = $this->getNkwgokDownloadURLs($this->nkwgokStartPageId);
 		$this->downloadURLs($URLList);
 
 		$success = true;
@@ -43,7 +43,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * @param int $pageUid
 	 * @return array
 	 */
-	protected function getNkwgokDownloadURLs($pageUid = 3) {
+	protected function getNkwgokDownloadURLs($pageUid = 1) {
 		// declare
 		$temp_TSFEclassName = t3lib_div::makeInstanceClassName('tslib_fe');
 

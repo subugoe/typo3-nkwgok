@@ -197,8 +197,6 @@ class tx_nkwgok extends tslib_pibase {
 		return $opacLink;
 	}
 
-	
-	
 	/**
 	 * Returns URL string pointing to an Opac search in the current language
 	 * for the given GOK record or Null if there is no search query.
@@ -229,8 +227,6 @@ class tx_nkwgok extends tslib_pibase {
 		return $GOKSearchURL;
 	}
 
-
-
 	/**
 	 * Helper function to add our default stylesheet or the one at the path
 	 * set up in Extension Manager configuration to the page’s head.
@@ -247,8 +243,6 @@ class tx_nkwgok extends tslib_pibase {
 		
 		$GLOBALS['TSFE']->pSetup['includeCSS.'][$this->extKey] = $cssPath;
 	}
-
-
 
 	/**
 	 * Return DOMDocument representing the tree set up in the given configuration.
