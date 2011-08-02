@@ -31,7 +31,7 @@ class tx_nkwgok_importAll extends tx_scheduler_Task {
 		}
 		else {
 			$convertCSVTask = t3lib_div::makeInstance('tx_nkwgok_convertCSV');
-			$success = $convertCSVTask->execute();
+			$success = $convertCSVTask->execute($this->nkwgokStartPageId);
 			if (!$success) {
 				t3lib_div::devLog('importAll Scheduler Task: Problem during conversion of CSV files. Stopping.' , 'nkwgok', 3);
 			}

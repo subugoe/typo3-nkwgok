@@ -28,11 +28,16 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 	/**
 	 * Function executed from the Scheduler.
-	 * 
+	 *
+	 * @param int $startPageID - ID of page where TypoScript with the URLs to download is set up
 	 * @return boolean TRUE if success, otherwise FALSE
 	 */
-	public function execute() {
-		$URLList = $this->getNkwgokDownloadURLs($this->nkwgokStartPageId);
+	public function execute($startPageID = Null) {
+		$myPageID = $startPageID;
+		if ($myPageID === Null) {
+			$myPageID = $this->nkwgokStartPageId;
+		}
+		$URLList = $this->getNkwgokDownloadURLs($myPageID);
 		if ($URLList) {
 			$this->downloadURLs($URLList);
 		}
@@ -113,11 +118,17 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 			$URLPathComponents = explode('/', parse_url($URL, PHP_URL_PATH));
 			$fileName = $URLPathComponents[count($URLPathComponents)-1];
 			$filePath = PATH_site. 'fileadmin/gok/csv/' . $fileName;
-			if (file_put_contents($filePath, file_get_contents($URL))) {
-				$filePaths[] = $filePath;
+			$readData = file_get_contents($URL);
+			if ($readData !== False) {
+				if (file_put_contents($filePath, $readData)) {
+					$filePaths[] = $filePath;
+				}
+				else {
+					t3lib_div::devLog('convertCSV Scheduler Task: failed to download ' . $URL . ' to ' . $filePath . '.', 'nkwgok', 2);
+				}
 			}
 			else {
-				t3lib_div::devLog('convertCSV Scheduler Task: failed to download ' . $URL . ' to ' . $filePath . '.', 'nkwgok', 2);
+				t3lib_div::devLog('convertCSV Scheduler Task: failed to download ' . $URL . '.', 'nkwgok', 2);
 			}
 		}
 	}
