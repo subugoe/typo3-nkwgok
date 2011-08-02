@@ -1,3 +1,7 @@
+2011-08-02 0.9.11 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* Reduce logging
+	* Cleanup
+
 2011-08-01 0.9.10 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
 	* Optimized Scheduler Task for converting CSV Data with an optional page id
 	* Moved scheduler tasks to a seperate directory
