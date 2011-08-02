@@ -85,7 +85,7 @@ class tx_nkwgok_scheduler_convertcsvadditionalparameters implements tx_scheduler
 		$submittedData['nkwgokStartPageId'] = intval($submittedData['nkwgokStartPageId']);
 
 		if ($submittedData['nkwgokStartPageId'] <= 0) {
-			$schedulerModule->addMessage('Invalid Page id given', 3);
+			$schedulerModule->addMessage('Invalid Page ID given', 3);
 		} else {
 			$result = TRUE;
 		}

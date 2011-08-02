@@ -18,13 +18,27 @@
 class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 	/**
+	 * List of all PPNs processed so far.
+	 * Used to determine whether all parent PPNs exist.
+	 * @var array
+	 */
+	protected $PPNList = Array();
+
+
+
+	/**
 	 * Function executed from the Scheduler.
 	 * 
 	 * @return boolean TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
 		$URLList = $this->getNkwgokDownloadURLs($this->nkwgokStartPageId);
-		$this->downloadURLs($URLList);
+		if ($URLList) {
+			$this->downloadURLs($URLList);
+		}
+		else {
+			t3lib_div::devLog('convertCSV Scheduler Task: no URLs for downloading CSV files set up in the Scheduler task', 'nkwgok', 1);
+		}
 
 		$success = true;
 		$fileList = glob(PATH_site . 'fileadmin/gok/csv/*.csv');
@@ -38,14 +52,18 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	
 	
 	/**
-	 * Frontend initialization and making TypoScript Configuration available.
+	 * Retrieves setup information with an array of URLs pointing to CSV files
+	 * that need to be downloaded from TypoScript.
+	 * The ID of the page storing the TypoScript needs to be set up in extension
+	 * manager.
 	 *
 	 * @param int $pageUid
-	 * @return array
+	 * @return array of URLs to download
 	 */
 	protected function getNkwgokDownloadURLs($pageUid = 1) {
+		$downloadURLs = Null;
 		// declare
-		$temp_TSFEclassName = t3lib_div::makeInstanceClassName('tslib_fe');
+		$temp_TSFEclassName = t3lib_div::makeInstance('tslib_fe');
 
 		// begin
 		if (!is_object($GLOBALS['TT'])) {
@@ -75,49 +93,23 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 			// get config array and other init from pagegen
 			$GLOBALS['TSFE']->getConfigArray();
 
-			$nkwgokConfig = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['downloadUrl.'];
-
-			return $nkwgokConfig;
+			$downloadURLs = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['downloadUrl.'];
 		}
+
+		return $downloadURLs;
 	}
 
 	
 
 	/**
-	 * Downloads files from passed array
+	 * Downloads files from URLs in the passed array to fileadmin/gok/csv.
+	 * Potentially overwrites previously existing files.
 	 *
-	 * @param array $nkwgokConfig
+	 * @param array $URLList
 	 */
 	private function downloadURLs($URLList) {
 		$filePaths = array();
 		foreach ($URLList as $URL) {
-			$URLPathComponents = explode('/', parse_url($URL, PHP_URL_PATH));
-			$fileName = $URLPathComponents[count($URLPathComponents)-1];
-			$filePath = PATH_site. 'fileadmin/gok/csv/' . $fileName;
-			if (file_put_contents($filePath, file_get_contents($URL))) {
-				$filePaths[] = $filePath;
-			}
-			else {
-				t3lib_div::devLog('convertCSV Scheduler Task: failed to download ' . $URL . ' to ' . $filePath . '.', 'nkwgok', 2);
-			}
-		}
-	}
-
-
-
-	/**
-	 * Uses file list from the extension configuration and downloads the
-	 * files to fileadmin/gok/csv.
-	 */
-	private function downloadFiles() {
-		//get Configuration for nkwgok
-		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
-		$urlListConf = $this->extConf['urlList'];
-		// Split it up by linebreaks
-		$urlList = explode("\n", $urlListConf);
-
-		$filePaths = array();
-		foreach ($urlList as $URL) {
 			$URLPathComponents = explode('/', parse_url($URL, PHP_URL_PATH));
 			$fileName = $URLPathComponents[count($URLPathComponents)-1];
 			$filePath = PATH_site. 'fileadmin/gok/csv/' . $fileName;
@@ -177,8 +169,6 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 			$set = $doc->createElement('SET');
 			$result->appendChild($set);
 
-			$PPNList = Array();
-
 
 			/* Work around PHP bug in CSV parsing: The fgetcsv function
 			 * only works correctly when the locale is _not_ en_US.UTF-8.
@@ -202,8 +192,9 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 			setlocale(LC_CTYPE, 'de_DE.UTF8');
 			
 			while (($fields = fgetcsv($fileHandle, 4096, ';', '"')) !== false) {
-				if (count($fields) >= 5) {
-					// GOK name is in field 5, so ignore lines with less fields.
+				if (count($fields) >= 5 && trim(implode('', $fields)) !== '') {
+					// GOK name is in field 5, so ignore lines with less fields
+					// as well as those with only empty fields.
 					$PPN = trim($fields[0]);
 
 					if ($PPN != '') {
@@ -234,23 +225,24 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 						// Warn about a few strange situations. These are not fatal, but they may be
 						// the result of a problem with the data structures.
-						if ($parentPPN != '' && !$PPNList[$parentPPN]) {
-							t3lib_div::devLog('convertCSV Scheduler Task: Parent PPN ' . $parentPPN . ' not defined when reading child record ' . $PPN . ' of file ' . $csvPath, 'nkwgok', 2);
+						if ($parentPPN != '' && $parentPPN != 'Root' && $parentPPN != 'GOK-Root'
+								&& !$this->PPNList[$parentPPN]) {
+							t3lib_div::devLog('convertCSV Scheduler Task: Parent PPN "' . $parentPPN . '" not defined when reading child record "' . $PPN . '" of file ' . $csvPath, 'nkwgok', 2);
 						}
 
-						if ($PPNList[$PPN]) {
-							t3lib_div::devLog('convertCSV Scheduler Task: Duplicate PPN ' . $PPN. ' in file ' . $csvPath, 'nkwgok', 2);
+						if ($this->PPNList[$PPN]) {
+							t3lib_div::devLog('convertCSV Scheduler Task: Duplicate PPN "' . $PPN. '" in file ' . $csvPath, 'nkwgok', 2);
 						}
 
 						// Add current PPN to PPN list.
-						$PPNList[$PPN] = True;
+						$this->PPNList[$PPN] = True;
 					}
 					else {
 						t3lib_div::devLog('convertCSV Scheduler Task: Blank PPN  in line: "' . implode(';', $fields) .'" of file ' . $csvPath, 'nkwgok', 2);
 
 					} // if ($PPN != '')
 				}	
-				else if (count($fields) > 1) {
+				else if (count($fields) > 1 && trim(implode('', $fields)) !== '') {
 					t3lib_div::devLog('convertCSV Scheduler Task: Line "' . implode(';', $fields) . '" of file ' . $csvPath . ' contains less than 5 fields.', 'nkwgok', 2);
 				} // (count($fields) >= 5)
 			}
@@ -270,7 +262,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 				t3lib_div::devLog('convertCSV Scheduler Task: Failed to write XML file' . $resultPath , 'nkwgok', 3);
 			}
 			else {
-				t3lib_div::devLog('convertCSV Scheduler Task: Successfully wrote XML file ' . $resultPath , 'nkwgok', 1);
+				// t3lib_div::devLog('convertCSV Scheduler Task: Successfully wrote XML file ' . $resultPath , 'nkwgok', 1);
 				$success = True;
 			}
 		}
