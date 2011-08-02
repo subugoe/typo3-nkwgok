@@ -229,8 +229,8 @@ class tx_nkwgok extends tslib_pibase {
 		return $GOKSearchURL;
 	}
 
-
-
+	
+	
 	/**
 	 * Helper function to add our default stylesheet or the one at the path
 	 * set up in Extension Manager configuration to the page’s head.
@@ -247,8 +247,6 @@ class tx_nkwgok extends tslib_pibase {
 		
 		$GLOBALS['TSFE']->pSetup['includeCSS.'][$this->extKey] = $cssPath;
 	}
-
-
 
 	/**
 	 * Return DOMDocument representing the tree set up in the given configuration.
