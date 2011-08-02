@@ -1,3 +1,7 @@
+2011-08-01 0.9.10 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
+	* Optimized Scheduler Task for converting CSV Data with an optional page id
+	* Moved scheduler tasks to a seperate directory
+
 2011-05-29 0.9.9 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
 	* Added hitcounts for various fields
 	* Added configuration for Scheduler Tasks in TypoScript
