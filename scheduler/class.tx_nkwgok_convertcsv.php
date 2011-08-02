@@ -31,8 +31,11 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * 
 	 * @return boolean TRUE if success, otherwise FALSE
 	 */
-	public function execute() {
-		$URLList = $this->getNkwgokDownloadURLs($this->nkwgokStartPageId);
+	public function execute($startPageID = Null) {
+		if ($startPageID === Null) {
+			$startpageID = $this->nkwgokStartPageId;
+		}
+		$URLList = $this->getNkwgokDownloadURLs($startPageID);
 		if ($URLList) {
 			$this->downloadURLs($URLList);
 		}

@@ -53,6 +53,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_updat
 	'extension'        => $_EXTKEY,
 	'title'            => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.updateCSV.name',
 	'description'      => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.updateCSV.description',
+	'additionalFields' => 'tx_nkwgok_scheduler_convertcsvadditionalparameters'
 );
 
 // Scheduler task for running our 3 other Scheduler tasks in the correct order.
@@ -60,6 +61,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_impor
 	'extension'        => $_EXTKEY,
 	'title'            => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.importAll.name',
 	'description'      => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.importAll.description',
+	'additionalFields' => 'tx_nkwgok_scheduler_convertcsvadditionalparameters'
 );
 
 
