@@ -67,18 +67,16 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 */
 	protected function getNkwgokDownloadURLs($pageUid = 1) {
 		$downloadURLs = Null;
-		// declare
-		$temp_TSFEclassName = t3lib_div::makeInstance('tslib_fe');
-
+		
 		// begin
 		if (!is_object($GLOBALS['TT'])) {
-			$GLOBALS['TT'] = new t3lib_timeTrack;
+			$GLOBALS['TT'] = t3lib_div::makeInstance('t3lib_timeTrack');
 			$GLOBALS['TT']->start();
 		}
 
 		if ((!is_object($GLOBALS['TSFE'])) && is_int($pageUid)) {
 			// builds TSFE object
-			$GLOBALS['TSFE'] = new $temp_TSFEclassName($GLOBALS['TYPO3_CONF_VARS'], $pageUid, $type=0, $no_cache=0, $cHash='', $jumpurl='', $MP='', $RDCT='');
+			$GLOBALS['TSFE'] = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], $pageUid, $type=0, $no_cache=0, $cHash='', $jumpurl='', $MP='', $RDCT='');
 
 			// builds rootline
 			$GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');

@@ -11,7 +11,7 @@
 
 			<label index="scheduler.convertCSV.name">2: Convert CSV-files to XML</label>
 			<label index="scheduler.convertCSV.description">Converts CSV files in fileadmin/gok/csv/ with subject tree information to Pica-XML which can be imported to the database.</label>
-			<label index="scheduler.convertCSV.startPageId">Add the page ID where your root TypoScript is inserted (usually 1)</label>
+			<label index="scheduler.convertCSV.startPageId">Add the page id where your root TypoScript is inserted (usually 1)</label>
 
 			<label index="scheduler.loadxml.name">3: Import GOK XML</label>
 			<label index="scheduler.loadxml.description">Imports Pica-XML files in fileadmin/gok/xml/ with subject tree information into the TYPO3 database.</label>
