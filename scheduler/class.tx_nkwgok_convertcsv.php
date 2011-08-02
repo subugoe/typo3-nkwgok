@@ -28,14 +28,16 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 	/**
 	 * Function executed from the Scheduler.
-	 * 
+	 *
+	 * @param int $startPageID - ID of page where TypoScript with the URLs to download is set up
 	 * @return boolean TRUE if success, otherwise FALSE
 	 */
 	public function execute($startPageID = Null) {
-		if ($startPageID === Null) {
-			$startpageID = $this->nkwgokStartPageId;
+		$myPageID = $startPageID;
+		if ($myPageID === Null) {
+			$myPageID = $this->nkwgokStartPageId;
 		}
-		$URLList = $this->getNkwgokDownloadURLs($startPageID);
+		$URLList = $this->getNkwgokDownloadURLs($myPageID);
 		if ($URLList) {
 			$this->downloadURLs($URLList);
 		}
