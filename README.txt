@@ -29,6 +29,16 @@ Er sollte im regulären Betrieb nachts ausgeführt werden, da die GOK Daten
 während des Neuimports in Schritt 3 (ca. 30 Sekunden) nicht verfügbar sind.
 
 
+=== auto 2+3: Prüfen, ob die CSV Dateien aktualisiert wurden und konvertieren/reimportieren wenn sie es sind ===
+Dieser Scheduler Task prüft, ob es zu allen CSV Dateien in fileadmin/gok/csv/
+entsprechende XML Dateien in fileadmin/gok/xml/ mit einem neueren Änderungsdatum
+gibt. Ist dies nicht der Fall, werden die CSV Dateien erneut konvertiert und
+importiert.
+
+Dieser Scheduler Task kann häufig aufgerufen werden, damit Änderungen an den CSV
+Dateien schnell auf der Seite verfügbar sind.
+
+
 === 2+3: CSV Dateien konvertieren und alle XML Dateien neu importieren ===
 Dieser Scheduler Task führt nur die bei einer Aktualisierung der CSV Dateien
 nötigen Schritte aus:

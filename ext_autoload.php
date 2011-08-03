@@ -25,6 +25,7 @@ return array(
 	'tx_nkwgok_loadfromopac' => t3lib_extMgm::extPath('nkwgok', 'scheduler/class.tx_nkwgok_loadfromopac.php'),
 	'tx_nkwgok_convertcsv' => t3lib_extMgm::extPath('nkwgok', 'scheduler/class.tx_nkwgok_convertcsv.php'),
 	'tx_nkwgok_loadxml' => t3lib_extMgm::extPath('nkwgok', 'scheduler/class.tx_nkwgok_loadxml.php'),
+	'tx_nkwgok_checknewcsv' => t3lib_extMgm::extPath('nkwgok', 'scheduler/class.tx_nkwgok_checknewcsv.php'),
 	'tx_nkwgok_updatecsv' => t3lib_extMgm::extPath('nkwgok', 'scheduler/class.tx_nkwgok_updatecsv.php'),
 	'tx_nkwgok_importall' => t3lib_extMgm::extPath('nkwgok', 'scheduler/class.tx_nkwgok_importall.php'),
 	'tx_nkwgok_scheduler_convertcsvadditionalparameters' => t3lib_extMgm::extPath('nkwgok', 'scheduler/class.tx_nkwgok_scheduler_convertcsvadditionalparameters.php')
