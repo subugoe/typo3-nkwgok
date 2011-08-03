@@ -37,6 +37,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 		if ($myPageID === Null) {
 			$myPageID = $this->nkwgokStartPageId;
 		}
+
 		$URLList = $this->getNkwgokDownloadURLs($myPageID);
 		if ($URLList) {
 			$this->downloadURLs($URLList);
@@ -111,18 +112,22 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * @param array $URLList
 	 */
 	private function downloadURLs($URLList) {
-		$filePaths = array();
 		foreach ($URLList as $URL) {
 			$URLPathComponents = explode('/', parse_url($URL, PHP_URL_PATH));
 			$fileName = $URLPathComponents[count($URLPathComponents)-1];
-			$filePath = PATH_site. 'fileadmin/gok/csv/' . $fileName;
-			$readData = file_get_contents($URL);
-			if ($readData !== False) {
-				if (file_put_contents($filePath, $readData)) {
-					$filePaths[] = $filePath;
-				}
-				else {
-					t3lib_div::devLog('convertCSV Scheduler Task: failed to download ' . $URL . ' to ' . $filePath . '.', 'nkwgok', 2);
+			$remoteData = file_get_contents($URL);
+			if ($remoteData !== False) {
+				$localPath = PATH_site. 'fileadmin/gok/csv/' . $fileName;
+				$localData = file_get_contents($localPath);
+				if ($localData != $remoteData) {
+					// Only overwrite local file if the file contents have changed.
+					if (file_put_contents($localPath, $remoteData)) {
+						t3lib_div::devLog('convertCSV Scheduler Task: replaced file ' . $localPath . '.', 'nkwgok', 1);
+						$filePaths[] = $localPath;
+					}
+					else {
+						t3lib_div::devLog('convertCSV Scheduler Task: failed to write downloaded file to ' . $localPath . '.', 'nkwgok', 2, Array($localData, $remoteData));
+					}
 				}
 			}
 			else {
