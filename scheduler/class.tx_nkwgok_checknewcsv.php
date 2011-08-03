@@ -22,18 +22,17 @@ class tx_nkwgok_checkNewCSV extends tx_scheduler_Task {
 	 */
 	public function execute() {
 		$success = True;
-
 		if ($this->needsUpdate()) {
 			$convertCSVTask = t3lib_div::makeInstance('tx_nkwgok_convertCSV');
 			$success = $convertCSVTask->execute($this->nkwgokStartPageId);
 			if (!$success) {
-				t3lib_div::devLog('importAll Scheduler Task: Problem during conversion of CSV files. Stopping.' , 'nkwgok', 3);
+				t3lib_div::devLog('checkNewCSV Scheduler Task: Problem during conversion of CSV files. Stopping.' , 'nkwgok', 3);
 			}
 			else {
 				$loadxmlTask = t3lib_div::makeInstance('tx_nkwgok_loadxml');
 				$success = $loadxmlTask->execute();
 				if (!$success) {
-					t3lib_div::devLog('importAll Scheduler Task: could not import XML to Typo3 database.' , 'nkwgok', 3);
+					t3lib_div::devLog('checkNewCSV Scheduler Task: could not import XML to TYPO3 database.' , 'nkwgok', 3);
 				}
 			}
 		}
