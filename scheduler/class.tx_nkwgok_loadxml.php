@@ -157,7 +157,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							$fromOpac = True;
 							if ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
 								// Maths type GOK with an MSC type search term.
-								$search = 'MSC=' . $GOK['045G']['a'];
+								$search = 'msc=' . $GOK['045G']['a'];
 							}
 							else if ($GOK['045A']['a']) {
 								// Generic GOK search, using the LKL field.
