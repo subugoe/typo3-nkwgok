@@ -620,6 +620,7 @@ class tx_nkwgok extends tslib_pibase {
 			}
 			startSearch" . $objectID . "(selectedOption);
 		}
+
 		function newMenuForSelection" . $objectID . " (option) {
 			var URL = location.protocol + '//' + location.host + location.pathname;
 			var PPN = option.value;
@@ -631,16 +632,23 @@ class tx_nkwgok extends tslib_pibase {
 				+ '&tx_" . NKWGOKExtKey . "[objectID]=" . $objectID . "';
 
 			jQuery(option.parentNode).nextAll().remove();
-			var emptySelect = document.createElement('select');
-			option.form.appendChild(emptySelect);
-			var emptyOption = document.createElement('option');
-			emptySelect.appendChild(emptyOption);
-			emptyOption.appendChild(document.createTextNode('" . $this->localise('Laden ...', $language) . "'));
-			var downloadFinishedFunction = function (html) {
-				jQuery(option.parentNode).nextAll().remove();
-				var form =  jQuery(option.form);
-				form.append(html);
-				jQuery('select:last-child option:first-child', form)[0].setAttribute('query', option.getAttribute('query'));
+			var newSelect = document.createElement('select');
+			var jNewSelect = jQuery(newSelect);
+			jNewSelect.hide();
+			option.form.appendChild(newSelect);
+			jNewSelect.slideDown('fast');
+			var loadingOption = document.createElement('option');
+			newSelect.appendChild(loadingOption);
+			loadingOption.appendChild(document.createTextNode('" . $this->localise('Laden ...', $language) . "'));
+			var downloadFinishedFunction = function (HTML) {
+				jNewSelect.empty();
+				var jHTML = jQuery(HTML);
+				var newOptions = jQuery('option, optgroup', jHTML);
+				if (newOptions.length > 0) {
+					newOptions[0].setAttribute('query', option.getAttribute('query'));
+				}
+				jNewSelect.attr('onchange', jHTML.attr('onchange'));
+				jNewSelect.append(newOptions);
 			};
 			jQuery.get(URL, parameters, downloadFinishedFunction);
 		}
@@ -691,7 +699,7 @@ class tx_nkwgok extends tslib_pibase {
 				$container->appendChild($select);
 				$select->setAttribute('id', 'select-' . $objectID . '-' . $parentPPN);
 				$select->setAttribute('name', 'tx_' . NKWGOKExtKey . '[expand-' . $level . ']');
-				$select->setAttribute('onchange', 'GOKMenuSelectionChanged' . $objectID . '(this);return false;');
+				$select->setAttribute('onchange', 'GOKMenuSelectionChanged' . $objectID . '(this);');
 				$select->setAttribute('level', $level);
 
 				// add dummy item at the beginning of the menu
