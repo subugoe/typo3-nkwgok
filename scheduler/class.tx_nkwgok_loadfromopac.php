@@ -153,7 +153,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 		}
 
 		if ($success) {
-			t3lib_div::devLog('loadFromOpac Scheduler Task: hitcount download succeeded', 'nkwgok', 1);
+			t3lib_div::devLog('loadFromOpac Scheduler Task: hitcount download for index ' . $indexName . ' succeeded', 'nkwgok', 1);
 		}
 
 		return $success;
