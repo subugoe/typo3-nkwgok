@@ -649,6 +649,7 @@ class tx_nkwgok extends tslib_pibase {
 				}
 				jNewSelect.attr('onchange', jHTML.attr('onchange'));
 				jNewSelect.append(newOptions);
+				newSelect.selectedIndex = 0;
 			};
 			jQuery.get(URL, parameters, downloadFinishedFunction);
 		}
