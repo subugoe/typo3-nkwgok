@@ -752,7 +752,7 @@ class tx_nkwgok extends tslib_pibase {
 					$option->setAttribute('hasChildren', $GOK['childcount']);
 				}
 				$option->appendChild($doc->createTextNode($menuItemString));
-				if ($GOK['childcount'] <= $autoExpandLevel) {
+				if (($GOK['childcount'] > 0) && ($GOK['childcount'] <= $autoExpandLevel)) {
 					$option->setAttribute('isAutoExpanded', '');
 					$this->appendGOKMenuChildren($PPN, $doc, $select, $language, $objectID, $getVars, $autoExpandLevel, $level, $autoExpandStep + 1);
 				}
