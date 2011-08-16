@@ -634,6 +634,7 @@ class tx_nkwgok extends tslib_pibase {
 			jQuery(option.parentNode).nextAll().remove();
 			var newSelect = document.createElement('select');
 			var jNewSelect = jQuery(newSelect);
+			newSelect.setAttribute('level', level);
 			jNewSelect.hide();
 			option.form.appendChild(newSelect);
 			jNewSelect.slideDown('fast');
