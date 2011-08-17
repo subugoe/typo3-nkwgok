@@ -649,6 +649,7 @@ class tx_nkwgok extends tslib_pibase {
 					newOptions[0].setAttribute('query', option.getAttribute('query'));
 				}
 				jNewSelect.attr('onchange', jHTML.attr('onchange'));
+				jNewSelect.attr('title', jHTML.attr('title'));
 				jNewSelect.append(newOptions);
 				newSelect.selectedIndex = 0;
 			};
@@ -702,6 +703,8 @@ class tx_nkwgok extends tslib_pibase {
 				$select->setAttribute('id', 'select-' . $objectID . '-' . $parentPPN);
 				$select->setAttribute('name', 'tx_' . NKWGOKExtKey . '[expand-' . $level . ']');
 				$select->setAttribute('onchange', 'GOKMenuSelectionChanged' . $objectID . '(this);');
+				$select->setAttribute('title', $this->localise('Fachgebiet auswählen', $language) . ' ('
+						. $this->localise('Ebene', $language) . ' ' . ($level + 1) . ')');
 				$select->setAttribute('level', $level);
 
 				// add dummy item at the beginning of the menu
