@@ -133,6 +133,22 @@ $TCA['tx_nkwgok_data'] = array(
 				'default' => 0
 			)
 		),
+		'totalhitcount' => array(
+			'exclude' => 0,
+			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.totalhitcount',
+			'config' => array(
+				'type'     => 'input',
+				'size'     => '10',
+				'max'      => '10',
+				'eval'     => 'int',
+				'checkbox' => '0',
+				'range'    => array(
+					'upper' => '10000000',
+					'lower' => '-1'
+				),
+				'default' => 0
+			)
+		),
 		'tags' => array(
 			'exclude' => 0, 
 			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.tags', 

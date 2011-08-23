@@ -52,53 +52,94 @@ define('NKWGOKGOKRootNode', 'GOK-Root');
 class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 	/**
+	 * Stores the hierarchical GOK structure:
+	 * Key: PPN => Value: Array containing PPNs of child elements.
+	 * @var Array
+	 */
+	private $parentPPNs;
+
+
+
+	/**
+	 * Maps Normsatz-PPN to its corresponding GOK.
+	 * Key: PPN => Value: GOK string
+	 * @var Array
+	 */
+	private $PPNToGOK;
+
+
+
+	/**
+	 * Stores the hitcount for each GOK.
+	 * Key: GOK string => Value: integer
+	 * @var Array
+	 */
+	private $hitCounts;
+
+
+
+	/**
 	 * Function executed from the Scheduler.
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
+		// Initialisation and general setup.
 		set_time_limit(300);
 		$result = False;
 
-		$hitCounts = $this->getHitCounts();
+		$this->parentPPNs = Array(NKWGOKRootNode => Array(), NKWGOKGOKRootNode => Array());
+		$this->PPNToGOK = Array();
 
 		$wantedFieldNames = array('045A', '044E', '044K', '009B', '038D', '003@', '045G', 'str', 'tags');
+
 		$dir = PATH_site . 'fileadmin/gok/xml/';
 		$fileList = glob($dir . '*.xml');
-
 		if (count($fileList) > 0) {
-			// Empty our database table.
-			$GLOBALS['TYPO3_DB']->sql_query('TRUNCATE tx_nkwgok_data');
+			// Run through all files once to gather information about the
+			// structure of the data we process.
 
-			// Run through all files once to get a child count for each parent
-			// element in the list.
-			// $parentPPNs is a dictionary whose keys are the parent element PPNs.
-			$parentPPNs = Array(NKWGOKRootNode => Array(), NKWGOKGOKRootNode => Array());
 			foreach ($fileList as $xmlPath) {
 				$xml = simplexml_load_file($xmlPath);
 				$records = $xml->xpath('/RESULT/SET/SHORTTITLE/record');
+
 				foreach ($records as $record) {
-					$PPN = trim((string)$record->xpath('datafield[@tag="003@"]/subfield[@code="0"]'));
+					$PPNs = $record->xpath('datafield[@tag="003@"]/subfield[@code="0"]');
+					$PPN = (string)($PPNs[0]);
 					$myParentPPNs = $record->xpath('datafield[@tag="038D"]/subfield[@code="9"]');
 					if (count($myParentPPNs) > 0) {
-						$parentPPN = (string)$myParentPPNs[0];
-						if ($parentPPNs[$parentPPN]) {
-							$parentPPNs[$parentPPN][] = $PPN;
+						$parentPPN = (string)($myParentPPNs[0]);
+						if (array_key_exists($parentPPN, $this->parentPPNs)) {
+							$this->parentPPNs[$parentPPN][] = $PPN;
 						}
 						else {
-							$parentPPNs[$parentPPN] = Array($PPN);
+							$this->parentPPNs[$parentPPN] = Array($PPN);
 						}
 					}
 					else {
-						$fromOpac = (count($record->xpath('datafield[@tag="str"]')) == 0);
+						$fromOpac = (count($record->xpath('datafield[@tag="str"]')) === 0);
 						if ($fromOpac) {
-							$parentPPNs[NKWGOKGOKRootNode][] = $PPN;
+							$this->parentPPNs[NKWGOKGOKRootNode][] = $PPN;
 						}
 						else {
-							$parentPPNs[NKWGOKRootNode][] = $PPN;
+							$this->parentPPNs[NKWGOKRootNode][] = $PPN;
 						}
+					}
+
+					$GOKStrings = $record->xpath('datafield[@tag="045A"]/subfield[@code="a"]');
+					if (count($GOKStrings) > 0) {
+						$GOKString = (string)($GOKStrings[0]);
+						$this->PPNToGOK[$PPN] = strtolower(trim($GOKString));
 					}
 				}
 			}
+
+			
+			// Load hit count information and compute total hit count sums.
+			$this->hitCounts = $this->loadHitCounts();
+			$totalHitCounts = $this->computeTotalHitCounts(NKWGOKGOKRootNode);
+
+			// Empty our database table.
+			$GLOBALS['TYPO3_DB']->sql_query('TRUNCATE tx_nkwgok_data');
 
 			// Run through the files again, read all data, add the information
 			// about parent elements and store it to our table in the database.
@@ -115,7 +156,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						// Only read the desired fields
 						if (in_array($fieldName, $wantedFieldNames)) {
 							// append "_2" to field Name to avoid duplication (ahem)
-							if ($fieldName == $previousFieldName) {
+							if ($fieldName === $previousFieldName) {
 								$fieldName = $fieldName . '_2';
 							}
 							$previousFieldName = $fieldName;
@@ -135,37 +176,43 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					// Build complete record and insert into database.
 					// Discard records without a PPN.
 					$PPN = trim($GOK['003@']['0']);
-					if ($PPN != '') {
+					if ($PPN !== '') {
 						$childCount = 0;
-						if ($parentPPNs[$PPN]) {
-							$childCount = count($parentPPNs[$PPN]);
+						if ($this->parentPPNs[$PPN]) {
+							$childCount = count($this->parentPPNs[$PPN]);
 						}
 
-						$parent = trim($GOK['038D'][9]);
+						$parent = Null;
+						if (array_key_exists('038D', $GOK) && array_key_exists(9, $GOK['038D']) && $GOK['038D'][9]) {
+							$parent = trim($GOK['038D'][9]);
+						}
 
 						$search = '';
 						$fromOpac = False;
-						if ($GOK['str']['a'] !== Null) {
+						if (array_key_exists('str', $GOK) && array_key_exists('a', $GOK['str']) && $GOK['str']['a']) {
 							// GOK coming from CSV file with a CCL search query in the 'str/a' field.
 							$search = $GOK['str']['a'];
-							if ($parent == '') {
+
+							// Set parent element to Root node if it is blank.
+							if ($parent === Null) {
 								$parent = NKWGOKRootNode;
 							}
 						}
 						else {
 							// GOK coming from standard Opac record.
 							$fromOpac = True;
-							if ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
+							
+							if (array_key_exists('045G', $GOK) && array_key_exists('C', $GOK['045G']) && $GOK['045G']['C'] === 'MSC') {
 								// Maths type GOK with an MSC type search term.
 								$search = 'msc=' . $GOK['045G']['a'];
 							}
-							else if ($GOK['045A']['a']) {
+							else if (array_key_exists('045A', $GOK) && array_key_exists ('a', $GOK['045A']) && $GOK['045A']['a']) {
 								// Generic GOK search, using the LKL field.
 								$search = 'lkl=' . $GOK['045A']['a'];
 							}
 							
-							// Set parent element to GOK-Root if it, i.e. '038D/9', is blank.
-							if ($parent == '') {
+							// Set parent element to GOK-Root node if it is blank.
+							if ($parent === Null) {
 								$parent = NKWGOKGOKRootNode;
 							}
 						}
@@ -189,7 +236,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 						// English translation of the GOK’s name is in field 044K $a.
 						// This field is designated for the _English_ version.
-						if ($GOK['044K']['a']) {
+						if (array_key_exists('044K', $GOK) && array_key_exists('a', $GOK['044K'])) {
 							$values['descr_en'] = trim($GOK['044K']['a']);
 						}
 
@@ -198,19 +245,20 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						// * for GOK and MSC-type records: try to use hitcount
 						// * for CSV-type records: if only one LKL query, try to use hitcount, else use -1
 						// * otherwise: use 0
-						if ($GOK['045G'] && $GOK['045G']['C'] == 'MSC') {
-							$values['hitcount'] = (int)$hitCounts[strtolower($GOK['045G']['a'])];
+						if (array_key_exists('045G', $GOK) && array_key_exists('C', $GOK['045G']) && $GOK['045G']['C'] === 'MSC') {
+							$values['hitcount'] = $this->hitCounts[strtolower($GOK['045G']['a'])];
 						}
-						else if ($hitCounts[strtolower($GOKString)]) {
-							$values['hitcount'] = (int)$hitCounts[strtolower($GOKString)];
+						else if (array_key_exists(strtolower($GOKString), $this->hitCounts)) {
+							$values['hitcount'] = $this->hitCounts[strtolower($GOKString)];
 						}
-						else if ($GOK['str']) {
+						else if (array_key_exists('str', $GOK)) {
 							$foundGOKs = array();
 							$pattern = '/lkl=([a-zA-Z]*\s?[.X0-9]*)$/';
 							preg_match($pattern, $GOK['str']['a'], $foundGOKs);
+							$foundGOK = strtolower($foundGOKs[1]);
 
-							if (count($foundGOKs) > 1 && strtolower($foundGOKs[1]) && $hitCounts[strtolower($foundGOKs[1])]) {
-								$values['hitcount'] = (int)$hitCounts[strtolower($foundGOKs[1])];
+							if (count($foundGOKs) > 1 && $foundGOK && array_key_exists($foundGOK, $this->hitCounts)) {
+								$values['hitcount'] = $this->hitCounts[$foundGOK];
 							}
 							else {
 								$values['hitcount'] = -1;
@@ -218,6 +266,11 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						}
 						else {
 							$values['hitcount'] = 0;
+						}
+
+						// Add total hit count information if it exists.
+						if (array_key_exists($PPN, $totalHitCounts)) {
+							$values['totalhitcount'] = $totalHitCounts[$PPN];
 						}
 
 						$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
@@ -235,7 +288,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				'gok' => NKWGOKGOKRootNode,
 				'crdate' => time(),
 				'tstamp' => time(),
-				'childcount' => count($parentPPNs[NKWGOKGOKRootNode]),
+				'childcount' => count($this->parentPPNs[NKWGOKGOKRootNode]),
 				'fromopac' => True
 			);
 
@@ -253,14 +306,15 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 
 	/**
-	 * Load LKL hit counts from /fileadmin/gok/hitcounts/*.xml
+	 * Load LKL hit counts from fileadmin/gok/hitcounts/*.xml.
 	 * These files are downloaded from the Opac by the loadFromOpac
 	 * Scheduler task.
 	 *
 	 * @author Sven-S. Porst
-	 * @return array keys: LKL entries, values: hit count for the entry
+	 *
+	 * @return Array with Key: LKL entries => Value: integer with the hit count for the entry
 	 */
-	private function getHitCounts () {
+	private function loadHitCounts () {
 		$hitCounts = Array();
 
 		$fileList = glob(PATH_site . '/fileadmin/gok/hitcounts/' . '*.xml');
@@ -272,15 +326,15 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					$hits = Null;
 					$description = Null;
 					foreach($scanline->attributes() as $name => $value) {
-						if ($name == 'hits') {
+						if ($name === 'hits') {
 							// Reduce the hit count by 1 as it includes the GOK-Normsatz.
 							$hits = (int)$value - 1;
 						}
-						else if ($name == 'description') {
+						else if ($name === 'description') {
 							$description = (string)$value;
 						}
 					}
-					if ($hits != Null && $description) {
+					if ($hits !== Null && $description !== Null) {
 						$hitCounts[$description] = $hits;
 					}
 				}
@@ -290,11 +344,59 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			}
 		} // end foreach
 
-		t3lib_div::devLog('loadXML Scheduler Task: Loaded ' . count($hitCounts) . ' hit count entries.', 'nkwgok', 1);
+		t3lib_div::devLog('loadXML Scheduler Task: Loaded ' . count($this->hitCounts) . ' hit count entries.', 'nkwgok', 1);
 
 		return $hitCounts;
 	}
 
+
+
+	/**
+	 * Recursively go through the $childRelations and add up the $hitCounts to return a
+	 * total hit count including the hits for all child elements.
+	 *
+	 * Requires that the class’ $hitCounts and $parentPPNs arrays are initialised.
+	 *
+	 * @author Sven-S. Porst
+	 *
+	 * @param String $startPPN - PPN to start at
+	 * @return Array with Key: PPN => Value: sum of hit counts
+	 */
+	private function computeTotalHitCounts ($startPPN) {
+		$totalHitCounts = Array();
+		$GOK = Null;
+		$myHitCount = 0;
+
+		if (array_key_exists($startPPN, $this->PPNToGOK)) {
+			$GOK = $this->PPNToGOK[$startPPN];
+		}
+
+		if (array_key_exists($startPPN, $this->parentPPNs)) {
+			// A parent node: recursively collect and add up the hit counts.
+			foreach ($this->parentPPNs[$startPPN] as $childPPN) {
+				$childHitCounts = $this->computeTotalHitCounts($childPPN);
+				if (array_key_exists($childPPN, $childHitCounts)) {
+					$myHitCount += $childHitCounts[$childPPN];
+				}
+				$totalHitCounts += $childHitCounts;
+			}
+
+			if ($GOK && array_key_exists($GOK, $this->hitCounts)) {
+				$myHitCount += $this->hitCounts[$GOK];
+			}
+
+		}
+		else {
+			// A leaf node: just store its hit count.
+			if ($GOK && array_key_exists($GOK, $this->hitCounts)) {
+				$myHitCount += $this->hitCounts[$GOK];
+			}
+		}
+
+		$totalHitCounts[$startPPN] = $myHitCount;
+
+		return $totalHitCounts;
+	}
 
 }
 

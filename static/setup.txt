@@ -4,4 +4,6 @@ plugin.tx_nkwgok_pi1{
 		# link1 = http://www.sub.uni-goettingen.de/download/library.csv
 		# link2 = http://www.sub.uni-goettingen.de/download/geography.csv
 	}
+	# Do Opac links in the tree perform a deep or shallow search?
+	shallowSearch = 0
 }

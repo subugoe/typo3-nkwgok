@@ -1,3 +1,9 @@
+2011-08-23 0.9.13 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* compute total hit counts for Opac LKLs
+	* add total hitcounts to database
+	* add link to full subject hierarchy to tree output
+	* add plugin.tx_nkwgok_pi1.shallowSearch setting to toggle between deep and shallow searches
+
 2011-08-02 0.9.11 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Reduce logging
 	* Cleanup

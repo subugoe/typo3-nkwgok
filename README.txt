@@ -149,3 +149,9 @@ Jeder Seitenhinhalt mit GOK Plug-In hat drei Einstellungsmöglichkeiten:
 ## unpraktischer Baum - hierarchische Baumstruktur mit ursprünglich geplantem Layout
 ## Menüs - es erscheint ein Menü mit den Untergebieten. Nach Auswahl eines Menüpunktes erscheint ein weiteres Menü mit den Untergebieten des ausgewählten Faches
 # GOK-ID anzeigen: hiermit kann die Anzeige der GOK-IDs wie 'IA 663' an- bzw. abgestellt werden
+
+Weiterhin kann über TypoScript konfiguriert mit der Einstellung
+	plugin.tx_nkwgok_pi1.shallowSearch
+werden, ob die Anzeige vom Typ 'Baum' für eine GOK aus dem Opac
+* verlinkt auf eine Suche nach Büchern aller Kindelemente der GOK [0, Standard]
+* verlinkt auf eine Suche nach Büchern speziell zu dieser GOK [1]

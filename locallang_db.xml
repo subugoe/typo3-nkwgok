@@ -13,6 +13,7 @@
 			<label index="tx_nkwgok_data.descr">Title (German)</label>
 			<label index="tx_nkwgok_data.descr_en">Title (English)</label>
 			<label index="tx_nkwgok_data.hitcount">Number of hits in Opac</label>
+			<label index="tx_nkwgok_data.totalhitcount">Number of hits in Opac, including child-topics</label>
 			<label index="tx_nkwgok_data.parent">PPN of parent element</label>
 			<label index="tx_nkwgok_data.hierarchy">GOK hierarchy Level</label>
 			<label index="tx_nkwgok_data.tags">Tags</label>
@@ -28,7 +29,8 @@
 			<label index="tx_nkwgok_data.ppn">PPN</label>
 			<label index="tx_nkwgok_data.descr">Titel (Deutsch)</label>
 			<label index="tx_nkwgok_data.descr_en">Titel (Englisch)</label>
-			<label index="tx_nkwgok_data.hitcount">Anzahl der Treffer im Opac</label>
+			<label index="tx_nkwgok_data.hitcount">Anzahl der Treffer zum Thema im Opac</label>
+			<label index="tx_nkwgok_data.totalhitcount">Anzahl der Treffer zum Thema im Opac, einschließlich aller untergeordneten Themen</label>
 			<label index="tx_nkwgok_data.parent">PPN des Elternelements</label>
 			<label index="tx_nkwgok_data.hierarchy">Stufe in der GOK Hierarchie</label>
 			<label index="tx_nkwgok_data.tags">Tags</label>

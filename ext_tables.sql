@@ -18,6 +18,7 @@ CREATE TABLE tx_nkwgok_data (
 	hierarchy int(11) DEFAULT '0' NOT NULL,
 	childcount int(11) DEFAULT '0' NOT NULL,
 	hitcount int(11) DEFAULT '0' NOT NULL,
+	totalhitcount int(11) DEFAULT '0' NOT NULL,
 	PRIMARY KEY (uid),
 	KEY parent (pid)
 );

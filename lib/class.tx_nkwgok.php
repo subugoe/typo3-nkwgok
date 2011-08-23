@@ -25,7 +25,7 @@
 
 define('NKWGOKExtKey', 'nkwgok');
 define('NKWGOKQueryTable', 'tx_nkwgok_data');
-define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, childcount, hitcount, fromopac');
+define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, childcount, hitcount, totalhitcount, fromopac');
 
 /**
  * undocumented class
@@ -128,6 +128,32 @@ class tx_nkwgok extends tslib_pibase {
 
 
 	/**
+	 * Appends two Opac search links to $container, one for shallow search and
+	 * one for deep search. One of them will be hidden by CSS.
+	 *
+	 * @author Sven-S. Porst
+	 * @param Array $GOK GOK record
+	 * @param DOMDocument $doc document used to create the resulting element
+	 * @param string $language ISO 639-1 language code
+	 * @param DOMElement $container the link elements are appended to
+	 */
+	private function appendOpacLinksTo ($GOK, $doc, $language, $container) {
+		$opacLinkElement = $this->OPACLinkElement($GOK, $doc, $language, True);
+		if ($opacLinkElement) {
+			$container->appendChild($doc->createTextNode(' '));
+			$container->appendChild($opacLinkElement);
+		}
+
+		$opacLinkElement = $this->OPACLinkElement($GOK, $doc, $language, False);
+		if ($opacLinkElement) {
+			$container->appendChild($doc->createTextNode(' '));
+			$container->appendChild($opacLinkElement);
+		}
+	}
+
+
+
+	/**
 	 * Returns DOMElement with complete markup for linking to the OPAC entry.
 	 * The link text indicates the number of results if it is known.
 	 *
@@ -135,27 +161,35 @@ class tx_nkwgok extends tslib_pibase {
 	 * @param Array $GOKData GOK record
 	 * @param DOMDocument $doc document used to create the resulting element
 	 * @param string $language ISO 639-1 language code
+	 * @param Boolean $deepSearch
 	 * @return DOMElement
 	 */
-	private function OPACLinkElement ($GOKData, $doc, $language) {
+	private function OPACLinkElement ($GOKData, $doc, $language, $deepSearch) {
 		$opacLink = Null;
-		$hitCount = $GOKData['hitcount'];
-		$URL = $this->opacGOKSearchURL($GOKData, $language);
+		$hitCount = (($deepSearch === True) ? $GOKData['totalhitcount'] : $GOKData['hitcount']);
+		$URL = $this->opacGOKSearchURL($GOKData, $language, $deepSearch);
 		if ($hitCount != 0 && $URL) {
 			$opacLink = $doc->createElement('a');
 			$opacLink->setAttribute('href', $URL);
-			$opacLink->setAttribute('title', $this->localise('Bücher zu diesem Thema im Opac anzeigen', $language) );
+			if ($deepSearch === True) {
+				$opacLink->setAttribute('title', $this->localise('Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen', $language) );
+			}
+			else {
+				$opacLink->setAttribute('title', $this->localise('Bücher zu genau diesem Thema im Opac anzeigen', $language) );
+			}
+
 			// Question: Is '_blank' a good idea?
 			$opacLink->setAttribute('target', '_blank');
 			if ($hitCount > 0) {
 				// we know the number of results: display it
-				$opacLink->appendChild($doc->createTextNode(sprintf($this->localise('%d Treffer anzeigen', $language), $GOKData['hitcount'])));
+				$numberString = number_format($hitCount, 0, $this->localise('decimal separator', $language), $this->localise('thousands separator', $language));
+				$opacLink->appendChild($doc->createTextNode(sprintf($this->localise('%s Treffer anzeigen', $language), $numberString)));
 			}
 			else {
 				// we don't know the number of results: display a general text
 				$opacLink->appendChild($doc->createTextNode($this->localise('Treffer anzeigen', $language)));
 			}
-			$opacLink->setAttribute('class', 'opacLink');
+			$opacLink->setAttribute('class', 'opacLink' . (($hitCount > 0) ? ' ' . (($deepSearch) ? 'deep' : 'shallow') : '') );
 		}
 
 		return $opacLink;
@@ -171,18 +205,20 @@ class tx_nkwgok extends tslib_pibase {
 	 * @param Array $GOKData GOK record
 	 * @param DOMDocument $doc document used to create the resulting element
 	 * @param string $language ISO 639-1 language code
+	 * @param Boolean $deepSearch [defaults to False]
 	 * @return DOMElement
 	 */
-	private function OPACLinkElementUgly ($GOKData, $doc, $language) {
+	private function OPACLinkElementUgly ($GOKData, $doc, $language, $deepSearch = False) {
 		$opacLink = $doc->createElement('a');
 		$hitCount = $GOKData['hitcount'];
-		$URL = $this->opacGOKSearchURL($GOKData, $language);
+		$URL = $this->opacGOKSearchURL($GOKData, $language, $deepSearch);
 		if ($hitCount != 0 && $URL) {
 			$opacLink->setAttribute('href', $URL);
 
 			if ($hitCount > 0) {
 				// we know the number of results: display it
-				$opacLink->setAttribute('title', sprintf($this->localise('%d Treffer anzeigen', $language), $GOKData['hitcount']));
+				$numberString = number_format($GOKData['hitcount'], 0, $this->localise('decimal separator', $language), $this->localise('thousands separator', $language));
+				$opacLink->setAttribute('title', sprintf($this->localise('%s Treffer anzeigen', $language), $numberString));
 			}
 			else {
 				// we don't know the number of results: display a general text
@@ -191,7 +227,7 @@ class tx_nkwgok extends tslib_pibase {
 
 			// Question: Is '_blank' a good idea?
 			$opacLink->setAttribute('target', '_blank');
-			$opacLink->setAttribute('class', 'opacLink');
+			$opacLink->setAttribute('class', 'opacLink' . (($hitCount > 0) ? ' ' . (($deepSearch) ? 'deep' : 'shallow') : '') );
 		}
 
 		return $opacLink;
@@ -200,36 +236,43 @@ class tx_nkwgok extends tslib_pibase {
 	
 	
 	/**
-	 * Returns URL string pointing to an Opac search in the current language
-	 * for the given GOK record or Null if there is no search query.
+	 * Returns URL string for an Opac Search.
+	 * If $deepSearch is false, the search query stored in $GOKData is used.
+	 * If $deepSearch is true, a deep hierarchical search for records related
+	 * to the GOK Normsatz PPN is used
+	 * If the record did not originate from Opac, Null is returned.
 	 *
 	 * @author Sven-S. Porst
 	 * @param Array $GOKData GOK record
 	 * @param string $language ISO 639-1 language code
+	 * @param Boolean $deepSearch
 	 * @return string|Null URL
 	 */
-	private function opacGOKSearchURL($GOKData, $language) {
+	private function opacGOKSearchURL($GOKData, $language, $deepSearch) {
 		$GOKSearchURL = Null;
 
-		if ($GOKData['search']) {
+		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
+		$picaLanguageCode = ($language === 'en') ? 'EN' : 'DU';
+		$GOKSearchURL = $conf['opacBaseURL'] . 'LNG=' . $picaLanguageCode . '/REC=1';
+
+		if ($deepSearch === True && $GOKData['fromopac'] == 1) {
+			// Use special command to do the hierarchical search for records related
+			// to the Normsatz PPN.
+			$GOKSearchURL .= '/EPD?PPN=' . $GOKData['ppn'];
+		}
+		else if ($deepSearch === False && $GOKData['search']) {
 			// Convert CCL string to Opac-style search string and escape.
 			$searchString = urlencode(str_replace('=', ' ', $GOKData['search']));
-
-			$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
-
-			$picaLanguageCode = 'DU';
-			if ($language == 'en') {
-				$picaLanguageCode = 'EN';
-			}
-
-			$GOKSearchURL = $conf['opacBaseURL'] . 'LNG=' . $picaLanguageCode
-				. '/REC=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=' . $searchString;
+			$GOKSearchURL .= '/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=' . $searchString;
 		}
-		
+		else {
+			$GOKSearchURL = Null;
+		}
+
 		return $GOKSearchURL;
 	}
 
-	
+
 	
 	/**
 	 * Helper function to add our default stylesheet or the one at the path
@@ -247,6 +290,8 @@ class tx_nkwgok extends tslib_pibase {
 		
 		$GLOBALS['TSFE']->pSetup['includeCSS.'][$this->extKey] = $cssPath;
 	}
+
+
 
 	/**
 	 * Return DOMDocument representing the tree set up in the given configuration.
@@ -299,9 +344,11 @@ class tx_nkwgok extends tslib_pibase {
 			if ($conf['getVars']['style'] != 'treeOld') {
 				$containerClasses[] = 'newStyle';
 			}
-
 			if (!$conf['getVars']['showGOKID']) {
 				$containerClasses[] = 'hideGOKID';
+			}
+			if ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowLinks'] == 1) {
+				$containerClasses[] = 'shallowLinks';
 			}
 			$container->setAttribute('class', implode(' ', $containerClasses));
 
@@ -336,8 +383,6 @@ class tx_nkwgok extends tslib_pibase {
 		$scriptElement = $doc->createElement('script');
 		$doc->appendChild($scriptElement);
 		$scriptElement->setAttribute('type', 'text/javascript');
-
-		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][NKWGOKExtKey]);
 
 		$js = "
 		function swapTitles" . $objectID . " (element) {
@@ -450,11 +495,7 @@ class tx_nkwgok extends tslib_pibase {
 					$openLink->appendChild($GOKIDSpan);
 					$openLink->appendChild($doc->createTextNode(' '));
 					$openLink->appendChild($GOKNameSpan);
-					$opacLinkElement = $this->OPACLinkElement($GOK, $doc, $language);
-					if ($opacLinkElement) {
-						$li->appendChild($doc->createTextNode(' '));
-						$li->appendChild($opacLinkElement);
-					}
+					$this->appendOpacLinksTo($GOK, $doc, $language, $li);
 				}
 				else {
 					$li->appendChild($doc->createTextNode(' '));
@@ -473,8 +514,7 @@ class tx_nkwgok extends tslib_pibase {
 					$mainTitle = $GOK['childcount'] . ' ' . $this->localise('Unterkategorien anzeigen', $language);
 					$alternativeTitle = $this->localise('Unterkategorien ausblenden', $language);
 					
-					if ( ($expandInfo && in_array($PPN, $expandInfo))
-							|| $GOK['childcount'] <= $autoExpandLevel) {
+					if ( ($expandInfo && in_array($PPN, $expandInfo)) || $GOK['childcount'] <= $autoExpandLevel) {
 						$li->setAttribute('class', 'close');
 						$JSCommand = 'hideGOK' . $objectID;
 						$buttonText = '[-]';
@@ -482,7 +522,8 @@ class tx_nkwgok extends tslib_pibase {
 						$mainTitle = $alternativeTitle;
 						$alternativeTitle = $tmpTitle;
 						$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
-								array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker, 'tx_' . NKWGOKExtKey . '[style]' => $style) );
+								array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker,
+										'tx_' . NKWGOKExtKey . '[style]' => $style) );
 						
 						// recursively call self to get child UL
 						$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $objectID, $expandInfo, $expand, $autoExpandLevel, $style);
