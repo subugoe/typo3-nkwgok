@@ -344,7 +344,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			}
 		} // end foreach
 
-		t3lib_div::devLog('loadXML Scheduler Task: Loaded ' . count($this->hitCounts) . ' hit count entries.', 'nkwgok', 1);
+		t3lib_div::devLog('loadXML Scheduler Task: Loaded ' . count($hitCounts) . ' hit count entries.', 'nkwgok', 1);
 
 		return $hitCounts;
 	}
