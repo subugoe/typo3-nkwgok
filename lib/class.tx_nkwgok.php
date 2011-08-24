@@ -258,7 +258,7 @@ class tx_nkwgok extends tslib_pibase {
 		if ($deepSearch === True && $GOKData['fromopac'] == 1) {
 			// Use special command to do the hierarchical search for records related
 			// to the Normsatz PPN.
-			$GOKSearchURL .= '/EPD?PPN=' . $GOKData['ppn'];
+			$GOKSearchURL .= '/EPD?PPN=' . $GOKData['ppn'] . '&FRM=';
 		}
 		else if ($deepSearch === False && $GOKData['search']) {
 			// Convert CCL string to Opac-style search string and escape.
