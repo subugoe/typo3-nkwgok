@@ -106,7 +106,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					$PPNs = $record->xpath('datafield[@tag="003@"]/subfield[@code="0"]');
 					$PPN = (string)($PPNs[0]);
 					$myParentPPNs = $record->xpath('datafield[@tag="038D"]/subfield[@code="9"]');
-					if (count($myParentPPNs) > 0) {
+					if ($myParentPPNs && count($myParentPPNs) > 0) {
 						$parentPPN = (string)($myParentPPNs[0]);
 						if (array_key_exists($parentPPN, $this->parentPPNs)) {
 							$this->parentPPNs[$parentPPN][] = $PPN;
@@ -384,7 +384,6 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			if ($GOK && array_key_exists($GOK, $this->hitCounts)) {
 				$myHitCount += $this->hitCounts[$GOK];
 			}
-
 		}
 		else {
 			// A leaf node: just store its hit count.
