@@ -532,7 +532,6 @@ class tx_nkwgok extends tslib_pibase {
 						$li->setAttribute('class', 'open');
 						$JSCommand = 'expandGOK' . $objectID;
 						$buttonText = '[+]';
-						$linkTitle = $GOK['childcount'] . ' ' . $this->localise('Unterkategorien anzeigen', $language);
 						$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
 								array('tx_' . NKWGOKExtKey . '[expand]' => $expand, 'no_cache' => 1) )
 								. '#c' . $PPN;
