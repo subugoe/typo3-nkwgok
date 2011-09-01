@@ -1,3 +1,6 @@
+2011-09-01 1 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* final tweaks, we’ll start using this
+
 2011-08-23 0.9.13 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* compute total hit counts for Opac LKLs
 	* add total hitcounts to database
