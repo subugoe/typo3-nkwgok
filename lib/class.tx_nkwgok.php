@@ -652,7 +652,7 @@ class tx_nkwgok extends tslib_pibase {
 		function GOKMenuSelectionChanged" . $objectID . " (menu) {
 			var selectedOption = menu.options[menu.selectedIndex];
 			jQuery(menu).nextAll().remove();
-			if (selectedOption.hasAttribute('haschildren') && !selectedOption.hasAttribute('isautoexpanded')) {
+			if (selectedOption.getAttribute('haschildren') && !selectedOption.getAttribute('isautoexpanded')) {
 				newMenuForSelection" . $objectID . "(selectedOption);
 			}
 			if (selectedOption.value != 'pleaseselect') {
