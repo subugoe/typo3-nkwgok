@@ -14,9 +14,9 @@
 			<label index="styleMenu">Menus</label>
 			<label index="showGOKID">Display GOK-ID (e.g. IA 663)</label>
 
-			<label index="Bücher zu diesem Thema im Opac anzeigen">Show books on this subject in Opac</label>
-			<label index="Bücher zu genau diesem Thema im Opac anzeigen">Show books on exactly this subject in Opac</label>
-			<label index="Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen">Show books on this and more specific subjects in Opac</label>
+			<label index="Bücher zu diesem Thema im Opac anzeigen">Show books on this subject in the catalogue (opens in new window)</label>
+			<label index="Bücher zu genau diesem Thema im Opac anzeigen">Show books on this subject in the catalogue (opens in new window)</label>
+			<label index="Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen">Show books on this and more specific subjects in the catalogue (opens in new window)</label>
 			<label index="%s Treffer anzeigen">show %s matching books</label>
 			<label index="Treffer anzeigen">show matching books</label>
 			<label index="keine Treffer">no matching books</label>
@@ -43,9 +43,9 @@
 			<label index="styleMenu">Menüs</label>
 			<label index="showGOKID">GOK-ID (z.B. IA 663) anzeigen</label>
 
-			<label index="Bücher zu diesem Thema im Opac anzeigen">Bücher zu diesem Thema im Opac anzeigen</label>
-			<label index="Bücher zu genau diesem Thema im Opac anzeigen">Bücher zu genau diesem Thema im Opac anzeigen</label>
-			<label index="Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen">Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen</label>
+			<label index="Bücher zu diesem Thema im Opac anzeigen">Bücher zu diesem Thema im Katalog anzeigen (öffnet ein neues Fenster)</label>
+			<label index="Bücher zu genau diesem Thema im Opac anzeigen">Bücher zu diesem Thema im Katalog anzeigen (öffnet ein neues Fenster)</label>
+			<label index="Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen">Bücher zu diesem und enthaltenen Themengebieten im Katalog anzeigen (öffnet ein neues Fenster)</label>
 			<label index="%s Treffer anzeigen">%s Treffer anzeigen</label>
 			<label index="Treffer anzeigen">Treffer anzeigen</label>
 			<label index="keine Treffer">keine Treffer</label>

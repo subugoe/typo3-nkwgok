@@ -166,17 +166,23 @@ class tx_nkwgok extends tslib_pibase {
 	 */
 	private function OPACLinkElement ($GOKData, $doc, $language, $deepSearch) {
 		$opacLink = Null;
-		$hitCount = (($deepSearch === True) ? $GOKData['totalhitcount'] : $GOKData['hitcount']);
+		$hitCount = $GOKData['hitcount'];
+		$useDeepSearch = $deepSearch && ($GOKData['totalhitcount'] > 0);
+		if ($useDeepSearch === True) {
+			$hitCount = $GOKData['totalhitcount'];
+		}
 		$URL = $this->opacGOKSearchURL($GOKData, $language, $deepSearch);
 		if ($hitCount != 0 && $URL) {
 			$opacLink = $doc->createElement('a');
 			$opacLink->setAttribute('href', $URL);
-			if ($deepSearch === True) {
-				$opacLink->setAttribute('title', $this->localise('Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen', $language) );
+			$titleString = '';
+			if ($useDeepSearch === True && $GOKData['childcount'] != 0) {
+				$titleString = $this->localise('Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen', $language);
 			}
 			else {
-				$opacLink->setAttribute('title', $this->localise('Bücher zu genau diesem Thema im Opac anzeigen', $language) );
+				$titleString = $this->localise('Bücher zu genau diesem Thema im Opac anzeigen', $language);
 			}
+			$opacLink->setAttribute('title', $titleString);
 
 			// Question: Is '_blank' a good idea?
 			$opacLink->setAttribute('target', '_blank');
@@ -189,7 +195,9 @@ class tx_nkwgok extends tslib_pibase {
 				// we don't know the number of results: display a general text
 				$opacLink->appendChild($doc->createTextNode($this->localise('Treffer anzeigen', $language)));
 			}
-			$opacLink->setAttribute('class', 'opacLink' . (($hitCount > 0) ? ' ' . (($deepSearch) ? 'deep' : 'shallow') : '') );
+
+			$linkClass= 'opacLink ' . (($deepSearch === True) ? 'deep' : 'shallow');
+			$opacLink->setAttribute('class', $linkClass);
 		}
 
 		return $opacLink;
@@ -253,17 +261,17 @@ class tx_nkwgok extends tslib_pibase {
 
 		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
 		$picaLanguageCode = ($language === 'en') ? 'EN' : 'DU';
-		$GOKSearchURL = $conf['opacBaseURL'] . 'LNG=' . $picaLanguageCode . '/REC=1';
+		$GOKSearchURL = $conf['opacBaseURL'] . 'LNG=' . $picaLanguageCode;
 
 		if ($deepSearch === True && $GOKData['fromopac'] == 1) {
 			// Use special command to do the hierarchical search for records related
 			// to the Normsatz PPN.
 			$GOKSearchURL .= '/EPD?PPN=' . $GOKData['ppn'] . '&FRM=';
 		}
-		else if ($deepSearch === False && $GOKData['search']) {
+		else if ($GOKData['search']) {
 			// Convert CCL string to Opac-style search string and escape.
 			$searchString = urlencode(str_replace('=', ' ', $GOKData['search']));
-			$GOKSearchURL .= '/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=' . $searchString;
+			$GOKSearchURL .= '/REC=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=' . $searchString;
 		}
 		else {
 			$GOKSearchURL = Null;
@@ -452,99 +460,105 @@ class tx_nkwgok extends tslib_pibase {
 			$ul->setAttribute('id', 'ul-' . $objectID . '-' . $parentPPN);
 
 			foreach ($GOKs as $GOK) {
-				$PPN = $GOK['ppn'];
-				$expand = $PPN;
+				/* Do not display the GOK if
+				 * 1. it has no child elements
+				 * 2. it is known to have to matching hits
+				 */	
+				if ($GOK['hitcount'] != 0 || $GOK['childcount'] != 0) {
+					$PPN = $GOK['ppn'];
+					$expand = $PPN;
 
-				if ($expandMarker != '') {
-					$expand = $expandMarker . '-' . $PPN;
-				}
+					if ($expandMarker != '') {
+						$expand = $expandMarker . '-' . $PPN;
+					}
 
-				/* Display in each list item:
-				 * 1. Expand xor collapse link if there are child elements depending on the expanded state
-				 * 2. The linked name
-				 * 3. If the item has child elements and is expanded, the list of child elements
-				 */
-				$li = $doc->createElement('li');
-				$ul->appendChild($li);
-				$li->setAttribute('id', 'c' . $objectID . '-' . $PPN);
+					/* Display in each list item:
+					 * 1. Expand xor collapse link if there are child elements depending on the expanded state
+					 * 2. The linked name
+					 * 3. If the item has child elements and is expanded, the list of child elements
+					 */
+					$li = $doc->createElement('li');
+					$ul->appendChild($li);
+					$li->setAttribute('id', 'c' . $objectID . '-' . $PPN);
 
-				$openLink = $doc->createElement('a');
-				$openLink->setAttribute('id', 'openCloseLink-' . $objectID . '-' . $PPN);
-				$li->appendChild($openLink);
+					$openLink = $doc->createElement('a');
+					$openLink->setAttribute('id', 'openCloseLink-' . $objectID . '-' . $PPN);
+					$li->appendChild($openLink);
 
-				$control = $doc->createElement('span');
-				$openLink->appendChild($control);
-				$control->setAttribute('class', 'plusMinus');
+					$control = $doc->createElement('span');
+					$openLink->appendChild($control);
+					$control->setAttribute('class', 'plusMinus');
 
-				$GOKIDSpan = $doc->createElement('span');
-				$GOKIDSpan->setAttribute('class', 'GOKID');
-				$GOKIDSpan->appendChild($doc->createTextNode($GOK['gok']));
+					$GOKIDSpan = $doc->createElement('span');
+					$GOKIDSpan->setAttribute('class', 'GOKID');
+					$GOKIDSpan->appendChild($doc->createTextNode($GOK['gok']));
 
-				$GOKNameSpan = $doc->createElement('span');
-				$GOKNameSpan->setAttribute('class', 'GOKName');
-				$GOKNameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
+					$GOKNameSpan = $doc->createElement('span');
+					$GOKNameSpan->setAttribute('class', 'GOKName');
+					$GOKNameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
 
-				/* Offer new and old/ugly display styles:
-				 * NEW: * Link around +/- and the GOK and the subject name for opening/closing.
-				 *      * Link to a separate element pointing to Opac results. If possible the number of hits is displayed.
-				 * OLD: * Link around +/- only for opening/closing.
-				 *      * Link around the GOK and subject name pointing to Opac results.
-				 */
-				if ($style != 'treeOld') {
-					$openLink->appendChild($doc->createTextNode(' '));
-					$openLink->appendChild($GOKIDSpan);
-					$openLink->appendChild($doc->createTextNode(' '));
-					$openLink->appendChild($GOKNameSpan);
-					$this->appendOpacLinksTo($GOK, $doc, $language, $li);
-				}
-				else {
-					$li->appendChild($doc->createTextNode(' '));
-					$opacLinkElement = $this->OPACLinkElementUgly($GOK, $doc, $language);
-					$li->appendChild($opacLinkElement);
-					$opacLinkElement->appendChild($GOKIDSpan);
-					$opacLinkElement->appendChild($doc->createTextNode(' '));
-					$opacLinkElement->appendChild($GOKNameSpan);
-				}
-
-				// Careful: These are three non-breaking spaces to get better alignment.
-				$buttonText = '   ';
-				if ($GOK['childcount'] > 0) {
-					$JSCommand = '';
-					$noscriptLink = '#';
-					$mainTitle = $GOK['childcount'] . ' ' . $this->localise('Unterkategorien anzeigen', $language);
-					$alternativeTitle = $this->localise('Unterkategorien ausblenden', $language);
-					
-					if ( ($expandInfo && in_array($PPN, $expandInfo)) || $GOK['childcount'] <= $autoExpandLevel) {
-						$li->setAttribute('class', 'close');
-						$JSCommand = 'hideGOK' . $objectID;
-						$buttonText = '[-]';
-						$tmpTitle = $mainTitle;
-						$mainTitle = $alternativeTitle;
-						$alternativeTitle = $tmpTitle;
-						$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
-								array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker,
-										'tx_' . NKWGOKExtKey . '[style]' => $style) );
-						
-						// recursively call self to get child UL
-						$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $objectID, $expandInfo, $expand, $autoExpandLevel, $style);
+					/* Offer new and old/ugly display styles:
+					 * NEW: * Link around +/- and the GOK and the subject name for opening/closing.
+					 *      * Link to a separate element pointing to Opac results. If possible the number of hits is displayed.
+					 * OLD: * Link around +/- only for opening/closing.
+					 *      * Link around the GOK and subject name pointing to Opac results.
+					 */
+					if ($style != 'treeOld') {
+						$openLink->appendChild($doc->createTextNode(' '));
+						$openLink->appendChild($GOKIDSpan);
+						$openLink->appendChild($doc->createTextNode(' '));
+						$openLink->appendChild($GOKNameSpan);
+						$this->appendOpacLinksTo($GOK, $doc, $language, $li);
 					}
 					else {
-						$li->setAttribute('class', 'open');
-						$JSCommand = 'expandGOK' . $objectID;
-						$buttonText = '[+]';
-						$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
-								array('tx_' . NKWGOKExtKey . '[expand]' => $expand, 'no_cache' => 1) )
-								. '#c' . $PPN;
+						$li->appendChild($doc->createTextNode(' '));
+						$opacLinkElement = $this->OPACLinkElementUgly($GOK, $doc, $language);
+						$li->appendChild($opacLinkElement);
+						$opacLinkElement->appendChild($GOKIDSpan);
+						$opacLinkElement->appendChild($doc->createTextNode(' '));
+						$opacLinkElement->appendChild($GOKNameSpan);
 					}
 
-					$openLink->setAttribute('onclick',  $JSCommand . '("' . $PPN . '");return false;');
-					$openLink->setAttribute('href', $noscriptLink);
-					$openLink->setAttribute('title', $mainTitle);
-					$openLink->setAttribute('alttitle', $alternativeTitle);
-				}
+					// Careful: These are three non-breaking spaces to get better alignment.
+					$buttonText = '   ';
+					if ($GOK['childcount'] > 0) {
+						$JSCommand = '';
+						$noscriptLink = '#';
+						$mainTitle = $GOK['childcount'] . ' ' . $this->localise('Unterkategorien anzeigen', $language);
+						$alternativeTitle = $this->localise('Unterkategorien ausblenden', $language);
 
-				$control->appendChild($doc->createTextNode($buttonText));
-			}
+						if ( ($expandInfo && in_array($PPN, $expandInfo)) || $GOK['childcount'] <= $autoExpandLevel) {
+							$li->setAttribute('class', 'close');
+							$JSCommand = 'hideGOK' . $objectID;
+							$buttonText = '[-]';
+							$tmpTitle = $mainTitle;
+							$mainTitle = $alternativeTitle;
+							$alternativeTitle = $tmpTitle;
+							$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
+									array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker,
+											'tx_' . NKWGOKExtKey . '[style]' => $style) );
+
+							// recursively call self to get child UL
+							$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $objectID, $expandInfo, $expand, $autoExpandLevel, $style);
+						}
+						else {
+							$li->setAttribute('class', 'open');
+							$JSCommand = 'expandGOK' . $objectID;
+							$buttonText = '[+]';
+							$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
+									array('tx_' . NKWGOKExtKey . '[expand]' => $expand, 'no_cache' => 1) )
+									. '#c' . $PPN;
+						}
+
+						$openLink->setAttribute('onclick',  $JSCommand . '("' . $PPN . '");return false;');
+						$openLink->setAttribute('href', $noscriptLink);
+						$openLink->setAttribute('title', $mainTitle);
+						$openLink->setAttribute('alttitle', $alternativeTitle);
+					}
+
+					$control->appendChild($doc->createTextNode($buttonText));
+				}
+			} // end foreach ($GOKs as $GOK)
 		}
 	}
 
