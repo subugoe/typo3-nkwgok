@@ -189,10 +189,12 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 						$search = '';
 						$fromOpac = False;
-						if (array_key_exists('str', $GOK) && array_key_exists('a', $GOK['str']) && $GOK['str']['a']) {
+						if (array_key_exists('str', $GOK) && array_key_exists('a', $GOK['str'])) {
 							// GOK coming from CSV file with a CCL search query in the 'str/a' field.
-							$search = $GOK['str']['a'];
-
+							if ($GOK['str']['a']) {
+								$search = $GOK['str']['a'];
+							}
+							
 							// Set parent element to Root node if it is blank.
 							if ($parent === Null) {
 								$parent = NKWGOKRootNode;
@@ -251,7 +253,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						else if (array_key_exists(strtolower($GOKString), $this->hitCounts)) {
 							$values['hitcount'] = $this->hitCounts[strtolower($GOKString)];
 						}
-						else if (array_key_exists('str', $GOK)) {
+						else if ($GOK['str']['a']) {
 							$foundGOKs = array();
 							$pattern = '/lkl=([a-zA-Z]*\s?[.X0-9]*)$/';
 							preg_match($pattern, $GOK['str']['a'], $foundGOKs);
