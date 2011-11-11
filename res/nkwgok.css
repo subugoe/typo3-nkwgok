@@ -20,7 +20,12 @@ Styles for the GOK Tree
 }
 
 .gokContainer.tree ul ul {
-	margin: 0em 0em 0em 1em;
+	margin: 0em 0em 0em -1em;
+}
+
+.gokContainer.tree ul li {
+	padding-left: 3em;
+	text-indent: -3em;
 }
 
 .gokContainer.tree a:link:hover {
