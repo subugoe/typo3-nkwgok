@@ -20,12 +20,12 @@ Styles for the GOK Tree
 }
 
 .gokContainer.tree ul ul {
-	margin: 0em 0em 0em -1em;
+	margin: 0em 0em 0em -7.5em;
 }
 
 .gokContainer.tree ul li {
-	padding-left: 3em;
-	text-indent: -3em;
+	padding-left: 9em;
+	text-indent: -9em;
 }
 
 .gokContainer.tree a:link:hover {
@@ -33,12 +33,41 @@ Styles for the GOK Tree
 }
 
 .gokContainer.tree a .GOKID {
+	font-weight: normal;
 	display:block;
 	float:left;
 	width: 6em;
 	text-align: right;
 	color: #999;
-	padding-right:0.2em;
+	position: relative;
+	left: -9.5em;
+}
+
+.gokContainer.tree.hideGOKID ul li {
+	padding-left: 3em;
+	text-indent: -3em;
+}
+
+.gokContainer.tree.hideGOKID ul ul {
+	margin: 0em 0em 0em -1em;
+}
+
+.gokContainer.tree.hideGOKID .GOKID {
+	display:none;
+}
+
+.gokContainer.tree .rootNode .GOKID {
+	left: -0.5em;
+}
+
+a:hover .GOKID {
+	text-decoration: none;
+	color: #666;
+}
+
+
+.gokContainer.tree .plusMinus, .gokTreeContainer .GOKID {
+	font-family: monospace;
 }
 
 .gokContainer.tree .GOKName {
@@ -72,13 +101,6 @@ Styles for the GOK Tree
 	color: #333;
 }
 
-.gokContainer.tree .plusMinus, .gokTreeContainer .GOKID {
-	font-family: monospace;
-}
-
-.gokContainer.tree.hideGOKID .GOKID {
-	display:none;
-}
 
 
 /*
