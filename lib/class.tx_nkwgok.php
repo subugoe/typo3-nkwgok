@@ -317,10 +317,8 @@ class tx_nkwgok extends tslib_pibase {
 			}
 			$container->setAttribute('class', implode(' ', $containerClasses));
 
-			$nameSpan = $doc->createElement('span');
-			$container->appendChild($nameSpan);
-			$nameSpan->setAttribute('class', 'GOKName');
-			$nameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
+			$topElement = $this->appendGOKTreeItem($doc, $container, 'span', $GOK, $language, $objectID, $conf['getVars']['expand'], '', 1, False);
+			$topElement->setAttribute('class', 'rootNode');
 
 			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $language, $objectID, $conf['getVars']['expand'], '', 1);
 		}
@@ -342,6 +340,7 @@ class tx_nkwgok extends tslib_pibase {
 	 * @param DOMDocument $doc the containing document
 	 * @param string $language ISO 369-1 language code
 	 * @param string $objectID ID of Typo3 content object
+	 * @return void
 	 */
 	private function addGOKTreeJSToElement ($element, $doc, $language, $objectID) {
 		$scriptElement = $doc->createElement('script');
@@ -403,11 +402,12 @@ class tx_nkwgok extends tslib_pibase {
 	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $doc)
 	 * @param string $language ISO 639-1 language code
 	 * @param string $objectID ID of Typo3 content object
-	 * @param string $expandMarker list of PPNs of open parent elements, separated by '-' [defaults to '']
-	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
+	 * @param Array $expandInfo information which PPNs need to be expanded
+	 * @param string $expandMarker list of PPNs of open parent elements, separated by '-'
+	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements
  	 * @return void
 	 * */
-	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $objectID, $expandInfo, $expandMarker = '', $autoExpandLevel = 0) {
+	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel) {
 		$GOKs = $this->getChildren($parentPPN);
 		if (sizeof($GOKs) > 0) {
 			$ul = $doc->createElement('ul');
@@ -415,89 +415,118 @@ class tx_nkwgok extends tslib_pibase {
 			$ul->setAttribute('id', 'ul-' . $objectID . '-' . $parentPPN);
 
 			foreach ($GOKs as $GOK) {
-				/* Do not display the GOK if
+				/* Do not display the GOK item if
 				 * 1. it has no child elements
-				 * 2. it is known to have to matching hits
+				 * 2. it is known to have no matching hits
 				 */	
 				if ($GOK['hitcount'] != 0 || $GOK['childcount'] != 0) {
-					$PPN = $GOK['ppn'];
-					$expand = $PPN;
-
-					if ($expandMarker != '') {
-						$expand = $expandMarker . '-' . $PPN;
-					}
-
-					/* Display in each list item:
-					 * 1. Expand xor collapse link if there are child elements depending on the expanded state
-					 * 2. The linked name
-					 * 3. If the item has child elements and is expanded, the list of child elements
-					 */
-					$li = $doc->createElement('li');
-					$ul->appendChild($li);
-					$li->setAttribute('id', 'c' . $objectID . '-' . $PPN);
-
-					$openLink = $doc->createElement('a');
-					$openLink->setAttribute('id', 'openCloseLink-' . $objectID . '-' . $PPN);
-					$li->appendChild($openLink);
-
-					$control = $doc->createElement('span');
-					$openLink->appendChild($control);
-					$control->setAttribute('class', 'plusMinus');
-
-					$GOKIDSpan = $doc->createElement('span');
-					$GOKIDSpan->setAttribute('class', 'GOKID');
-					$GOKIDSpan->appendChild($doc->createTextNode($GOK['gok']));
-
-					$GOKNameSpan = $doc->createElement('span');
-					$GOKNameSpan->setAttribute('class', 'GOKName');
-					$GOKNameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
-
-					$openLink->appendChild($doc->createTextNode(' '));
-					$openLink->appendChild($GOKIDSpan);
-					$openLink->appendChild($doc->createTextNode(' '));
-					$openLink->appendChild($GOKNameSpan);
-					$this->appendOpacLinksTo($GOK, $doc, $language, $li);
-
-					// Careful: These are three non-breaking spaces to get better alignment.
-					$buttonText = '   ';
-					if ($GOK['childcount'] > 0) {
-						$JSCommand = '';
-						$noscriptLink = '#';
-						$mainTitle = $GOK['childcount'] . ' ' . $this->localise('Unterkategorien anzeigen', $language);
-						$alternativeTitle = $this->localise('Unterkategorien ausblenden', $language);
-
-						if ( ($expandInfo && in_array($PPN, $expandInfo)) || $GOK['childcount'] <= $autoExpandLevel) {
-							$li->setAttribute('class', 'close');
-							$JSCommand = 'hideGOK' . $objectID;
-							$buttonText = '[-]';
-							$tmpTitle = $mainTitle;
-							$mainTitle = $alternativeTitle;
-							$alternativeTitle = $tmpTitle;
-							$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
-									array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker) );
-
-							// recursively call self to get child UL
-							$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $objectID, $expandInfo, $expand, $autoExpandLevel);
-						}
-						else {
-							$li->setAttribute('class', 'open');
-							$JSCommand = 'expandGOK' . $objectID;
-							$buttonText = '[+]';
-							$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
-									array('tx_' . NKWGOKExtKey . '[expand]' => $expand, 'no_cache' => 1) )
-									. '#c' . $PPN;
-						}
-
-						$openLink->setAttribute('onclick',  $JSCommand . '("' . $PPN . '");return false;');
-						$openLink->setAttribute('href', $noscriptLink);
-						$openLink->setAttribute('title', $mainTitle);
-						$openLink->setAttribute('alttitle', $alternativeTitle);
-					}
-
-					$control->appendChild($doc->createTextNode($buttonText));
+					$this->appendGOKTreeItem($doc, $ul, 'li', $GOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel);
 				}
 			} // end foreach ($GOKs as $GOK)
 		}
+	}
+
+
+	
+	/**
+	 * Appends a single GOK item child element of typ3 $elementName
+	 * to the element $container inside $doc and returns it.
+	 * 
+	 * @author Sven-S. Porst
+	 * @param DOMDocument $doc document used to create the resulting element
+	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $doc)
+	 * @param string $elementName name of the element to insert into $container
+	 * @param Array $GOK
+	 * @param string $language ISO 639-1 language code
+	 * @param string $objectID ID of Typo3 content object
+	 * @param Array $expandInfo information which PPNs need to be expanded
+	 * @param string $expandMarker list of PPNs of open parent elements, separated by '-' [defaults to '']
+	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
+	 * @param Boolean $isInTree whether the element is part of the tree and should have dynamic links [defaults to True]
+	 * @return DOMElement
+	 */
+	private function appendGOKTreeItem ($doc, $container, $elementName, $GOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel,  $isInTree = True) {
+		$PPN = $GOK['ppn'];
+		$expand = $PPN;
+
+		if ($expandMarker != '') {
+			$expand = $expandMarker . '-' . $PPN;
+		}
+
+		/* Display in each list item:
+		 * 1. Expand xor collapse link if there are child elements depending on the expanded state
+		 * 2. The linked name
+		 * 3. If the item has child elements and is expanded, the list of child elements
+		 */
+		$item = $doc->createElement($elementName);
+		$container->appendChild($item);
+		$item->setAttribute('id', 'c' . $objectID . '-' . $PPN);
+
+		$openLink = $doc->createElement('a');
+		$openLink->setAttribute('id', 'openCloseLink-' . $objectID . '-' . $PPN);
+		$item->appendChild($openLink);
+
+		if ($isInTree === True) {
+			$control = $doc->createElement('span');
+			$openLink->appendChild($control);
+			$control->setAttribute('class', 'plusMinus');
+		}
+
+		$GOKIDSpan = $doc->createElement('span');
+		$GOKIDSpan->setAttribute('class', 'GOKID');
+		$GOKIDSpan->appendChild($doc->createTextNode($GOK['gok']));
+
+		$GOKNameSpan = $doc->createElement('span');
+		$GOKNameSpan->setAttribute('class', 'GOKName');
+		$GOKNameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
+
+		$openLink->appendChild($doc->createTextNode(' '));
+		$openLink->appendChild($GOKIDSpan);
+		$openLink->appendChild($doc->createTextNode(' '));
+		$openLink->appendChild($GOKNameSpan);
+		$this->appendOpacLinksTo($GOK, $doc, $language, $item);
+
+		if ($isInTree === True) {
+			// Careful: These are three non-breaking spaces to get better alignment.
+			$buttonText = '   ';
+			if ($GOK['childcount'] > 0) {
+				$JSCommand = '';
+				$noscriptLink = '#';
+				$mainTitle = $GOK['childcount'] . ' ' . $this->localise('Unterkategorien anzeigen', $language);
+				$alternativeTitle = $this->localise('Unterkategorien ausblenden', $language);
+
+				if ( ($expandInfo && in_array($PPN, $expandInfo)) || $GOK['childcount'] <= $autoExpandLevel) {
+					$item->setAttribute('class', 'close');
+					$JSCommand = 'hideGOK' . $objectID;
+					$buttonText = '[-]';
+					$tmpTitle = $mainTitle;
+					$mainTitle = $alternativeTitle;
+					$alternativeTitle = $tmpTitle;
+					$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
+							array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker) );
+
+					// recursively call self to get child UL
+					$this->appendGOKTreeChildren($PPN, $doc, $item, $language, $objectID, $expandInfo, $expand, $autoExpandLevel);
+				}
+				else {
+					$item->setAttribute('class', 'open');
+					$JSCommand = 'expandGOK' . $objectID;
+					$buttonText = '[+]';
+					$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
+							array('tx_' . NKWGOKExtKey . '[expand]' => $expand, 'no_cache' => 1) )
+							. '#c' . $PPN;
+				}
+
+				$openLink->setAttribute('onclick',  $JSCommand . '("' . $PPN . '");return false;');
+				$openLink->setAttribute('href', $noscriptLink);
+				$openLink->setAttribute('title', $mainTitle);
+				$openLink->setAttribute('alttitle', $alternativeTitle);
+			}
+
+			$control->appendChild($doc->createTextNode($buttonText));
+		}
+		
+		return $item;
 	}
 
 

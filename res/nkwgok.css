@@ -71,7 +71,7 @@ Styles for the GOK Tree
 	font-family: monospace;
 }
 
-.gokContainer.tree.hideGOKID li .GOKID {
+.gokContainer.tree.hideGOKID .GOKID {
 	display:none;
 }
 
