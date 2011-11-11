@@ -329,8 +329,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					$description = Null;
 					foreach($scanline->attributes() as $name => $value) {
 						if ($name === 'hits') {
-							// Reduce the hit count by 1 as it includes the GOK-Normsatz.
-							$hits = (int)$value - 1;
+							$hits = (int)$value;
 						}
 						else if ($name === 'description') {
 							$description = (string)$value;
