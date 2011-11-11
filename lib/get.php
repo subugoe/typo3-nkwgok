@@ -53,11 +53,11 @@ class tx_nkwgok_eid extends tx_nkwgok {
 		$nkwgok = t3lib_div::makeInstance('tx_nkwgok');
 		$ppn = $nkwgokArgs['expand'];
 		$display = Null;
-		if ($nkwgokArgs['style'] == 'menu') {
+		if ($nkwgokArgs['style'] === 'menu') {
 			$display = $nkwgok->AJAXGOKMenuChildren($ppn, (int)$nkwgokArgs['level'], $nkwgokArgs['language'], $nkwgokArgs['objectID']);
 		}
 		else {
-			$display = $nkwgok->AJAXGOKTreeChildren($ppn, $nkwgokArgs['style'], $nkwgokArgs['language'], $nkwgokArgs['objectID']);
+			$display = $nkwgok->AJAXGOKTreeChildren($ppn, $nkwgokArgs['language'], $nkwgokArgs['objectID']);
 		}
 	
 		// track action

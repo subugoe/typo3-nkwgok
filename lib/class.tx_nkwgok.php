@@ -206,44 +206,6 @@ class tx_nkwgok extends tslib_pibase {
 
 
 	/**
-	 * Returns DOMElement with complete markup for linking to the OPAC entry.
-	 * Link text is the GOK record’s name.
-	 *
-	 * @author Sven-S. Porst
-	 * @param Array $GOKData GOK record
-	 * @param DOMDocument $doc document used to create the resulting element
-	 * @param string $language ISO 639-1 language code
-	 * @param Boolean $deepSearch [defaults to False]
-	 * @return DOMElement
-	 */
-	private function OPACLinkElementUgly ($GOKData, $doc, $language, $deepSearch = False) {
-		$opacLink = $doc->createElement('a');
-		$hitCount = $GOKData['hitcount'];
-		$URL = $this->opacGOKSearchURL($GOKData, $language, $deepSearch);
-		if ($hitCount != 0 && $URL) {
-			$opacLink->setAttribute('href', $URL);
-
-			if ($hitCount > 0) {
-				// we know the number of results: display it
-				$numberString = number_format($GOKData['hitcount'], 0, $this->localise('decimal separator', $language), $this->localise('thousands separator', $language));
-				$opacLink->setAttribute('title', sprintf($this->localise('%s Treffer anzeigen', $language), $numberString));
-			}
-			else {
-				// we don't know the number of results: display a general text
-				$opacLink->setAttribute('title', $this->localise('Treffer anzeigen', $language));
-			}
-
-			// Question: Is '_blank' a good idea?
-			$opacLink->setAttribute('target', '_blank');
-			$opacLink->setAttribute('class', 'opacLink' . (($hitCount > 0) ? ' ' . (($deepSearch) ? 'deep' : 'shallow') : '') );
-		}
-
-		return $opacLink;
-	}
-
-	
-	
-	/**
 	 * Returns URL string for an Opac Search.
 	 * If $deepSearch is false, the search query stored in $GOKData is used.
 	 * If $deepSearch is true, a deep hierarchical search for records related
@@ -313,8 +275,6 @@ class tx_nkwgok extends tslib_pibase {
 	 * - an array element 'getVars' with:
 	 *   * an array element 'expand'. Each of that array’s elements are PPNs of
 	 *     the GOK elements displaying their child elements
-	 *   * an array element 'style' indicating the style (treeNew or treeOld)
-	 *     to be used
 	 *   * an array element 'showGOKID' indicating whether GOK IDs are shown or hidden
 	 *
 	 * @author Sven-S. Porst
@@ -326,7 +286,7 @@ class tx_nkwgok extends tslib_pibase {
 		$objectID = $this->cObj->data['uid'];
 
 		$doc = DOMImplementation::createDocument();
-		$this->addGOKTreeJSToElement($doc, $doc, $conf['getVars']['style'], $language, $objectID);
+		$this->addGOKTreeJSToElement($doc, $doc, $language, $objectID);
 
 		$this->addStylesheet();
 
@@ -349,9 +309,6 @@ class tx_nkwgok extends tslib_pibase {
 			$doc->appendChild($container);
 
 			$containerClasses = Array('gokContainer', 'tree');
-			if ($conf['getVars']['style'] != 'treeOld') {
-				$containerClasses[] = 'newStyle';
-			}
 			if (!$conf['getVars']['showGOKID']) {
 				$containerClasses[] = 'hideGOKID';
 			}
@@ -365,7 +322,7 @@ class tx_nkwgok extends tslib_pibase {
 			$nameSpan->setAttribute('class', 'GOKName');
 			$nameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
 
-			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $language, $objectID, $conf['getVars']['expand'], '', 1, $conf['getVars']['style']);
+			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $language, $objectID, $conf['getVars']['expand'], '', 1);
 		}
 
 		return $doc;
@@ -383,11 +340,10 @@ class tx_nkwgok extends tslib_pibase {
 	 * @author Sven-S. Porst
 	 * @param DOMElement $element the <script> tag is inserted into
 	 * @param DOMDocument $doc the containing document
-	 * @param string $style the display style to use ('treeNew' or 'treeOld')
 	 * @param string $language ISO 369-1 language code
 	 * @param string $objectID ID of Typo3 content object
 	 */
-	private function addGOKTreeJSToElement ($element, $doc, $style, $language, $objectID) {
+	private function addGOKTreeJSToElement ($element, $doc, $language, $objectID) {
 		$scriptElement = $doc->createElement('script');
 		$doc->appendChild($scriptElement);
 		$scriptElement->setAttribute('type', 'text/javascript');
@@ -411,7 +367,7 @@ class tx_nkwgok extends tslib_pibase {
 				{'eID': '" . NKWGOKExtKey . "', "
 				. "'tx_" . NKWGOKExtKey . "[language]': '" . $language . "', "
 				. "'tx_" . NKWGOKExtKey . "[expand]': id, "
-				. "'tx_" . NKWGOKExtKey . "[style]': '" . $style . "', "
+				. "'tx_" . NKWGOKExtKey . "[style]': 'tree', "
 				. "'tx_" . NKWGOKExtKey . "[objectID]': '" . $objectID . "'},
 				function (html) {
 					plusMinus.text('[-]');
@@ -449,10 +405,9 @@ class tx_nkwgok extends tslib_pibase {
 	 * @param string $objectID ID of Typo3 content object
 	 * @param string $expandMarker list of PPNs of open parent elements, separated by '-' [defaults to '']
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
-	 * @param string $style of the tree (treeNew or treeOld) [defaults to treeNew]
  	 * @return void
 	 * */
-	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $objectID, $expandInfo, $expandMarker = '', $autoExpandLevel = 0, $style = 'treeNew') {
+	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $objectID, $expandInfo, $expandMarker = '', $autoExpandLevel = 0) {
 		$GOKs = $this->getChildren($parentPPN);
 		if (sizeof($GOKs) > 0) {
 			$ul = $doc->createElement('ul');
@@ -497,27 +452,11 @@ class tx_nkwgok extends tslib_pibase {
 					$GOKNameSpan->setAttribute('class', 'GOKName');
 					$GOKNameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
 
-					/* Offer new and old/ugly display styles:
-					 * NEW: * Link around +/- and the GOK and the subject name for opening/closing.
-					 *      * Link to a separate element pointing to Opac results. If possible the number of hits is displayed.
-					 * OLD: * Link around +/- only for opening/closing.
-					 *      * Link around the GOK and subject name pointing to Opac results.
-					 */
-					if ($style != 'treeOld') {
-						$openLink->appendChild($doc->createTextNode(' '));
-						$openLink->appendChild($GOKIDSpan);
-						$openLink->appendChild($doc->createTextNode(' '));
-						$openLink->appendChild($GOKNameSpan);
-						$this->appendOpacLinksTo($GOK, $doc, $language, $li);
-					}
-					else {
-						$li->appendChild($doc->createTextNode(' '));
-						$opacLinkElement = $this->OPACLinkElementUgly($GOK, $doc, $language);
-						$li->appendChild($opacLinkElement);
-						$opacLinkElement->appendChild($GOKIDSpan);
-						$opacLinkElement->appendChild($doc->createTextNode(' '));
-						$opacLinkElement->appendChild($GOKNameSpan);
-					}
+					$openLink->appendChild($doc->createTextNode(' '));
+					$openLink->appendChild($GOKIDSpan);
+					$openLink->appendChild($doc->createTextNode(' '));
+					$openLink->appendChild($GOKNameSpan);
+					$this->appendOpacLinksTo($GOK, $doc, $language, $li);
 
 					// Careful: These are three non-breaking spaces to get better alignment.
 					$buttonText = '   ';
@@ -535,11 +474,10 @@ class tx_nkwgok extends tslib_pibase {
 							$mainTitle = $alternativeTitle;
 							$alternativeTitle = $tmpTitle;
 							$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
-									array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker,
-											'tx_' . NKWGOKExtKey . '[style]' => $style) );
+									array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker) );
 
 							// recursively call self to get child UL
-							$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $objectID, $expandInfo, $expand, $autoExpandLevel, $style);
+							$this->appendGOKTreeChildren($PPN, $doc, $li, $language, $objectID, $expandInfo, $expand, $autoExpandLevel);
 						}
 						else {
 							$li->setAttribute('class', 'open');
@@ -570,15 +508,14 @@ class tx_nkwgok extends tslib_pibase {
 
 	 * @author Sven-S. Porst
 	 * @param string $parentPPN
-	 * @param string $style ('treeOld' or 'treeNew')
 	 * @param string $language ISO 639-1 language code
 	 * @param string $objectID ID of Typo3 content object
 	 * @return DOMDocument
 	 * */
-	public function AJAXGOKTreeChildren ($parentPPN, $style, $language, $objectID) {
+	public function AJAXGOKTreeChildren ($parentPPN, $language, $objectID) {
 		$doc = DOMImplementation::createDocument();
 		
-		$this->appendGOKTreeChildren($parentPPN, $doc, $doc, $language, $objectID, Array($parentPPN), '', 1, $style)->firstChild;
+		$this->appendGOKTreeChildren($parentPPN, $doc, $doc, $language, $objectID, Array($parentPPN), '', 1)->firstChild;
 
 		return $doc;
 	}
