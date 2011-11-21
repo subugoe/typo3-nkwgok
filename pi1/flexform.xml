@@ -36,12 +36,8 @@
 						<type>radio</type>
 						<items type="array">
 							<numIndex index="0" type="array">
-								<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleTreeNew</numIndex>
-								<numIndex index="1">treeNew</numIndex>
-							</numIndex>
-							<numIndex index="1" type="array">
-								<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleTreeOld</numIndex>
-								<numIndex index="1">treeOld</numIndex>
+								<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleTree</numIndex>
+								<numIndex index="1">tree</numIndex>
 							</numIndex>
 							<numIndex index="2" type="array">
 								<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleMenu</numIndex>

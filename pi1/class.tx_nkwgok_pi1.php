@@ -81,15 +81,11 @@ class tx_nkwgok_pi1 extends tx_nkwgok {
 
 		$doc = Null;
 		$style = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'style', 'sDEF');
-		if (!$style) {
-			$style = 'treeNew';
-		}
 
-		if ($style == 'menu') {
+		if ($style === 'menu') {
 			$doc = $this->GOKMenus($conf);
 		}
 		else {
-			$conf['getVars']['style'] = $style;
 			$conf['getVars']['showGOKID'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'showGOKID');
 			$doc = $this->GOKTree($conf);
 		}
