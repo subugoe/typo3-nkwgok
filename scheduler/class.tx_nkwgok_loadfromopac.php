@@ -27,7 +27,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
-		set_time_limit(300);
+		set_time_limit(1200);
 
 		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
 		$opacBaseURL = $conf['opacBaseURL'] . 'XML=1/';

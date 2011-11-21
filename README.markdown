@@ -153,8 +153,7 @@ Jeder Seitenhinhalt mit GOK Plug-In hat drei Einstellungsmöglichkeiten:
 	2. Durch Eingabe der GOK des Wurzelknotens in das Feld ‘Eigene GOK als Startknoten angeben’
 2. Anzeigestil:
 	1. Baum - hierarchische Baumstruktur
-	2. unpraktischer Baum - hierarchische Baumstruktur mit ursprünglich geplantem Layout
-	3. Menüs - es erscheint ein Menü mit den Untergebieten. Nach Auswahl eines
+	2. Menüs - es erscheint ein Menü mit den Untergebieten. Nach Auswahl eines
 	Menüpunktes erscheint ein weiteres Menü mit den Untergebieten des ausgewählten Faches
 3. GOK-ID anzeigen: hiermit kann die Anzeige der GOK-IDs wie ‘IA 663’ an- bzw. abgestellt werden
 

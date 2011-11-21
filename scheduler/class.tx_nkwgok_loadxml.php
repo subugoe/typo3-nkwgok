@@ -84,7 +84,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	 */
 	public function execute() {
 		// Initialisation and general setup.
-		set_time_limit(300);
+		set_time_limit(1200);
 		$result = False;
 
 		$this->parentPPNs = Array(NKWGOKRootNode => Array(), NKWGOKGOKRootNode => Array());
