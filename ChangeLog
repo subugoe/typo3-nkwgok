@@ -1,4 +1,7 @@
-2011-11-?? 1.1.1
+2011-11-24 1.2.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* vastly reduce downtime due to database update (batch add new records, switch with old records after import has finished)
+	* fix localisation problem in TYPO3 4.6
+	* extend timeout for long scheduler actions to 20 minutes
 	* add searchFields to ext_tables.php
 
 2011-11-11 1.1.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
