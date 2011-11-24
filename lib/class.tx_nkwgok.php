@@ -28,10 +28,11 @@ define('NKWGOKQueryTable', 'tx_nkwgok_data');
 define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, childcount, hitcount, totalhitcount, fromopac');
 
 /**
- * undocumented class
+ * Class tx_nkwgok: provides output for the nkwgok extension.
  *
- * @package default
+ * @package TYPO3
  * @author Nils K. Windisch
+ * @author Sven-S. Porst
  * */
 class tx_nkwgok extends tslib_pibase {
 
@@ -41,8 +42,12 @@ class tx_nkwgok extends tslib_pibase {
 	protected $localisation;
 
 	/**
-	 * Provide our own localisation function as getLL() isn't available when
+	 * Provide our own localisation function as getLL() is not available when
 	 * running in eID.
+	 *
+	 * t3lib_div::readLLXMLfile() will go away in TYPO3 4.8.
+	 * TODO:Switch to t3lib_l10n_parser_Llxml::getParsedData() once we can expect
+	 * to run on TYPO3 4.6 or higher.
 	 *
 	 * @author Sven-S. Porst
 	 * @param string $key key to lool up in pi1/locallang.xml
@@ -52,7 +57,8 @@ class tx_nkwgok extends tslib_pibase {
 	private function localise ($key, $language) {
 		// initialise the $localisation variable
 		if (!$this->localisation) {
-	        $this->localisation = t3lib_div::readLLfile('EXT:' . NKWGOKExtKey . '/pi1/locallang.xml', $language, '', 2);
+			$filePath = t3lib_div::getFileAbsFileName('EXT:' . NKWGOKExtKey . '/pi1/locallang.xml');
+	        $this->localisation = t3lib_div::readLLXMLfile($filePath, $language);
 		}
 
 		$result = $this->localisation[$language][$key];
