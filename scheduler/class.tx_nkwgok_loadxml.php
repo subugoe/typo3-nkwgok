@@ -90,7 +90,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		$this->parentPPNs = Array(NKWGOKRootNode => Array(), NKWGOKGOKRootNode => Array());
 		$this->PPNToGOK = Array();
 
-		$wantedFieldNames = array('045A', '044E', '044K', '009B', '038D', '003@', '045G', 'str', 'tags');
+		$wantedFieldNames = Array('045A', '044E', '044K', '009B', '038D', '003@', '045G', 'str', 'tags');
 
 		$dir = PATH_site . 'fileadmin/gok/xml/';
 		$fileList = glob($dir . '*.xml');
@@ -138,14 +138,13 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			$this->hitCounts = $this->loadHitCounts();
 			$totalHitCounts = $this->computeTotalHitCounts(NKWGOKGOKRootNode);
 
-			// Empty our database table.
-			$GLOBALS['TYPO3_DB']->sql_query('TRUNCATE tx_nkwgok_data');
-
 			// Run through the files again, read all data, add the information
 			// about parent elements and store it to our table in the database.
 			foreach ($fileList as $xmlPath) {
-				$xml = simplexml_load_file($xmlPath);
+				$rows = Array();
+				$keyNames = Array('ppn', 'hierarchy', 'gok', 'parent', 'descr', 'search', 'descr_en', 'tags', 'childcount', 'fromopac', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
 
+				$xml = simplexml_load_file($xmlPath);
 				foreach ($xml->xpath('/RESULT/SET/SHORTTITLE') as $GOKElement) {
 					$previousFieldName = Null;
 					$GOK = Array();
@@ -219,27 +218,19 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							}
 						}
 
-						$search = trim($search);
-
 						$GOKString = trim($GOK['045A']['a']);
-						$values = array(
-							'ppn' => $PPN,
-							'parent' => $parent,
-							'hierarchy' => trim($GOK['009B']['a']),
-							'descr' => trim($GOK['044E']['a']),
-							'gok' => $GOKString,
-							'crdate' => time(),
-							'tstamp' => time(),
-							'search' => $search,
-							'childcount' => $childCount,
-							'tags' => $GOK['tags']['a'],
-							'fromopac' => $fromOpac
-						);
+						$hierarchy = trim($GOK['009B']['a']);
+						$descr = trim($GOK['044E']['a']);
+						$search = trim($search);
+						$descr_en = '';
+						$tags = $GOK['tags']['a'];
+						$hitCount = -1;
+						$totalHitCount = -1;
 
 						// English translation of the GOK’s name is in field 044K $a.
 						// This field is designated for the _English_ version.
 						if (array_key_exists('044K', $GOK) && array_key_exists('a', $GOK['044K'])) {
-							$values['descr_en'] = trim($GOK['044K']['a']);
+							$descr_en = trim($GOK['044K']['a']);
 						}
 
 						// Hit keys are lowercase.
@@ -248,53 +239,60 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						// * for CSV-type records: if only one LKL query, try to use hitcount, else use -1
 						// * otherwise: use 0
 						if (array_key_exists('045G', $GOK) && array_key_exists('C', $GOK['045G']) && $GOK['045G']['C'] === 'MSC') {
-							$values['hitcount'] = $this->hitCounts[strtolower($GOK['045G']['a'])];
+							$hitCount = $this->hitCounts[strtolower($GOK['045G']['a'])];
 						}
 						else if (array_key_exists(strtolower($GOKString), $this->hitCounts)) {
-							$values['hitcount'] = $this->hitCounts[strtolower($GOKString)];
+							$hitCount = $this->hitCounts[strtolower($GOKString)];
 						}
 						else if ($GOK['str']['a']) {
-							$foundGOKs = array();
+							$foundGOKs = Array();
 							$pattern = '/lkl=([a-zA-Z]*\s?[.X0-9]*)$/';
 							preg_match($pattern, $GOK['str']['a'], $foundGOKs);
 							$foundGOK = strtolower($foundGOKs[1]);
 
 							if (count($foundGOKs) > 1 && $foundGOK && array_key_exists($foundGOK, $this->hitCounts)) {
-								$values['hitcount'] = $this->hitCounts[$foundGOK];
-							}
-							else {
-								$values['hitcount'] = -1;
+								$hitCount = $this->hitCounts[$foundGOK];
 							}
 						}
 						else {
-							$values['hitcount'] = 0;
+							$hitCount = 0;
 						}
 
 						// Add total hit count information if it exists.
 						if (array_key_exists($PPN, $totalHitCounts)) {
-							$values['totalhitcount'] = $totalHitCounts[$PPN];
+							$totalHitCount = $totalHitCounts[$PPN];
 						}
 
-						$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
+						$rows[] = Array($PPN, $hierarchy, $GOKString, $parent, $descr, $search, $descr_en, $tags, $childCount, $fromOpac, $hitCount, $totalHitCount, time(), time(), 1);
 					}
 				} // end of loop over GOKs
+				$result = $GLOBALS['TYPO3_DB']->exec_INSERTmultipleRows('tx_nkwgok_data', $keyNames, $rows);
+
 			} // end of loop over files
 
-			// Finally add the GOK root node
-			$values = array(
+			// Add the GOK root node.
+			$row = array(
 				'ppn' => NKWGOKGOKRootNode,
-				'parent' => NKWGOKRootNode,
 				'hierarchy' => '-1',
-				'descr' => 'Göttinger Online Klassifikation (GOK)',
-				'descr_en' => 'Göttingen Online Classification (GOK)',
 				'gok' => NKWGOKGOKRootNode,
+				'parent' => NKWGOKRootNode,
+				'descr' => 'Göttinger Online Klassifikation (GOK)',
+				'search' => '',
+				'descr_en' => 'Göttingen Online Classification (GOK)',
+				'tags' => '',
+				'childcount' => count($this->parentPPNs[NKWGOKGOKRootNode]),
+				'fromopac' => True,
+				'hitcount' => -1,
+				'totalhitcount' => -1,
 				'crdate' => time(),
 				'tstamp' => time(),
-				'childcount' => count($this->parentPPNs[NKWGOKGOKRootNode]),
-				'fromopac' => True
+				'statusID' => 1
 			);
+			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $row);
 
-			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $values);
+			// Delete all old records with statusID 1, then switch all new records to statusID 0.
+			$GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_nkwgok_data', 'statusID = 0');
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_nkwgok_data', 'statusID = 1', Array('statusID' => 0));
 
 			t3lib_div::devLog('loadXML Scheduler Task: Import of GOK XML to Typo3 database completed', 'nkwgok', 1);
 			$result = True;
