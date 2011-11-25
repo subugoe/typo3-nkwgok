@@ -114,7 +114,7 @@ class tx_nkwgok extends tslib_pibase {
 	 * @return Array of GOK records of the $parentPPN’s children
 	 */
 	private function getChildren($parentPPN) {
-		$whereClause = 'parent = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, NKWGOKQueryTable);
+		$whereClause = 'parent = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, NKWGOKQueryTable) . ' AND statusID = 0';
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
 					NKWGOKQueryTable,
@@ -297,7 +297,7 @@ class tx_nkwgok extends tslib_pibase {
 		$this->addStylesheet();
 
 		// Get start node.
-		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok'], NKWGOKQueryTable);
+		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok'], NKWGOKQueryTable) . ' AND statusID = 0';
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
 					NKWGOKQueryTable,
@@ -589,7 +589,7 @@ class tx_nkwgok extends tslib_pibase {
 		$pageID->setAttribute('name', 'id');
 		$pageID->setAttribute('value', $GLOBALS['TSFE']->id);
 		
-		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok'], NKWGOKQueryTable);
+		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($conf['gok'], NKWGOKQueryTable) . ' AND statusID = 0';
 		// run query and collect result
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
