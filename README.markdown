@@ -140,7 +140,7 @@ Wird die Extension im TYPO3 Extension-Manager ausgewählt, gibt es zwei
 Grundeinstellungen:
 
 1. Opac Base URL with trailing /: Aus dieser URL werden die Links in den Opac
-gebaut. [Standardwert: http://opac.sub.uni-goettingen.de/DB=1/]
+gebaut. [Standardwert: https://opac.sub.uni-goettingen.de/DB=1/]
 2. replace included CSS with path: Pfad einer eigenen CSS-Datei für die Baum-
 und Menüdarstellung [Standardwert: leer, die CSS-Datei des Plug-Ins wird genutzt]
 
