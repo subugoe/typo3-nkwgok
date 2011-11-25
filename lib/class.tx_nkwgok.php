@@ -58,12 +58,21 @@ class tx_nkwgok extends tslib_pibase {
 		// initialise the $localisation variable
 		if (!$this->localisation) {
 			$filePath = t3lib_div::getFileAbsFileName('EXT:' . NKWGOKExtKey . '/pi1/locallang.xml');
-	        $this->localisation = t3lib_div::readLLXMLfile($filePath, $language);
+			$this->localisation = t3lib_div::readLLXMLfile($filePath, $language);
 		}
 
-		$result = $this->localisation[$language][$key];
-		if (!result) {
-			$result = $this->localisation['default'][$key];
+		$myLanguage = $language;
+		if (!array_key_exists($language, $this->localisation)) {
+			$myLanguage = 'default';
+		}
+
+		$result = $this->localisation[$myLanguage][$key];
+
+		if (is_array($result)) {
+			// In TYPO3 4.6 $localised ends up being an Array which has
+			// the localised string at [0]['target']. In earlier versions
+			// it was just a string.
+			$result = $result[0]['target'];
 		}
 
 		return $result;
