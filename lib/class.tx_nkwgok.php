@@ -327,7 +327,7 @@ class tx_nkwgok extends tslib_pibase {
 			if (!$conf['getVars']['showGOKID']) {
 				$containerClasses[] = 'hideGOKID';
 			}
-			if ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowLinks'] == 1) {
+			if ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowSearch'] == 1) {
 				$containerClasses[] = 'shallowLinks';
 			}
 			$container->setAttribute('class', implode(' ', $containerClasses));
