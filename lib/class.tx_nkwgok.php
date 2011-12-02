@@ -107,8 +107,10 @@ class tx_nkwgok extends tslib_pibase {
 			}
 		}
 
+		// Remove trailing ' - Allgemein- und Gesamtdarstellungen'
 		// Remove trailing super-subject designator in { }
 		if ($simplify) {
+			$displayName = preg_replace("/ - Allgemein- und Gesamtdarstellungen$/", "", $displayName);
 			$displayName = preg_replace("/( \{.*\})$/", "", $displayName);
 		}
 		return trim($displayName);
@@ -117,19 +119,25 @@ class tx_nkwgok extends tslib_pibase {
 
 
 	/**
-	 * Returns GOK records for the children of a given PPN.
+	 * Returns GOK records for the children of a given PPN, ordered by GOK.
 	 *
 	 * @param string $parentPPN
+	 * @param Boolean $includeParent if True, the parent item is included
 	 * @return Array of GOK records of the $parentPPN’s children
 	 */
-	private function getChildren($parentPPN) {
-		$whereClause = 'parent = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, NKWGOKQueryTable) . ' AND statusID = 0';
+	private function getChildren($parentPPN, $includeParent = False) {
+		$parentEscaped = $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, NKWGOKQueryTable);
+		$includeParentSelectCondition = '';
+		if ($includeParent) {
+			$includeParentSelectCondition = ' OR ppn = ' . $parentEscaped;
+		}
+		$whereClause = '(parent = ' . $parentEscaped . $includeParentSelectCondition . ') AND statusID = 0';
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
 					NKWGOKQueryTable,
 					$whereClause,
 					'',
-					'gok ASC',
+					'hierarchy,gok ASC',
 					'');
 
 		$children = Array();
@@ -423,17 +431,27 @@ class tx_nkwgok extends tslib_pibase {
  	 * @return void
 	 * */
 	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel) {
-		$GOKs = $this->getChildren($parentPPN);
-		if (sizeof($GOKs) > 0) {
+		$GOKs = $this->getChildren($parentPPN, True);
+		if (sizeof($GOKs) > 1) {
 			$ul = $doc->createElement('ul');
 			$container->appendChild($ul);
 			$ul->setAttribute('id', 'ul-' . $objectID . '-' . $parentPPN);
 
+			/* The first item in the array is the parent element. Fetch it
+			 * and
+			 */
+			$firstGOK = array_shift($GOKs);
+			if ($firstGOK['hitcount'] > 0) {
+				$firstGOK['descr'] = $this->localise('Allgemeines', 'de');
+				$firstGOK['descr_en'] = $this->localise('Allgemeines', 'en');
+				$this->appendGOKTreeItem($doc, $ul, 'li', $firstGOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel, False, 'general-items-node');
+			}
+
 			foreach ($GOKs as $GOK) {
 				/* Do not display the GOK item if
-				 * 1. it has no child elements
+				 * 1. it has no child elements and
 				 * 2. it is known to have no matching hits
-				 */	
+				 */
 				if ($GOK['hitcount'] != 0 || $GOK['childcount'] != 0) {
 					$this->appendGOKTreeItem($doc, $ul, 'li', $GOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel);
 				}
@@ -457,10 +475,11 @@ class tx_nkwgok extends tslib_pibase {
 	 * @param Array $expandInfo information which PPNs need to be expanded
 	 * @param string $expandMarker list of PPNs of open parent elements, separated by '-' [defaults to '']
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
-	 * @param Boolean $isInTree whether the element is part of the tree and should have dynamic links [defaults to True]
+	 * @param Boolean $isInteractive whether the element can be an expandable part of the tree and should have dynamic links [defaults to True]
+	 * @param string|Null $extraClass class added to the appended links [defaults to Null]
 	 * @return DOMElement
 	 */
-	private function appendGOKTreeItem ($doc, $container, $elementName, $GOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel,  $isInTree = True) {
+	private function appendGOKTreeItem ($doc, $container, $elementName, $GOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel, $isInteractive = True, $extraClass = Null) {
 		$PPN = $GOK['ppn'];
 		$expand = $PPN;
 
@@ -481,11 +500,13 @@ class tx_nkwgok extends tslib_pibase {
 		$openLink->setAttribute('id', 'openCloseLink-' . $objectID . '-' . $PPN);
 		$item->appendChild($openLink);
 
-		if ($isInTree === True) {
-			$control = $doc->createElement('span');
-			$openLink->appendChild($control);
-			$control->setAttribute('class', 'plusMinus');
+		$control = $doc->createElement('span');
+		$openLink->appendChild($control);
+		$openLinkClass = 'plusMinus';
+		if ($isInteractive !== True) {
+			$openLinkClass .= ' nkwgok-invisible';
 		}
+		$control->setAttribute('class', $openLinkClass);
 
 		$GOKIDSpan = $doc->createElement('span');
 		$GOKIDSpan->setAttribute('class', 'GOKID');
@@ -501,9 +522,14 @@ class tx_nkwgok extends tslib_pibase {
 		$openLink->appendChild($GOKNameSpan);
 		$this->appendOpacLinksTo($GOK, $doc, $language, $item);
 
-		if ($isInTree === True) {
+		$itemClass = '';
+		if ($extraClass !== Null) {
+			$itemClass = $extraClass . ' ';
+		}
+
+		$buttonText = '   ';
+		if ($isInteractive === True) {
 			// Careful: These are three non-breaking spaces to get better alignment.
-			$buttonText = '   ';
 			if ($GOK['childcount'] > 0) {
 				$JSCommand = '';
 				$noscriptLink = '#';
@@ -511,7 +537,7 @@ class tx_nkwgok extends tslib_pibase {
 				$alternativeTitle = $this->localise('Unterkategorien ausblenden', $language);
 
 				if ( ($expandInfo && in_array($PPN, $expandInfo)) || $GOK['childcount'] <= $autoExpandLevel) {
-					$item->setAttribute('class', 'close');
+					$itemClass .= 'close';
 					$JSCommand = 'hideGOK' . $objectID;
 					$buttonText = '[-]';
 					$tmpTitle = $mainTitle;
@@ -524,7 +550,7 @@ class tx_nkwgok extends tslib_pibase {
 					$this->appendGOKTreeChildren($PPN, $doc, $item, $language, $objectID, $expandInfo, $expand, $autoExpandLevel);
 				}
 				else {
-					$item->setAttribute('class', 'open');
+					$itemClass .= 'open';
 					$JSCommand = 'expandGOK' . $objectID;
 					$buttonText = '[+]';
 					$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
@@ -537,9 +563,11 @@ class tx_nkwgok extends tslib_pibase {
 				$openLink->setAttribute('title', $mainTitle);
 				$openLink->setAttribute('alttitle', $alternativeTitle);
 			}
-
-			$control->appendChild($doc->createTextNode($buttonText));
 		}
+
+		$item->setAttribute('class', $itemClass);
+
+		$control->appendChild($doc->createTextNode($buttonText));
 		
 		return $item;
 	}

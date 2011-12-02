@@ -84,11 +84,23 @@ a:hover .GOKID {
 	display: none;
 }
 
+.gokContainer.tree .general-items-node .opacLink.shallow {
+	display: inline;
+}
+
+.gokContainer.tree .general-items-node .opacLink.deep {
+	display: none;
+}
+
 .gokContainer.tree.shallowLinks .opacLink.shallow {
 	display: inline;
 }
 
 .gokContainer.tree.shallowLinks .opacLink.deep {
+	display: none;
+}
+
+.gokContainer.tree.shallowLinks .general-items-node {
 	display: none;
 }
 
@@ -101,6 +113,9 @@ a:hover .GOKID {
 	color: #333;
 }
 
+.gokContainer.tree .rootNode .plusMinus.nkwgok-invisible {
+	display: none;
+}
 
 
 /*
