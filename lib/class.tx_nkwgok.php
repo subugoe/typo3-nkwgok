@@ -248,7 +248,7 @@ class tx_nkwgok extends tslib_pibase {
 		$picaLanguageCode = ($language === 'en') ? 'EN' : 'DU';
 		$GOKSearchURL = $conf['opacBaseURL'] . 'LNG=' . $picaLanguageCode;
 
-		if ($deepSearch === True && $GOKData['fromopac'] == 1) {
+		if ($deepSearch === True && $GOKData['fromopac'] == 1 && $GOKData['ppn'] !== 'GOK-Root') {
 			// Use special command to do the hierarchical search for records related
 			// to the Normsatz PPN.
 			$GOKSearchURL .= '/EPD?PPN=' . $GOKData['ppn'] . '&FRM=';
