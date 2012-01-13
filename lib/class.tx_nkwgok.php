@@ -45,33 +45,56 @@ class tx_nkwgok extends tslib_pibase {
 	 * Provide our own localisation function as getLL() is not available when
 	 * running in eID.
 	 *
-	 * t3lib_div::readLLXMLfile() will go away in TYPO3 4.8.
-	 * TODO:Switch to t3lib_l10n_parser_Llxml::getParsedData() once we can expect
-	 * to run on TYPO3 4.6 or higher.
-	 *
 	 * @author Sven-S. Porst
-	 * @param string $key key to lool up in pi1/locallang.xml
+	 * @param string $key key to look up in pi1/locallang.xml
 	 * @param string $language ISO 639-1 language code
 	 * @return string
 	 */
 	private function localise ($key, $language) {
-		// initialise the $localisation variable
+		$result = '';
+		
+		$filePath = t3lib_div::getFileAbsFileName('EXT:' . NKWGOKExtKey . '/pi1/locallang.xml');
 		if (!$this->localisation) {
-			$filePath = t3lib_div::getFileAbsFileName('EXT:' . NKWGOKExtKey . '/pi1/locallang.xml');
-			$this->localisation = t3lib_div::readLLXMLfile($filePath, $language);
+			if (t3lib_div::int_from_ver(TYPO3_version) >= 4006000) {
+				/**
+				 * In TYPO3 >=4.6 t3lib_l10n_parser_Llxml is recommended for reading
+				 * localisations.
+				 *
+				 * The returned $localisation seems to have the following structure:
+				 * array('languageKey' => array('stringKey' => array(array('target' => 'localisedString'))))
+				 * Only the requested languageKey seems to be present and the innermost
+				 * array can also contain a 'source' key.
+				 */
+				$parser = t3lib_div::makeInstance('t3lib_l10n_parser_Llxml');
+				$this->localisation = $parser->getParsedData($filePath, $language);
+			}
+			else {
+				/**
+				 * In TYPO3 <4.6 use t3lib_div::readLLXMLfile.
+				 *
+				 * The returned $localisation has the following structure:
+				 * array('languageKey' => array('stringKey' => 'localisedString'))
+				 * It seems to contain languageKeys for all localisations in the XML file.
+				 */
+				$this->localisation = t3lib_div::readLLXMLfile($filePath, $language);
+			}
 		}
 
 		$myLanguage = $language;
 		if (!array_key_exists($language, $this->localisation)) {
 			$myLanguage = 'default';
 		}
+		
+		if (array_key_exists($key, $this->localisation[$myLanguage])) {
+			$result = $this->localisation[$myLanguage][$key];
+		}
+		else {
+			// Return the original key in upper case if we don’t find a localisation.
+			$result = strtoupper($key);
+		}
 
-		$result = $this->localisation[$myLanguage][$key];
-
+		// In TYPO3 >=4.6 $result is an array. Extract the relevant string from that.
 		if (is_array($result)) {
-			// In TYPO3 4.6 $localised ends up being an Array which has
-			// the localised string at [0]['target']. In earlier versions
-			// it was just a string.
 			$result = $result[0]['target'];
 		}
 
@@ -442,8 +465,7 @@ class tx_nkwgok extends tslib_pibase {
 			 */
 			$firstGOK = array_shift($GOKs);
 			if ($firstGOK['hitcount'] > 0) {
-				$firstGOK['descr'] = $this->localise('Allgemeines', 'de');
-				$firstGOK['descr_en'] = $this->localise('Allgemeines', 'en');
+				$firstGOK['descr'] = $this->localise('Allgemeines', $language);
 				$this->appendGOKTreeItem($doc, $ul, 'li', $firstGOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel, False, 'general-items-node');
 			}
 
