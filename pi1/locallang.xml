@@ -62,31 +62,5 @@
 			<label index="thousands separator"></label>
 		</languageKey>
 
-		<languageKey index="default" type="array">
-			<label index="source">GOK-Hierarchie beginnen mit</label>
-			<label index="altSource">Eigene GOK als Startknoten angeben (die Menüauswahl wird dann ignoriert)</label>
-			<label index="style">Anzeigestil</label>
-			<label index="styleTree">Baum</label>
-			<label index="styleMenu">Menüs</label>
-			<label index="showGOKID">GOK-ID (z.B. IA 663) anzeigen</label>
-
-			<label index="Bücher zu diesem Thema im Opac anzeigen">Bücher zu diesem Thema im Opac anzeigen</label>
-			<label index="Bücher zu genau diesem Thema im Opac anzeigen">Bücher zu genau diesem Thema im Opac anzeigen</label>
-			<label index="Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen">Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen</label>
-			<label index="%s Treffer anzeigen">%s Treffer anzeigen</label>
-			<label index="Treffer anzeigen">Treffer anzeigen</label>
-			<label index="keine Treffer">keine Treffer</label>
-			<label index="Unterkategorien anzeigen">Unterkategorien anzeigen</label>
-			<label index="Unterkategorien ausblenden">Unterkategorien ausblenden</label>
-			<label index="Laden ...">Laden …</label>
-			<label index="Fachgebiet auswählen">Fachgebiet auswählen</label>
-			<label index="Ebene">Ebene</label>
-			<label index="Bitte Fachgebiet auswählen:">Bitte Fachgebiet auswählen:</label>
-			<label index="Treffer für diese Zwischenebene zeigen">Treffer für diese Zwischenebene zeigen</label>
-			<label index="Treffer aller enthaltenen Untergebiete zeigen">Treffer aller enthaltenen Untergebiete zeigen</label>
-			<label index=" ..."> …</label>
-			<label index="decimal separator">.</label>
-			<label index="thousands separator">,</label>
-		</languageKey>
 	</data>
 </T3locallang>

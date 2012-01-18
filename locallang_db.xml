@@ -5,7 +5,7 @@
 		<description>Language labels for database tables/fields belonging to extension 'nkwgok'</description>
 	</meta>
 	<data type="array">
-		<languageKey index="default" type="array">
+		<languageKey index="en" type="array">
 			<label index="tx_nkwgok_data">GOK</label>
 			<label index="tx_nkwgok_data.gok">GOK</label>
 			<label index="tx_nkwgok_data.search">Search Term (URL escaped)</label>
@@ -22,6 +22,7 @@
 			<label index="flexform.gok">GOK</label>
 			<label index="flexform.url">URL</label>
 		</languageKey>
+		
 		<languageKey index="de" type="array">
 			<label index="tx_nkwgok_data">GOK</label>
 			<label index="tx_nkwgok_data.search">Suchabfrage (URL escaped)</label>

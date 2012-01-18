@@ -5,7 +5,7 @@
 		<description>General language labels for extension 'nkwgok'</description>
 	</meta>
 	<data type="array">
-		<languageKey index="default" type="array">
+		<languageKey index="en" type="array">
 			<label index="scheduler.loadFromOpac.name">1: Load GOK-data from Opac</label>
 			<label index="scheduler.loadFromOpac.description">Loads Pica-XML GOK records from Opac to fileadmin/gok/xml/ and result counts to fileadmin/gok/hitcounts/.</label>
 
