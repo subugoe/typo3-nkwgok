@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset>
+  <rule ref="rulesets/codesize.xml/CyclomaticComplexity">
+    <priority>2</priority>
+  </rule>
+  <rule ref="rulesets/codesize.xml/NPathComplexity">
+    <priority>2</priority>
+  </rule>
+  <rule ref="rulesets/codesize.xml/ExcessiveMethodLength">
+    <priority>1</priority>
+  </rule>
+  <rule ref="rulesets/codesize.xml/ExcessiveClassLength">
+    <priority>3</priority>
+  </rule>
+  <rule ref="rulesets/codesize.xml/ExcessiveParameterList">
+    <priority>1</priority>
+  </rule>
+  <rule ref="rulesets/codesize.xml/ExcessivePublicCount">
+    <priority>3</priority>
+  </rule>
+  <rule ref="rulesets/codesize.xml/TooManyFields">
+    <priority>3</priority>
+  </rule>
+  <rule ref="rulesets/codesize.xml/TooManyMethods">
+    <priority>3</priority>
+  </rule>
+  <rule ref="rulesets/naming.xml/ShortVariable">
+    <priority>4</priority>
+  </rule>
+  <rule ref="rulesets/naming.xml/LongVariable">
+    <priority>5</priority>
+  </rule>
+  <rule ref="rulesets/naming.xml/ShortMethodName">
+    <priority>5</priority>
+  </rule>
+  <rule ref="rulesets/naming.xml/ConstructorWithNameAsEnclosingClass">
+    <priority>5</priority>
+  </rule>
+  <rule ref="rulesets/naming.xml/ConstantNamingConventions">
+    <priority>4</priority>
+  </rule>
+  <rule ref="rulesets/naming.xml/BooleanGetMethodName">
+    <priority>5</priority>
+  </rule>
+  <rule ref="rulesets/unusedcode.xml/UnusedPrivateField">
+    <priority>3</priority>
+  </rule>
+  <rule ref="rulesets/unusedcode.xml/UnusedLocalVariable">
+    <priority>3</priority>
+  </rule>
+  <rule ref="rulesets/unusedcode.xml/UnusedPrivateMethod">
+    <priority>3</priority>
+  </rule>
+  <rule ref="rulesets/unusedcode.xml/UnusedPrivateMethod">
+    <priority>3</priority>
+  </rule>
+</ruleset>
+
