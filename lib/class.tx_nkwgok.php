@@ -582,6 +582,7 @@ class tx_nkwgok extends tslib_pibase {
 
 				$openLink->setAttribute('onclick',  $JSCommand . '("' . $PPN . '");return false;');
 				$openLink->setAttribute('href', $noscriptLink);
+				$openLink->setAttribute('rel', 'nofollow');
 				$openLink->setAttribute('title', $mainTitle);
 				$openLink->setAttribute('alttitle', $alternativeTitle);
 			}
