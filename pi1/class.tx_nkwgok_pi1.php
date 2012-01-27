@@ -24,17 +24,13 @@
  * ************************************************************* */
 
 /**
- * Changed by Sven-S. Porst <porst@sub.uni-goettingen.de>
- * 2011-02-10: fix image and Ajax paths to work with sites not at /
- * 2011-02-10: pass language code to eID
+ * Changes 2011-2012 by Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * See the ChangeLog or git repository for details.
  */
 require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok.php');
 
+
 /**
- * Plugin 'GOK I' for the 'nkwgok' extension.
- *
- * laengster moeglicher Link:
- * http://w3d.typo3.work/test-nils/gok/?no_cache=1&tx_nkwgok[expand]=621711713-621915254-621916862-621920185-621921890-621927139-621928283-621928887-621930628-621931284-621931322-621931438
  * @author	Nils K. Windisch <windisch@sub.uni-goettingen.de>
  * @package	TYPO3
  * @subpackage	tx_nkwgok

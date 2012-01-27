@@ -22,22 +22,25 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
+
+/**
+ * Changes 2011-2012 by Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * See the ChangeLog or git repository for details.
+ */
+
+
 if (!defined('PATH_typo3conf')) {
 	die('Could not access this script directly!');
 }
 require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok.php');
 
 /**
- * undocumented class
- *
  * @package default
  * @author Nils K. Windisch
  * */
 class tx_nkwgok_eid extends tx_nkwgok {
 
 	/**
-	 * undocumented function
-	 *
 	 * @return void
 	 * @author Nils K. Windisch
 	 * */

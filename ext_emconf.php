@@ -12,7 +12,7 @@
 
 $EM_CONF[$_EXTKEY] = array(
 	'title' => 'GOK',
-	'description' => 'Displays Göttingen Local Classification (GOK) information on the page as a tree or a series of menus.',
+	'description' => 'Displays Göttingen Local Classification (GOK) subject hierarchy information as a tree or a series of menus.',
 	'category' => 'plugin',
 	'author' => 'Nils K. Windisch, Sven-S. Porst',
 	'author_email' => 'windisch@sub.uni-goettingen.de, porst@sub.uni-goettingen.de',
@@ -30,7 +30,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'clearCacheOnLoad' => 0,
 	'lockType' => '',
 	'author_company' => 'Göttingen State and University Library, Germany http://www.sub.uni-goettingen.de',
-	'version' => '1.3.0',
+	'version' => '1.5.0',
 	'constraints' => array(
 		'depends' => array(
 			'php' => '5.2.0-0.0.0',
