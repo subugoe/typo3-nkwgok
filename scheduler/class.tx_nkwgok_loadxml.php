@@ -25,6 +25,8 @@
 
 
 /**
+ * … Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * - many more changes, see ChangeLog or github repository
  * 2011-03-14: Sven-S. Porst <porst@sub.uni-goettingen.de>
  * - unify data model by storing complete queries in the search field and not
  * omitting the leading LKL for pure GOK queries
@@ -47,26 +49,18 @@
 
 define('NKWGOKRootNode', 'Root');
 define('NKWGOKGOKRootNode', 'GOK-Root');
-
+define('NKWGOKMaxHierarchy', 31);
 
 class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 	/**
-	 * Stores the hierarchical GOK structure:
-	 * Key: PPN => Value: Array containing PPNs of child elements.
+	 * Stores the subject tree. Keys are PPNs, values are Arrays with:
+	 * * children => Array of strings (PPNs of child elements)
+	 * * [parent => string (PPN of parent element)]
+	 * * GOK => string
 	 * @var Array
 	 */
-	private $parentPPNs;
-
-
-
-	/**
-	 * Maps Normsatz-PPN to its corresponding GOK.
-	 * Key: PPN => Value: GOK string
-	 * @var Array
-	 */
-	private $PPNToGOK;
-
+	private $subjectTree;
 
 
 	/**
@@ -87,52 +81,16 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		set_time_limit(1200);
 		$result = False;
 
-		$this->parentPPNs = Array(NKWGOKRootNode => Array(), NKWGOKGOKRootNode => Array());
-		$this->PPNToGOK = Array();
 
-		$wantedFieldNames = Array('045A', '044E', '044K', '009B', '038D', '003@', '045G', 'str', 'tags');
-
+		// Loop over all XML files to extract their data.
+		// Do so in reverse order as a heuristic to process the handwritten
+		// files first. Some of them are large and PHP seems less likely to run
+		// out of memory when processing those first.
 		$dir = PATH_site . 'fileadmin/gok/xml/';
-		$fileList = glob($dir . '*.xml');
+		$fileList = array_reverse(glob($dir . '*.xml'));
 		if (count($fileList) > 0) {
-			// Run through all files once to gather information about the
-			// structure of the data we process.
-
-			foreach ($fileList as $xmlPath) {
-				$xml = simplexml_load_file($xmlPath);
-				$records = $xml->xpath('/RESULT/SET/SHORTTITLE/record');
-
-				foreach ($records as $record) {
-					$PPNs = $record->xpath('datafield[@tag="003@"]/subfield[@code="0"]');
-					$PPN = (string)($PPNs[0]);
-					$myParentPPNs = $record->xpath('datafield[@tag="038D"]/subfield[@code="9"]');
-					if ($myParentPPNs && count($myParentPPNs) > 0) {
-						$parentPPN = (string)($myParentPPNs[0]);
-						if (array_key_exists($parentPPN, $this->parentPPNs)) {
-							$this->parentPPNs[$parentPPN][] = $PPN;
-						}
-						else {
-							$this->parentPPNs[$parentPPN] = Array($PPN);
-						}
-					}
-					else {
-						$fromOpac = (count($record->xpath('datafield[@tag="str"]')) === 0);
-						if ($fromOpac) {
-							$this->parentPPNs[NKWGOKGOKRootNode][] = $PPN;
-						}
-						else {
-							$this->parentPPNs[NKWGOKRootNode][] = $PPN;
-						}
-					}
-
-					$GOKStrings = $record->xpath('datafield[@tag="045A"]/subfield[@code="a"]');
-					if (count($GOKStrings) > 0) {
-						$GOKString = (string)($GOKStrings[0]);
-						$this->PPNToGOK[$PPN] = strtolower(trim($GOKString));
-					}
-				}
-			}
-
+			// Parse XML files to extract just the tree structure.
+			$this->subjectTree = $this->loadSubjectTree($fileList);
 			
 			// Load hit count information and compute total hit count sums.
 			$this->hitCounts = $this->loadHitCounts();
@@ -142,61 +100,23 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			// about parent elements and store it to our table in the database.
 			foreach ($fileList as $xmlPath) {
 				$rows = Array();
-				$keyNames = Array('ppn', 'hierarchy', 'gok', 'parent', 'descr', 'search', 'descr_en', 'tags', 'childcount', 'fromopac', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
 
 				$xml = simplexml_load_file($xmlPath);
 				foreach ($xml->xpath('/RESULT/SET/SHORTTITLE') as $GOKElement) {
-					$previousFieldName = Null;
-					$GOK = Array();
-
-					foreach ($GOKElement->xpath('record/datafield') as $field) {
-						$fieldName = trim((string) $field->attributes());
-
-						// Only read the desired fields
-						if (in_array($fieldName, $wantedFieldNames)) {
-							// append "_2" to field Name to avoid duplication (ahem)
-							if ($fieldName === $previousFieldName) {
-								$fieldName = $fieldName . '_2';
-							}
-							$previousFieldName = $fieldName;
-
-							// Get subfields
-							foreach ($field->xpath('subfield') as $subfield) {
-								$subfieldName = (string) $subfield['code'];
-								$subfieldContent = trim((string) $subfield);
-								if ($subfieldContent !== Null) {
-									$GOK[$fieldName][$subfieldName] = $subfieldContent;
-								}
-							}
-						}
-					} // end of datafield loop
-
+					$GOK = $this->GOKXMLToArray($GOKElement);
 
 					// Build complete record and insert into database.
 					// Discard records without a PPN.
 					$PPN = trim($GOK['003@']['0']);
-					if ($PPN !== '') {
-						$childCount = 0;
-						if ($this->parentPPNs[$PPN]) {
-							$childCount = count($this->parentPPNs[$PPN]);
-						}
+					if ($PPN !== '' && array_key_exists($PPN, $this->subjectTree)) {
+						$treeElement = $this->subjectTree[$PPN];
 
-						$parent = Null;
-						if (array_key_exists('038D', $GOK) && array_key_exists(9, $GOK['038D']) && $GOK['038D'][9]) {
-							$parent = trim($GOK['038D'][9]);
-						}
-
-						$search = '';
 						$fromOpac = False;
+						$search = '';
 						if (array_key_exists('str', $GOK) && array_key_exists('a', $GOK['str'])) {
 							// GOK coming from CSV file with a CCL search query in the 'str/a' field.
 							if ($GOK['str']['a']) {
 								$search = $GOK['str']['a'];
-							}
-							
-							// Set parent element to Root node if it is blank.
-							if ($parent === Null) {
-								$parent = NKWGOKRootNode;
 							}
 						}
 						else {
@@ -211,15 +131,34 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 								// Generic GOK search, using the LKL field.
 								$search = 'lkl=' . $GOK['045A']['a'];
 							}
-							
-							// Set parent element to GOK-Root node if it is blank.
-							if ($parent === Null) {
-								$parent = NKWGOKGOKRootNode;
+						}
+
+						$childCount = count($treeElement['children']);
+						$parent = $treeElement['parent'];
+
+						// Use stored subject tree to determine hierarchy level.
+						// The hierarchy typically is no deeper than 12 levels:
+						// cut off at 32 to prevent an infinite loop.
+						$hierarchy = 0;
+						$nextParent = $parent;
+						while ($nextParent !== Null && $nextParent !== NKWGOKRootNode) {
+							$hierarchy++;
+							if (array_key_exists($nextParent, $this->subjectTree)) {
+								$nextParent = $this->subjectTree[$nextParent]['parent'];
+							}
+							else {
+								t3lib_div::devLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN ' . $nextParent . ' for record PPN ' . $PPN . '. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', 'nkwgok', 3, $GOK);
+								$hierarchy = -1;
+								break;
+							}
+							if ($hierarchy > NKWGOKMaxHierarchy) {
+								t3lib_div::devLog('loadXML Scheduler Task: Hierarchy level for PPN ' . $PPN . ' exceeds the maximum limit of ' . NKWGOKMaxHierarchy . ' levels. This needs to be fixed, the subject tree may contain an infinite loop.', 'nkwgok', 3, $GOK);
+								$hierarchy = -1;
+								break;
 							}
 						}
 
 						$GOKString = trim($GOK['045A']['a']);
-						$hierarchy = trim($GOK['009B']['a']);
 						$descr = trim($GOK['044E']['a']);
 						$search = trim($search);
 						$descr_en = '';
@@ -266,6 +205,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						$rows[] = Array($PPN, $hierarchy, $GOKString, $parent, $descr, $search, $descr_en, $tags, $childCount, $fromOpac, $hitCount, $totalHitCount, time(), time(), 1);
 					}
 				} // end of loop over GOKs
+				$keyNames = Array('ppn', 'hierarchy', 'gok', 'parent', 'descr', 'search', 'descr_en', 'tags', 'childcount', 'fromopac', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
 				$result = $GLOBALS['TYPO3_DB']->exec_INSERTmultipleRows('tx_nkwgok_data', $keyNames, $rows);
 
 			} // end of loop over files
@@ -280,7 +220,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				'search' => '',
 				'descr_en' => 'Göttingen Online Classification (GOK)',
 				'tags' => '',
-				'childcount' => count($this->parentPPNs[NKWGOKGOKRootNode]),
+				'childcount' => count($this->tree[NKWGOKGOKRootNode]),
 				'fromopac' => True,
 				'hitcount' => -1,
 				'totalhitcount' => -1,
@@ -296,11 +236,117 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 			t3lib_div::devLog('loadXML Scheduler Task: Import of GOK XML to Typo3 database completed', 'nkwgok', 1);
 			$result = True;
-		} else {
-			t3lib_div::devLog('loadXML Scheduler Task: No "*.xml" files found in ' . $dir, 'nkwgok', 3);
+		}
+		else {
+			t3lib_div::devLog('loadXML Scheduler Task: No "*.xml" files found in ' . $dir . '.', 'nkwgok', 3);
 		}
 
 		return $result;
+	}
+
+
+	
+	/**
+	 * Go through the SHORTRECORD XML element and turn it into a PHP array.
+	 * The array uses Pica field names as keys with arrays as values. The
+	 * inner arrays use Pica subfield names as keys and their values as values.
+	 * 
+	 * If fields or subfields are repeated, their last occurrence is used.
+	 * 
+	 * @param type $GOKElement
+	 * @return type
+	 */
+	private function GOKXMLToArray ($GOKElement) {
+		$GOK = Array();
+
+		foreach ($GOKElement->xpath('record/datafield') as $field) {
+			$fieldName = trim((string) $field->attributes());
+
+			// Process just the fields we need.
+			$wantedFieldNames = Array('003@', '044E', '044K', '045A', '045G', 'str', 'tags');
+			if (in_array($fieldName, $wantedFieldNames)) {
+				foreach ($field->xpath('subfield') as $subfield) {
+					$subfieldName = (string) $subfield['code'];
+					$subfieldContent = trim((string) $subfield);
+					if ($subfieldContent !== Null) {
+						$GOK[$fieldName][$subfieldName] = $subfieldContent;
+					}
+				}
+			}
+		}
+
+		return $GOK;
+	}
+
+
+
+	/**
+	 * Goes through data files and creates information of the subject tree’s
+	 * structure from that.
+	 *
+	 * Storing the full data from all records would run into memory problems.
+	 * The resulting array just keeps the information we strictly need for
+	 * analysis.
+	 *
+	 * @author Sven-S. Porst
+	 *
+	 * @param Array $fileList list of XML files to read
+	 * @return Array containing subject tree structure
+	 */
+	private function loadSubjectTree ($fileList) {
+		$tree = Array();
+		$tree[NKWGOKRootNode] = Array('children' => Array());
+		$tree[NKWGOKGOKRootNode] = Array('children' => Array(), 'parent' => NKWGOKRootNode);
+
+		// Run through all files once to gather information about the
+		// structure of the data we process.
+		foreach ($fileList as $xmlPath) {
+			$xml = simplexml_load_file($xmlPath);
+			$records = $xml->xpath('/RESULT/SET/SHORTTITLE/record');
+
+			foreach ($records as $record) {
+				$PPNs = $record->xpath('datafield[@tag="003@"]/subfield[@code="0"]');
+				$PPN = (string)($PPNs[0]);
+
+				// Create entry in the tree array if necessary.
+				if (!array_key_exists($PPN, $tree)) {
+					$tree[$PPN] = Array('children' => Array());
+				}
+
+				$myParentPPNs = $record->xpath('datafield[@tag="038D"]/subfield[@code="9"]');
+				if ($myParentPPNs && count($myParentPPNs) > 0) {
+					// Child record: store its PPN in the list of its parent’s children…
+					$parentPPN = (string)($myParentPPNs[0]);
+					if (!array_key_exists($parentPPN, $tree)) {
+						$tree[$parentPPN] = Array('children' => Array());
+					}
+					$tree[$parentPPN]['children'][] = $PPN;
+
+					// … and store the PPN of the parent record.
+					$tree[$PPN]['parent'] = $parentPPN;
+				}
+				else {
+					// has no parent record
+					$fromOpac = (count($record->xpath('datafield[@tag="str"]')) === 0);
+					if ($fromOpac) {
+						$tree[NKWGOKGOKRootNode]['children'][] = $PPN;
+						$tree[$PPN]['parent'] = NKWGOKGOKRootNode;
+					}
+					else {
+						$tree[NKWGOKRootNode]['children'][] = $PPN;
+						$tree[$PPN]['parent'] = NKWGOKRootNode;
+					}
+				}
+
+				$GOKStrings = $record->xpath('datafield[@tag="045A"]/subfield[@code="a"]');
+				if (count($GOKStrings) > 0) {
+					$GOKString = (string)($GOKStrings[0]);
+					$tree[$PPN]['GOK'] = strtolower(trim($GOKString));
+				}
+			} // end foreach $records
+		} // end foreach $fileList
+
+		return $tree;
 	}
 
 
@@ -351,10 +397,10 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 
 	/**
-	 * Recursively go through the $childRelations and add up the $hitCounts to return a
+	 * Recursively go through the subject tree and add up the $hitCounts to return a
 	 * total hit count including the hits for all child elements.
 	 *
-	 * Requires that the class’ $hitCounts and $parentPPNs arrays are initialised.
+	 * Requires that the class’ $hitCounts and $subjectTree arrays are initialised.
 	 *
 	 * @author Sven-S. Porst
 	 *
@@ -366,31 +412,32 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		$GOK = Null;
 		$myHitCount = 0;
 
-		if (array_key_exists($startPPN, $this->PPNToGOK)) {
-			$GOK = $this->PPNToGOK[$startPPN];
-		}
+		if (array_key_exists($startPPN, $this->subjectTree)) {
+			$record = $this->subjectTree[$startPPN];
+			$GOK = $record['GOK'];
 
-		if (array_key_exists($startPPN, $this->parentPPNs)) {
-			// A parent node: recursively collect and add up the hit counts.
-			foreach ($this->parentPPNs[$startPPN] as $childPPN) {
-				$childHitCounts = $this->computeTotalHitCounts($childPPN);
-				if (array_key_exists($childPPN, $childHitCounts)) {
-					$myHitCount += $childHitCounts[$childPPN];
+			if (count($record['children']) > 0) {
+				// A parent node: recursively collect and add up the hit counts.
+				foreach ($record['children'] as $childPPN) {
+					$childHitCounts = $this->computeTotalHitCounts($childPPN);
+					if (array_key_exists($childPPN, $childHitCounts)) {
+						$myHitCount += $childHitCounts[$childPPN];
+					}
+					$totalHitCounts += $childHitCounts;
 				}
-				$totalHitCounts += $childHitCounts;
-			}
 
-			if ($GOK && array_key_exists($GOK, $this->hitCounts)) {
-				$myHitCount += $this->hitCounts[$GOK];
+				if (array_key_exists($GOK, $this->hitCounts)) {
+					$myHitCount += $this->hitCounts[$GOK];
+				}
+			}
+			else {
+				// A leaf node: just store its hit count.
+				if (array_key_exists($GOK, $this->hitCounts)) {
+					$myHitCount += $this->hitCounts[$GOK];
+				}
 			}
 		}
-		else {
-			// A leaf node: just store its hit count.
-			if ($GOK && array_key_exists($GOK, $this->hitCounts)) {
-				$myHitCount += $this->hitCounts[$GOK];
-			}
-		}
-
+		
 		$totalHitCounts[$startPPN] = $myHitCount;
 
 		return $totalHitCounts;
