@@ -81,6 +81,9 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		set_time_limit(1200);
 		$result = False;
 
+		// Remove records with statusID 1. These should not be around, but can
+		// exist if a previous run of this task was cancelled.
+		$GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_nkwgok_data', 'statusID = 1');
 
 		// Loop over all XML files to extract their data.
 		// Do so in reverse order as a heuristic to process the handwritten
