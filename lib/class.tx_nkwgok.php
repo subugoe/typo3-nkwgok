@@ -23,6 +23,12 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
 
+/**
+ * Changes 2011-2012 by Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * See the ChangeLog or git repository for details.
+ */
+
+
 define('NKWGOKExtKey', 'nkwgok');
 define('NKWGOKQueryTable', 'tx_nkwgok_data');
 define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, childcount, hitcount, totalhitcount, fromopac');

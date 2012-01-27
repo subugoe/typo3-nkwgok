@@ -146,7 +146,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 *
 	 * Columns in the file are:
 	 * 1:	PPN -> 003@ $0
-	 * 2:	hierarchy level -> 009B $a
+	 * 2:	hierarchy level -> ignored
 	 * 3:	GOK -> 045A $a
 	 * 4:	parent PPN -> 038D $9
 	 * 5:	GOK name (German) -> 044E $a
@@ -219,7 +219,6 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 						$shorttitle->appendChild($record);
 						$parentPPN = trim($fields[3]);
 						$this->appendFieldForDataTo('003@', '0', $PPN, $record, $doc);
-						$this->appendFieldForDataTo('009B', 'a', trim($fields[1]), $record, $doc);
 						$this->appendFieldForDataTo('045A', 'a', trim($fields[2]), $record, $doc);
 						$this->appendFieldForDataTo('038D', '9', $parentPPN, $record, $doc);
 						$this->appendFieldForDataTo('044E', 'a', trim($fields[4]), $record, $doc);

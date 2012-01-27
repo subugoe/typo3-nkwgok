@@ -6,9 +6,9 @@ Es gibt Scheduler Tasks, um die benötigten Daten zu importieren.
 
 
 ## Datenimport
-Die Extension kann aus zwei Quellen GOK Normdaten importieren:
+Die Extension kann aus zwei Quellen Fachhierarchien importieren:
 
-* Durch Auslesen der Tev-Sätze im XML-Format aus dem Opac
+* Durch Auslesen der GOK Normdaten (Tev)-Sätze im XML-Format aus dem Opac
 * Über CSV-Dateien mit den zu importierenden Informationen
 
 Hierfür gibt es verschiedene TYPO3 Scheduler Tasks, die die notwendigen
@@ -73,7 +73,7 @@ Solche CSV-Dateien liegen momentan vor für:
 
 * das Fach Geschichte (GOK P*) mit einer feinsinnigeren Aufteilung als die reine GOK
 * SSG-FI Guides
-* die Neuerwerbungslisten
+* Neuerwerbungslisten
 
 Eingabedateien kommen aus zwei Quellen:
 
@@ -97,11 +97,9 @@ Eingabedateien kommen aus zwei Quellen:
 2. können CSV Dateien im Ordner fileadmin/gok/csv hinterlegt werden. Ihre Dateinamen
 	sollten sich nicht mit denen aus Schritt 1 überschneiden.
 
-Die Dateien werden in der Reihenfolge ihrer Namen von vorne nach hinten bearbeitet.
-Bei der Bearbeitung wird geprüft, ob die verwandten Elternelemente vorhanden sind
-und andernfalls im TYPO3 Developer Log eine Warnung ausgegeben. Daher ist es sinnvoll,
-die Dateien so aufzubauen, daß die hierarchisch übergeordneten Elemente vor ihren
-Kindelementen eingelesen werden.
+Jede der CSV Dateien sollte höchstens 500 Zeilen umfassen, da sonst – abhängig
+vom Speicherbedarf der genutzten TYPO3 Version – der Import an der Standardspeichergrenze
+von 128MB für PHP/apache scheitern kann.
 
 Dateiformat: Als Spaltentrenner wird ein Semikolon (;) erwartet, Spalteninhalte
 können von Anführungszeichen (") umschlossen sein.
@@ -109,7 +107,7 @@ können von Anführungszeichen (") umschlossen sein.
 Jede Zeile muß mindestens 5 Spalten enthalten:
 
 1. PPN des Datensatzen (wie `003@ $0` in Tev-Sätzen)
-2. Hierarchiestufe (`009B $a`)
+2. egal
 3. GOK (`045A $a`)
 4. PPN der Eltern-GOK (`038D $9`)
 5. deutscher Name der GOK (`044E $a`)
@@ -123,16 +121,16 @@ Jede Zeile muß mindestens 5 Spalten enthalten:
 
 Ausgabedateien: Die CSV-Dateien werden zunächst in XML-Dateien im Format der
 Pica-Opac-Ausgabe umgewandelt. Die umgewandelten Dateien werden in den Ordner
-fileadmin/gok/xml/ geschrieben, der Dateinamen ist der der Ausgangsdatei, in dem
-das ‘csv’ durch ‘xml’ ersetzt ist.
+fileadmin/gok/xml/ geschrieben, der Dateiname ist der der Ausgangsdatei, in dem
+das abschließende ‘csv’ durch ‘xml’ ersetzt ist.
 
 
 ### 3: GOK XML Daten importieren
-Dieser Scheduler Task leert zunächst die GOK Tabelle in der TYPO3-Datenbank und
-füllt sie dann mit den Daten aus den XML-Dateien in fileadmin/gok/xml/*.xml.
+Überschreibt die Daten in der GOK Tabelle in der TYPO3-Datenbank und
+mit neuen Daten aus den XML-Dateien in fileadmin/gok/xml/*.xml.
 
-Der Vorgang dauert etwa eine Minute. Während dieser Zeit kann TYPO3 den Baum nicht
-korrekt darstellen. Darum wäre ein Ausführen dieses Tasks in der Nacht sinnvoll.
+Der Vorgang dauert je nach Rechnergeschwindigkeit und Datenbankanbindung
+30-300 Sekunden.
 
 
 ## Grundeinstellungen
