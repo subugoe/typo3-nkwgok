@@ -45,30 +45,20 @@ class tx_nkwgok_eid extends tx_nkwgok {
 		// initialize DB functions
 		tslib_eidtools::connectDB();
 
-		// even more get values
 		$get = t3lib_div::_GET();
 		$nkwgokArgs = $get['tx_nkwgok'];
 
-		// and display them
+		$output = Null;
 		$nkwgok = t3lib_div::makeInstance('tx_nkwgok');
-		$ppn = $nkwgokArgs['expand'];
-		$display = Null;
+		$PPN = $nkwgokArgs['expand'];
 		if ($nkwgokArgs['style'] === 'menu') {
-			$display = $nkwgok->AJAXGOKMenuChildren($ppn, (int)$nkwgokArgs['level'], $nkwgokArgs['language'], $nkwgokArgs['objectID']);
+			$output = $nkwgok->AJAXGOKMenuChildren($PPN, (int)$nkwgokArgs['level'], $nkwgokArgs['language'], $nkwgokArgs['objectID']);
 		}
 		else {
-			$display = $nkwgok->AJAXGOKTreeChildren($ppn, $nkwgokArgs['language'], $nkwgokArgs['objectID']);
+			$output = $nkwgok->AJAXGOKTreeChildren($PPN, $nkwgokArgs['language'], $nkwgokArgs['objectID']);
 		}
 	
-		// track action
-		if ($statsEnabled === true) {
-			$doStatistics = t3lib_div::getUserObj('EXT:ke_stats/pi1/class.tx_kestats_pi1.php:tx_kestats_pi1');
-			$doStatistics->initApi();
-			$doStatistics->increaseCounter('GOK', 'element_title,year,month', $ppn, $ppn, 290, 1, 1, 'extension', FALSE);
-			unset($doStatistics);
-		}
-		// return ajax call output
-		echo $display->saveHTML();
+		echo $output->saveHTML();
 	}
 
 }
