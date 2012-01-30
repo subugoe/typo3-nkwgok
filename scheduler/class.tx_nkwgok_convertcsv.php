@@ -154,134 +154,102 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * 7:	GOK name (English) -> 044K $a
 	 * 8:	Tags (comma-separated list of strings) -> tags $a
 	 *
-	 * @param string $csvPath path to CSV file whose name should end in .csv and contain no other dots
+	 * @param string $CSVPath path to CSV file whose name should end in .csv and contain no other dots
 	 * @return Boolean success status
 	 */
-	private function processCSVFile ($csvPath) {
+	private function processCSVFile ($CSVPath) {
 		$success = False;
 		$doc = Null;
+		$startLine = 0;
 
-		$csvString = file_get_contents($csvPath);
+		$CSVString = file_get_contents($CSVPath);
 		// Handle UTF-8, ISO, and Windows files. We expect the latter as the CSV is written by Excel.
-		$stringEncoding = mb_detect_encoding($csvString, Array('UTF-8', 'ISO-8859-1', 'windows-1252'));
+		$stringEncoding = mb_detect_encoding($CSVString, Array('UTF-8', 'ISO-8859-1', 'windows-1252'));
 		if ($stringEncoding != 'UTF-8') {
-			$csvString = mb_convert_encoding($csvString, 'UTF-8', $stringEncoding);
+			$CSVString = mb_convert_encoding($CSVString, 'UTF-8', $stringEncoding);
 		}
+		$CSVString = str_replace("\r\n", "\n", $CSVString);
 
-		// Put our text in a file handle, so we can use fgetcsv on it.
-		// (SLES 11 only supports PHP 5.2 and using str_getcsv requires PHP 5.3)
-		// http://php.net/manual/de/function.str-getcsv.php#100579
-		$fileHandle = fopen("php://memory", "rw");
-		if ($fileHandle) {
-			fwrite($fileHandle, $csvString);
-			fseek($fileHandle, 0);
-		
-			// Set up XML document.
-			$doc = DOMImplementation::createDocument();
-			$result = $doc->createElement('RESULT');
-			$doc->appendChild($result);
-			$set = $doc->createElement('SET');
-			$result->appendChild($set);
+		$CSVLines = explode("\n", $CSVString);
+		foreach ($CSVLines as $lineNumber => $line) {
+			// Set up document.
+			if ($doc === Null) {
+				$doc = DOMImplementation::createDocument();
+				$result = $doc->createElement('RESULT');
+				$doc->appendChild($result);
+				$set = $doc->createElement('SET');
+				$result->appendChild($set);
+				$startLine = $lineNumber;
+			}
 
+			$fields = str_getcsv($line, ';', '"');
 
-			/* Work around PHP bug in CSV parsing: The fgetcsv function
-			 * only works correctly when the locale is _not_ en_US.UTF-8.
-			 * The PHP makers are in denial about this, which means they claim
-			 * the _intended_ behaviour of the function is to sometimes omit
-			 * the first character of a CSV field if it is not quoted and 
-			 * non-ASCII.
-			 * 
-			 * http://bugs.php.net/bug.php?id=31740
-			 * http://bugs.php.net/bug.php?id=48507
-			 * 
-			 * Problem seen, for example, in PHP 5.3 on Open Suse 11.3. 
-			 * 
-			 * To work around this, change the encoding part of the locale to
-			 * 'de_DE.UTF8' and set it back to the original value 'C' (?)
-			 * afterwards.
-			 * As locale changes seem to be in some sense 'global' to PHP, this 
-			 * has potential to cause trouble in unforeseen ways. 
-			 */
-			$oldLocale = setlocale(LC_CTYPE, Null);
-			setlocale(LC_CTYPE, 'de_DE.UTF8');
-			
-			while (($fields = fgetcsv($fileHandle, 4096, ';', '"')) !== false) {
-				if (count($fields) >= 5 && trim(implode('', $fields)) !== '') {
-					// GOK name is in field 5, so ignore lines with less fields
-					// as well as those with only empty fields.
-					$PPN = trim($fields[0]);
+			// Use data from CSV to build Pica-style data fields in XML.
+			if (count($fields) >= 5 && trim(implode('', $fields)) !== '') {
+				// GOK name is in field 5, so ignore lines with less fields
+				// as well as those with only empty fields.
+				$PPN = trim($fields[0]);
 
-					if ($PPN != '') {
-						// The record is required to have a non-empty PPN.
-						$shorttitle = $doc->createElement('SHORTTITLE');
-						$set->appendChild($shorttitle);
-						$record = $doc->createElement('record');
-						$shorttitle->appendChild($record);
-						$parentPPN = trim($fields[3]);
-						$this->appendFieldForDataTo('003@', '0', $PPN, $record, $doc);
-						$this->appendFieldForDataTo('045A', 'a', trim($fields[2]), $record, $doc);
-						$this->appendFieldForDataTo('038D', '9', $parentPPN, $record, $doc);
-						$this->appendFieldForDataTo('044E', 'a', trim($fields[4]), $record, $doc);
-						if (count($fields) > 5) {
-							// Search query
-							$this->appendFieldForDataTo('str', 'a', trim($fields[5]), $record, $doc);
+				if ($PPN != '') {
+					// The record is required to have a non-empty PPN.
+					$shorttitle = $doc->createElement('SHORTTITLE');
+					$set->appendChild($shorttitle);
+					$record = $doc->createElement('record');
+					$shorttitle->appendChild($record);
+					$parentPPN = trim($fields[3]);
+					$this->appendFieldForDataTo('003@', '0', $PPN, $record, $doc);
+					$this->appendFieldForDataTo('045A', 'a', trim($fields[2]), $record, $doc);
+					$this->appendFieldForDataTo('038D', '9', $parentPPN, $record, $doc);
+					$this->appendFieldForDataTo('044E', 'a', trim($fields[4]), $record, $doc);
+					if (count($fields) > 5) {
+						// Search query
+						$this->appendFieldForDataTo('str', 'a', trim($fields[5]), $record, $doc);
 
-							if (count($fields) > 6) {
-								// English GOK Name
-								$englishTitleField = $this->appendFieldForDataTo('044K', 'a', trim($fields[6]), $record, $doc);
+						if (count($fields) > 6) {
+							// English GOK Name
+							$this->appendFieldForDataTo('044K', 'a', trim($fields[6]), $record, $doc);
 
-								if (count($fields > 7)) {
-									$this->appendFieldForDataTo('tags', 'a', trim($fields[7]), $record, $doc);
-								}
+							if (count($fields > 7)) {
+								$this->appendFieldForDataTo('tags', 'a', trim($fields[7]), $record, $doc);
 							}
 						}
-
-						// Warn about a few strange situations. These are not fatal, but they may be
-						// the result of a problem with the data structures.
-						if ($parentPPN != '' && $parentPPN != 'Root' && $parentPPN != 'GOK-Root'
-								&& !$this->PPNList[$parentPPN]) {
-							t3lib_div::devLog('convertCSV Scheduler Task: Parent PPN "' . $parentPPN . '" not defined when reading child record "' . $PPN . '" of file ' . $csvPath, 'nkwgok', 2);
-						}
-
-						if ($this->PPNList[$PPN]) {
-							t3lib_div::devLog('convertCSV Scheduler Task: Duplicate PPN "' . $PPN. '" in file ' . $csvPath, 'nkwgok', 2);
-						}
-
-						// Add current PPN to PPN list.
-						$this->PPNList[$PPN] = True;
 					}
-					else {
-						t3lib_div::devLog('convertCSV Scheduler Task: Blank PPN  in line: "' . implode(';', $fields) .'" of file ' . $csvPath, 'nkwgok', 2);
 
-					} // if ($PPN != '')
-				}	
-				else if (count($fields) > 1 && trim(implode('', $fields)) !== '') {
-					t3lib_div::devLog('convertCSV Scheduler Task: Line "' . implode(';', $fields) . '" of file ' . $csvPath . ' contains less than 5 fields.', 'nkwgok', 2);
-				} // (count($fields) >= 5)
-			}
-			
-			// Undo locale change required by fgetcsv() bug [see above].
-			setlocale(LC_CTYPE, $oldLocale);
-			
-			fclose($fileHandle); 
+					if ($this->PPNList[$PPN]) {
+						t3lib_div::devLog('convertCSV Scheduler Task: Duplicate PPN "' . $PPN. '" in file ' . $CSVPath, 'nkwgok', 2);
+					}
 
-			// Write XML file
-			$csvPathParts = explode('/', $csvPath);
-			$originalFileName = $csvPathParts[count($csvPathParts) - 1];
-			$originalFileNameParts = explode('.', $originalFileName);
-			$XMLFileName = $originalFileNameParts[0] . '.xml';
-			$resultPath = PATH_site. 'fileadmin/gok/xml/' . $XMLFileName ;
-			if ($doc->save($resultPath) === False) {
-				t3lib_div::devLog('convertCSV Scheduler Task: Failed to write XML file' . $resultPath , 'nkwgok', 3);
+					// Add current PPN to PPN list.
+					$this->PPNList[$PPN] = True;
+				}
+				else {
+					t3lib_div::devLog('convertCSV Scheduler Task: Blank PPN  in line: "' . implode(';', $fields) .'" of file ' . $CSVPath, 'nkwgok', 2);
+				} // if ($PPN != '')
 			}
-			else {
-				// t3lib_div::devLog('convertCSV Scheduler Task: Successfully wrote XML file ' . $resultPath , 'nkwgok', 1);
-				$success = True;
+			else if (count($fields) > 1 && trim(implode('', $fields)) !== '') {
+				t3lib_div::devLog('convertCSV Scheduler Task: Line "' . implode(';', $fields) . '" of file ' . $CSVPath . ' contains less than 5 fields.', 'nkwgok', 2);
+			} // (count($fields) >= 5)
+
+
+			// Write document to XML file every 500 lines or after the last line in the file.
+			if (($lineNumber + 1) % 500 === 0 || $lineNumber + 1 === count($CSVLines)) {
+				$csvPathParts = explode('/', $CSVPath);
+				$originalFileName = $csvPathParts[count($csvPathParts) - 1];
+				$originalFileNameParts = explode('.', $originalFileName);
+				$XMLFileName = $originalFileNameParts[0] . '-' . $startLine . '.xml';
+				$resultPath = PATH_site. 'fileadmin/gok/xml/' . $XMLFileName;
+
+				if ($doc->save($resultPath) === False) {
+					t3lib_div::devLog('convertCSV Scheduler Task: Failed to write XML file' . $resultPath , 'nkwgok', 3);
+					break;
+				}
+				else {
+					// t3lib_div::devLog('convertCSV Scheduler Task: Successfully wrote XML file ' . $resultPath , 'nkwgok', 1);
+					$success = True;
+				}
+				$doc = Null;
 			}
-		}
-		else {
-			t3lib_div::devLog('convertCSV Scheduler Task: Could not open file ' . $csvPath , 'nkwgok', 3);
-		}
+		} // $foreach $CSVLines
 
 		return $success;
 	}
