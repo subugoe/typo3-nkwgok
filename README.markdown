@@ -1,11 +1,40 @@
 # GOK
 Importiert Daten aus Fächerhierarchien wie der Göttinger Online
-Klassifikation (GOK) und zeigt sie an.
+Klassifikation (GOK) und zeigt sie in einem Content-Element an.
 Die Anzeige kann als Baum oder über Menüs erfolgen.
 Es gibt Scheduler Tasks, um die benötigten Daten zu importieren.
 
 
-## Datenimport
+## Grundeinstellungen im Extension Manager
+Wird die Extension im TYPO3 Extension-Manager ausgewählt, gibt es zwei
+Grundeinstellungen:
+
+1. Opac Base URL with trailing /: Aus dieser URL werden die Links in den Opac
+gebaut. [Standardwert: https://opac.sub.uni-goettingen.de/DB=1/]
+2. replace included CSS with path: Pfad einer eigenen CSS-Datei für die Baum-
+und Menüdarstellung [Standardwert: leer, die CSS-Datei der Extension wird genutzt]
+
+
+## Einstellungen für das Content Element
+Jeder Seitenhinhalt mit GOK Plug-In hat drei Einstellungsmöglichkeiten:
+
+1. Startknoten: Der Startknoten kann auf zwei Arten festgelegt werden:
+	1. Durch Auswahl eines GOK Wurzelknotens aus dem Popup-Menü ‘GOK-Hierarchie beginnen mit’
+	2. Durch Eingabe der GOK des Wurzelknotens in das Feld ‘Eigene GOK als Startknoten angeben’
+2. Anzeigestil:
+	1. Baum - hierarchische Baumstruktur
+	2. Menüs - es erscheint ein Menü mit den Untergebieten. Nach Auswahl eines
+	Menüpunktes erscheint ein weiteres Menü mit den Untergebieten des ausgewählten Faches
+3. GOK-ID anzeigen: hiermit kann die Anzeige der GOK-IDs wie ‘IA 663’ an- bzw. abgestellt werden
+
+Weiterhin kann über TypoScript konfiguriert mit der Einstellung	`plugin.tx_nkwgok_pi1.shallowSearch`
+werden, ob die Anzeige vom Typ ‘Baum’ für eine GOK aus dem Opac
+
+* verlinkt auf eine Suche nach Büchern aller Kindelemente der GOK [0, Standard]
+* verlinkt auf eine Suche nach Büchern speziell zu dieser GOK [1]
+
+
+## Datenimport im Scheduler
 Die Extension kann aus zwei Quellen Fachhierarchien importieren:
 
 * Durch Auslesen der GOK Normdaten (Tev)-Sätze im XML-Format aus dem Opac
@@ -26,15 +55,16 @@ Reihenfolge aus:
 2. CSV Dateien laden und zu XML konvertieren
 3. GOK XML Dateien importieren
 
-Er sollte im regulären Betrieb nachts ausgeführt werden, da die GOK Daten
-während des Neuimports in Schritt 3 (ca. 30 Sekunden) nicht verfügbar sind.
+Im regulären Betrieb sollte dieser Task gelegentlich regelmäßig, z.B. einmal
+wöchentlich, ausgeführt werden. Wegen der vielen Zugriffe auf Opac und TYPO3
+Datenbank, erscheint eine Ausführung abseits der starken Nutzungszeiten sinnvoll.
 
 
 ### auto 2+3: Prüfen, ob die CSV Dateien aktualisiert wurden und konvertieren/reimportieren wenn sie es sind
 Dieser Scheduler Task prüft, ob es zu allen CSV Dateien in `fileadmin/gok/csv/`
 entsprechende XML Dateien in `fileadmin/gok/xml/` mit einem neueren Änderungsdatum
 gibt. Ist dies nicht der Fall, werden die CSV Dateien erneut konvertiert und
-importiert.
+alle XML Daten nenu importiert.
 
 Dieser Scheduler Task kann häufig aufgerufen werden, damit Änderungen an den CSV
 Dateien schnell auf der Seite verfügbar sind.
@@ -49,12 +79,13 @@ nötigen Schritte aus:
 
 
 ### 1: GOK XML-Daten importieren
-Dieser Scheduler Task lädt die GOK (Tev) Normdatensätze, sowie die Anzahl der
+Dieser Scheduler Task lädt die GOK (Tev) Normdatensätze sowie die Anzahl der
 Treffer pro GOK aus dem Opac.
 
 Die Abfrage für die Normdaten ist `MAK tev NOT LKL p*`, also alle GOK
 Normdatensätze außer denen, deren GOK mit P beginnt. Der Bereich P (Geschichte)
-wird im folgenden Scheduler Task aus einer CSV Datei gelesen.
+liegt in einer verfeinerten Fassung as CSV Datei vor (Ansprechpartner hierfür
+ist Herr Enderle).
 
 Die geladenen Daten sind im XML-Format des Opac (URL-Optionen `XML=1/PRS=XML`)
 und enthalten Pica-Daten. Sie werden im Ordner `fileadmin/gok/xml/` abgelegt. Der
@@ -66,8 +97,8 @@ Der Inhalt dieses Ordners wird beim Start des Scheduler Tasks gelöscht.
 
 
 ### 2: CSV Daten laden und zu XML konvertieren
-Dieser Scheduler Task konvertiert spezielle CSV-Dateien mit Fachinformationen
-in das Pica-XML Format.
+Dieser Scheduler Task konvertiert spezielle CSV-Dateien mit Fachinhierarchie
+Informationen in das Pica-XML Format.
 
 Solche CSV-Dateien liegen momentan vor für:
 
@@ -131,32 +162,3 @@ mit neuen Daten aus den XML-Dateien in fileadmin/gok/xml/*.xml.
 
 Der Vorgang dauert je nach Rechnergeschwindigkeit und Datenbankanbindung
 30-300 Sekunden.
-
-
-## Grundeinstellungen
-Wird die Extension im TYPO3 Extension-Manager ausgewählt, gibt es zwei
-Grundeinstellungen:
-
-1. Opac Base URL with trailing /: Aus dieser URL werden die Links in den Opac
-gebaut. [Standardwert: https://opac.sub.uni-goettingen.de/DB=1/]
-2. replace included CSS with path: Pfad einer eigenen CSS-Datei für die Baum-
-und Menüdarstellung [Standardwert: leer, die CSS-Datei des Plug-Ins wird genutzt]
-
-
-## Einstellungen
-Jeder Seitenhinhalt mit GOK Plug-In hat drei Einstellungsmöglichkeiten:
-
-1. Startknoten: Der Startknoten kann auf zwei Arten festgelegt werden:
-	1. Durch Auswahl eines GOK Wurzelknotens aus dem Popup-Menü ‘GOK-Hierarchie beginnen mit’
-	2. Durch Eingabe der GOK des Wurzelknotens in das Feld ‘Eigene GOK als Startknoten angeben’
-2. Anzeigestil:
-	1. Baum - hierarchische Baumstruktur
-	2. Menüs - es erscheint ein Menü mit den Untergebieten. Nach Auswahl eines
-	Menüpunktes erscheint ein weiteres Menü mit den Untergebieten des ausgewählten Faches
-3. GOK-ID anzeigen: hiermit kann die Anzeige der GOK-IDs wie ‘IA 663’ an- bzw. abgestellt werden
-
-Weiterhin kann über TypoScript konfiguriert mit der Einstellung	`plugin.tx_nkwgok_pi1.shallowSearch`
-werden, ob die Anzeige vom Typ ‘Baum’ für eine GOK aus dem Opac
-
-* verlinkt auf eine Suche nach Büchern aller Kindelemente der GOK [0, Standard]
-* verlinkt auf eine Suche nach Büchern speziell zu dieser GOK [1]
