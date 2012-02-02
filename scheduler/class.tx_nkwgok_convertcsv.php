@@ -146,13 +146,11 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 *
 	 * Columns in the file are:
 	 * 1:	PPN -> 003@ $0
-	 * 2:	hierarchy level -> ignored
-	 * 3:	GOK -> 045A $a
-	 * 4:	parent PPN -> 038D $9
-	 * 5:	GOK name (German) -> 044E $a
-	 * 6:	search query -> str $a
-	 * 7:	GOK name (English) -> 044K $a
-	 * 8:	Tags (comma-separated list of strings) -> tags $a
+	 * 2:	parent PPN -> 038D $9
+	 * 3:	GOK name (German) -> 044E $a
+	 * 4:	search query -> str $a
+	 * 5:	GOK name (English) -> 044K $a [optional]
+	 * 6:	Tags (comma-separated list of strings) -> tags $a [optional]
 	 *
 	 * @param string $CSVPath path to CSV file whose name should end in .csv and contain no other dots
 	 * @return Boolean success status
@@ -185,7 +183,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 			$fields = str_getcsv($line, ';', '"');
 
 			// Use data from CSV to build Pica-style data fields in XML.
-			if (count($fields) >= 5 && trim(implode('', $fields)) !== '') {
+			if (count($fields) >= 3 && trim(implode('', $fields)) !== '') {
 				// GOK name is in field 5, so ignore lines with less fields
 				// as well as those with only empty fields.
 				$PPN = trim($fields[0]);
@@ -196,21 +194,21 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 					$set->appendChild($shorttitle);
 					$record = $doc->createElement('record');
 					$shorttitle->appendChild($record);
-					$parentPPN = trim($fields[3]);
+					$parentPPN = trim($fields[1]);
 					$this->appendFieldForDataTo('003@', '0', $PPN, $record, $doc);
-					$this->appendFieldForDataTo('045A', 'a', trim($fields[2]), $record, $doc);
+					$this->appendFieldForDataTo('045A', 'a', $PPN, $record, $doc);
 					$this->appendFieldForDataTo('038D', '9', $parentPPN, $record, $doc);
-					$this->appendFieldForDataTo('044E', 'a', trim($fields[4]), $record, $doc);
-					if (count($fields) > 5) {
+					$this->appendFieldForDataTo('044E', 'a', trim($fields[2]), $record, $doc);
+					if (count($fields) > 3) {
 						// Search query
-						$this->appendFieldForDataTo('str', 'a', trim($fields[5]), $record, $doc);
+						$this->appendFieldForDataTo('str', 'a', trim($fields[3]), $record, $doc);
 
-						if (count($fields) > 6) {
+						if (count($fields) > 4) {
 							// English GOK Name
-							$this->appendFieldForDataTo('044K', 'a', trim($fields[6]), $record, $doc);
+							$this->appendFieldForDataTo('044K', 'a', trim($fields[4]), $record, $doc);
 
-							if (count($fields > 7)) {
-								$this->appendFieldForDataTo('tags', 'a', trim($fields[7]), $record, $doc);
+							if (count($fields > 5)) {
+								$this->appendFieldForDataTo('tags', 'a', trim($fields[5]), $record, $doc);
 							}
 						}
 					}
@@ -227,8 +225,8 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 				} // if ($PPN != '')
 			}
 			else if (count($fields) > 1 && trim(implode('', $fields)) !== '') {
-				t3lib_div::devLog('convertCSV Scheduler Task: Line "' . implode(';', $fields) . '" of file ' . $CSVPath . ' contains less than 5 fields.', 'nkwgok', 2);
-			} // (count($fields) >= 5)
+				t3lib_div::devLog('convertCSV Scheduler Task: Line "' . implode(';', $fields) . '" of file ' . $CSVPath . ' contains less than 3 fields.', 'nkwgok', 2);
+			} // (count($fields) >= 3)
 
 
 			// Write document to XML file every 500 lines or after the last line in the file.

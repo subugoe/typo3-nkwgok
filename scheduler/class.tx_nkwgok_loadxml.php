@@ -216,7 +216,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			// Add the GOK root node.
 			$row = array(
 				'ppn' => NKWGOKGOKRootNode,
-				'hierarchy' => '-1',
+				'hierarchy' => 0,
 				'gok' => NKWGOKGOKRootNode,
 				'parent' => NKWGOKRootNode,
 				'descr' => 'Göttinger Online Klassifikation (GOK)',
