@@ -4,7 +4,7 @@
  * 1. Convert CSV Data to XML
  * 2. Import all the XML to the Typo3 Database
  *
- * 2011 Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * 2011-2012 Sven-S. Porst <porst@sub.uni-goettingen.de>
  */
 
 

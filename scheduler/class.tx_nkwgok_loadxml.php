@@ -25,18 +25,10 @@
 
 
 /**
- * … Sven-S. Porst <porst@sub.uni-goettingen.de>
- * - many more changes, see ChangeLog or github repository
- * 2011-03-14: Sven-S. Porst <porst@sub.uni-goettingen.de>
- * - unify data model by storing complete queries in the search field and not
- * omitting the leading LKL for pure GOK queries
- * 2011-02-28: Sven-S. Porst <porst@sub.uni-goettingen.de>
- * - add Opac hit counts to data
- * 2011-02-08: Sven-S. Porst <porst@sub.uni-goettingen.de>
- * - debugged
- * - improved structure
- * - > 20X speed improvement
+ * Changes 2011-2012 by Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * See the ChangeLog or git repository for details.
  */
+
 
 /**
  * Class "tx_nkwgok_loadxml" provides task procedures

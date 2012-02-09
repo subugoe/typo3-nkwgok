@@ -4,7 +4,7 @@
  *
  * The file format is described in the processCSVFile function.
  *
- * 2011 Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * 2011-2012 Sven-S. Porst <porst@sub.uni-goettingen.de>
  */
 
 

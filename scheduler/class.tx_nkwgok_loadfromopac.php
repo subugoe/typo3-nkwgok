@@ -6,7 +6,7 @@
  * Unifies the features provided by class.tx_nkwgok_loadxml.php and
  * getHitCounts.py and makes them accessible from the Typo3 Scheduler.
  *
- * 2011 Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * 2011-2012 Sven-S. Porst <porst@sub.uni-goettingen.de>
  */
 
 

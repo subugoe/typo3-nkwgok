@@ -3,7 +3,7 @@
  * Typo3 Scheduler task to check whether any of our CSV files has been updated
  * and triggering the CSV to XML conversion as well as database update if it has.
  *
- * 2011 Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * 2011-2012 Sven-S. Porst <porst@sub.uni-goettingen.de>
  */
 
 
