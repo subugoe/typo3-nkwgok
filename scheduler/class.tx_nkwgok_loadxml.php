@@ -123,8 +123,10 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 								$search = 'msc=' . $GOK['045G']['a'];
 							}
 							else if (array_key_exists('045A', $GOK) && array_key_exists ('a', $GOK['045A']) && $GOK['045A']['a']) {
-								// Generic GOK search, using the LKL field.
-								$search = 'lkl=' . $GOK['045A']['a'];
+								// Generic GOK search, using the LKL index.
+								// Requires quotation marks around the search term as GOKs can begin
+								// with three character strings that could be mistaken for index names.
+								$search = 'lkl="' . $GOK['045A']['a'] . '"';
 							}
 						}
 

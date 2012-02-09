@@ -129,7 +129,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 
 		while ($scanNext !== Null && $success) {
 			$index++;
-			$URL = $opacScanURL . '/TRM=' . $indexName . '+"' . $scanNext . '"';
+			$URL = $opacScanURL . '/TRM=' . $indexName . '+%22' . $scanNext . '%22';
 			$opacDownload = file_get_contents($URL);
 			if ($opacDownload) {
 				$targetFilePath = $folderPath . $indexName . '-' . $index . '.xml';
