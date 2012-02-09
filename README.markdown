@@ -115,9 +115,9 @@ Eingabedateien kommen aus zwei Quellen:
 		Beispiel:
 
 			plugin.tx_nkwgok_pi1.downloadUrl {
-				Neuerwerbungen = http://vlib-aac.sub.uni-goettingen.de/fileadmin/gok/csv/AACNeuerwerbungen.csv
-				NeuerwerbungenHist = http://vlib-aac.sub.uni-goettingen.de/fileadmin/gok/csv/AACNeuerwerbungenHist.csv
-				NeuerwerbungenLit = http://vlib-aac.sub.uni-goettingen.de/fileadmin/gok/csv/AACNeuerwerbungenLit.csv
+				Neuerwerbungen = http://aac.sub.uni-goettingen.de/fileadmin/gok/csv/AACNeuerwerbungen.csv
+				NeuerwerbungenHist = http://aac.sub.uni-goettingen.de/fileadmin/gok/csv/AACNeuerwerbungenHistory.csv
+				NeuerwerbungenLit = http://aac.sub.uni-goettingen.de/fileadmin/gok/csv/AACNeuerwerbungenLiterature.csv
 			}
 	2. in den Optionen des verwandten Scheduler-Tasks die ID der Root-Seite
 		eingetragen sein
@@ -135,20 +135,18 @@ von 128MB für PHP/apache scheitern kann.
 Dateiformat: Als Spaltentrenner wird ein Semikolon (;) erwartet, Spalteninhalte
 können von Anführungszeichen (") umschlossen sein.
 
-Jede Zeile muß mindestens 5 Spalten enthalten:
+Jede Zeile muß mindestens 3 Spalten enthalten:
 
 1. PPN des Datensatzen (wie `003@ $0` in Tev-Sätzen)
-2. egal
-3. GOK (`045A $a`)
-4. PPN der Eltern-GOK (`038D $9`)
-5. deutscher Name der GOK (`044E $a`)
-6. CCL Suchabfrage für diesen Eintrag [möglicherweise leer/nicht vorhanden]
+2. PPN der Eltern-GOK (`038D $9`)
+3. deutscher Name der GOK (`044E $a`)
+4. CCL Suchabfrage für diesen Eintrag [möglicherweise leer/nicht vorhanden]
 	Stücke dieser Suchabfragen haben die Form Suchschlüssel=Begriff?. Sie können
 	geklammert und mit `and`, `not` und `or` verbunden werden. Es ist wichtig, für die
 	Suchschlüssel dieselbe Groß- und Kleinschreibung wie in den pazpar2 Einstellungen
 	zu verwenden (unsere Konvention: Kleinbuchstaben).
-7. englischer Name der GOK (`044K $a`) [möglicherweise leer/nicht vorhanden]
-8. komma-separierte Liste von Tags zur beliebigen Nutzung [möglicherweise leer/nicht vorhanden]
+5. englischer Name der GOK (`044K $a`) [möglicherweise leer/nicht vorhanden]
+6. komma-separierte Liste von Tags zur beliebigen Nutzung [möglicherweise leer/nicht vorhanden]
 
 Ausgabedateien: Die CSV-Dateien werden zunächst in XML-Dateien im Format der
 Pica-Opac-Ausgabe umgewandelt. Die umgewandelten Dateien werden in den Ordner

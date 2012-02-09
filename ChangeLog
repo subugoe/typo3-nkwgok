@@ -6,6 +6,7 @@
 	* Split XML files generated from CSV files into chunks of 500 records (to
 		avoid hitting the 128MB RAM limit for PHP)
 	* CHANGE CSV DATA FORMAT: remove columns 2 and 3
+	* Fix links to Opac (enclose search terms in quotation marks)
 
 2012-01-23 1.4.0 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
 	* add nofollow attribute to tree expansion/collapsing links to reduce overzealous spidering
