@@ -27,11 +27,12 @@ Jeder Seitenhinhalt mit GOK Plug-In hat drei Einstellungsmöglichkeiten:
 	Menüpunktes erscheint ein weiteres Menü mit den Untergebieten des ausgewählten Faches
 3. GOK-ID anzeigen: hiermit kann die Anzeige der GOK-IDs wie ‘IA 663’ an- bzw. abgestellt werden
 
-Weiterhin kann über TypoScript konfiguriert mit der Einstellung	`plugin.tx_nkwgok_pi1.shallowSearch`
-werden, ob die Anzeige vom Typ ‘Baum’ für eine GOK aus dem Opac
+Weitere Einstellungsmöglichkeiten mit TypoScript `plugin.tx_nkwgok_pi1.`
 
-* verlinkt auf eine Suche nach Büchern aller Kindelemente der GOK [0, Standard]
-* verlinkt auf eine Suche nach Büchern speziell zu dieser GOK [1]
+* `shallowSearch` konfiguriert die Art der Kataloglinks, die im Anzeigestil ‘Baum’ verwendet werden:
+** 0 [Standard]: Suche nach Büchern aller Kindelemente des GOK-Datensatzes
+** 1: Suche nach Büchern speziell zu dieser GOK
+* `menuInlineThreshold` [2]: Hat ein Element höchstens so viele Kindelemente, werden die Kindelemente direkt in der übergeordneten Ebene angezeigt.
 
 
 ## Datenimport im Scheduler
@@ -127,10 +128,6 @@ Eingabedateien kommen aus zwei Quellen:
 		und ersetzen dabei ältere Dateien mit denselben Namen.
 2. können CSV Dateien im Ordner fileadmin/gok/csv hinterlegt werden. Ihre Dateinamen
 	sollten sich nicht mit denen aus Schritt 1 überschneiden.
-
-Jede der CSV Dateien sollte höchstens 500 Zeilen umfassen, da sonst – abhängig
-vom Speicherbedarf der genutzten TYPO3 Version – der Import an der Standardspeichergrenze
-von 128MB für PHP/apache scheitern kann.
 
 Dateiformat: Als Spaltentrenner wird ein Semikolon (;) erwartet, Spalteninhalte
 können von Anführungszeichen (") umschlossen sein.

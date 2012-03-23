@@ -666,7 +666,8 @@ class tx_nkwgok extends tslib_pibase {
 					'');
 
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
-			$this->appendGOKMenuChildren($row['ppn'], $doc, $form, $language, $objectID, $conf['getVars'], 2);
+			$menuInlineThreshold = $conf['menuInlineThreshold'] = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
+			$this->appendGOKMenuChildren($row['ppn'], $doc, $form, $language, $objectID, $conf['getVars'], $menuInlineThreshold);
 		}
 
 		$button = $doc->createElement('input');
@@ -721,7 +722,8 @@ class tx_nkwgok extends tslib_pibase {
 				+ '&tx_" . NKWGOKExtKey . "[language]=" . $language . "&eID=" . NKWGOKExtKey . "'
 				+ '&tx_" . NKWGOKExtKey . "[level]=' + level
 				+ '&tx_" . NKWGOKExtKey . "[style]=menu'
-				+ '&tx_" . NKWGOKExtKey . "[objectID]=" . $objectID . "';
+				+ '&tx_" . NKWGOKExtKey . "[objectID]=" . $objectID . "'
+				+ '&tx_" . NKWGOKExtKey . "[menuInlineThreshold]=" . $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'] . "';
 
 			jQuery(option.parentNode).nextAll().remove();
 			var newSelect = document.createElement('select');
@@ -879,7 +881,8 @@ class tx_nkwgok extends tslib_pibase {
 	 */
 	public function AJAXGOKMenuChildren ($parentPPN, $level, $language, $objectID) {
 		$doc = DOMImplementation::createDocument();
-		$this->appendGOKMenuChildren($parentPPN, $doc, $doc, $language, $objectID, Array(), 2, $level);
+		$menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
+		$this->appendGOKMenuChildren($parentPPN, $doc, $doc, $language, $objectID, Array(), $menuInlineThreshold, $level);
 
 		return $doc;
 	}
