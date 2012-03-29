@@ -30,9 +30,9 @@ Jeder Seitenhinhalt mit GOK Plug-In hat drei Einstellungsmöglichkeiten:
 Weitere Einstellungsmöglichkeiten mit TypoScript `plugin.tx_nkwgok_pi1.`
 
 * `shallowSearch` konfiguriert die Art der Kataloglinks, die im Anzeigestil ‘Baum’ verwendet werden:
-** 0 [Standard]: Suche nach Büchern aller Kindelemente des GOK-Datensatzes
-** 1: Suche nach Büchern speziell zu dieser GOK
-* `menuInlineThreshold` [2]: Hat ein Element höchstens so viele Kindelemente, werden die Kindelemente direkt in der übergeordneten Ebene angezeigt.
+	* 0 [Standard]: Suche nach Büchern aller Kindelemente des GOK-Datensatzes
+	* 1: Suche nach Büchern speziell zu dieser GOK
+* `menuInlineThreshold` [2]: Hat ein Element im Anzeigestil ‘Menü’ höchstens so viele Kindelemente, werden diese Kindelemente direkt im Menü der übergeordneten Ebene angezeigt.
 
 
 ## Datenimport im Scheduler
