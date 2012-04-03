@@ -53,8 +53,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	public function getMarkup () {
 		$language = $GLOBALS['TSFE']->lang;
 
-		$doc = DOMImplementation::createDocument();
-		$this->addGOKTreeJSToElement($doc, $doc, $language, $this->arguments['objectID']);
+		$this->addGOKTreeJSToElement($this->doc, $language, $this->arguments['objectID']);
 
 		// Get start node.
 		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->arguments['gok'], NKWGOKQueryTable) . ' AND statusID = 0';
@@ -71,8 +70,8 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		}
 
 		foreach ($GOKs as $GOK) {
-			$container = $doc->createElement('div');
-			$doc->appendChild($container);
+			$container = $this->doc->createElement('div');
+			$this->doc->appendChild($container);
 
 			$containerClasses = Array('gokContainer', 'tree');
 			if (!$this->arguments['showGOKID']) {
@@ -83,13 +82,13 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			}
 			$container->setAttribute('class', implode(' ', $containerClasses));
 
-			$topElement = $this->appendGOKTreeItem($doc, $container, 'span', $GOK, $language, $this->arguments['objectID'], $this->arguments['expand'], '', 1, False);
+			$topElement = $this->appendGOKTreeItem($container, 'span', $GOK, $language, $this->arguments['objectID'], $this->arguments['expand'], '', 1, False);
 			$topElement->setAttribute('class', 'rootNode');
 
-			$this->appendGOKTreeChildren($GOK['ppn'], $doc, $container, $language, $this->arguments['objectID'], $this->arguments['expand'], '', 1);
+			$this->appendGOKTreeChildren($GOK['ppn'], $container, $language, $this->arguments['objectID'], $this->arguments['expand'], '', 1);
 		}
 
-		return $doc;
+		return $this->doc;
 	}
 
 
@@ -101,15 +100,13 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @return DOMDocument
 	 */
 	public function getAJAXMarkup () {
-		$doc = DOMImplementation::createDocument();
-
 		$parentPPN = $this->arguments['expand'];
 		$language = $this->arguments['language'];
 		$objectID = $this->arguments['objectID'];
 
-		$this->appendGOKTreeChildren($parentPPN, $doc, $doc, $language, $objectID, Array($parentPPN), '', 1)->firstChild;
+		$this->appendGOKTreeChildren($parentPPN, $this->doc, $language, $objectID, Array($parentPPN), '', 1)->firstChild;
 
-		return $doc;
+		return $this->doc;
 	}
 
 
@@ -118,19 +115,15 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * Helper function to insert JavaScript for the GOK Tree into the passed
 	 * $element.
 	 *
-	 * It seems we need to pass the DOMDocument here as using $element->ownerDocument
-	 * doesn't seem to work if $element is the DOMDocument itself.
-	 *
 	 * @author Sven-S. Porst
-	 * @param DOMElement $element the <script> tag is inserted into
-	 * @param DOMDocument $doc the containing document
+	 * @param DOMElement $container the <script> tag is inserted into
 	 * @param string $language ISO 369-1 language code
 	 * @param string $objectID ID of Typo3 content object
 	 * @return void
 	 */
-	private function addGOKTreeJSToElement ($element, $doc, $language, $objectID) {
-		$scriptElement = $doc->createElement('script');
-		$doc->appendChild($scriptElement);
+	private function addGOKTreeJSToElement ($container, $language, $objectID) {
+		$scriptElement = $this->doc->createElement('script');
+		$container->appendChild($scriptElement);
 		$scriptElement->setAttribute('type', 'text/javascript');
 
 		$js = "
@@ -169,7 +162,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			link[0].onclick = new Function(functionText);
 		};
 ";
-		$scriptElement->appendChild($doc->createTextNode($js));
+		$scriptElement->appendChild($this->doc->createTextNode($js));
 	}
 
 
@@ -177,15 +170,14 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	/**
 	 * Looks up child elements for the given $parentPPN,
 	 * creates a list with markup for them
-	 * and adds them to the given $container element inside $doc,
+	 * and adds them to the given $container element inside $this->doc,
 	 * taking into account which parent elements are configured to display their
 	 * children.
 	 *
 	 * @author Nils K. Windisch
 	 * @author Sven-S. Porst
 	 * @param string $parentPPN
-	 * @param DOMDocument $doc document used to create the resulting element
-	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $doc)
+	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $this->doc)
 	 * @param string $language ISO 639-1 language code
 	 * @param string $objectID ID of Typo3 content object
 	 * @param Array $expandInfo information which PPNs need to be expanded
@@ -193,10 +185,10 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements
 	 * @return void
 	 * */
-	private function appendGOKTreeChildren($parentPPN, $doc, $container, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel) {
+	private function appendGOKTreeChildren($parentPPN, $container, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel) {
 		$GOKs = $this->getChildren($parentPPN, True);
 		if (sizeof($GOKs) > 1) {
-			$ul = $doc->createElement('ul');
+			$ul = $this->doc->createElement('ul');
 			$container->appendChild($ul);
 			$ul->setAttribute('id', 'ul-' . $objectID . '-' . $parentPPN);
 
@@ -206,7 +198,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			$firstGOK = array_shift($GOKs);
 			if ($firstGOK['hitcount'] > 0) {
 				$firstGOK['descr'] = $this->localise('Allgemeines', $language);
-				$this->appendGOKTreeItem($doc, $ul, 'li', $firstGOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel, False, 'general-items-node');
+				$this->appendGOKTreeItem($ul, 'li', $firstGOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel, False, 'general-items-node');
 			}
 
 			foreach ($GOKs as $GOK) {
@@ -215,7 +207,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				 * 2. it is known to have no matching hits
 				 */
 				if ($GOK['hitcount'] != 0 || $GOK['childcount'] != 0) {
-					$this->appendGOKTreeItem($doc, $ul, 'li', $GOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel);
+					$this->appendGOKTreeItem($ul, 'li', $GOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel);
 				}
 			} // end foreach ($GOKs as $GOK)
 		}
@@ -224,12 +216,11 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 
 	/**
-	 * Appends a single GOK item child element of typ3 $elementName
-	 * to the element $container inside $doc and returns it.
+	 * Appends a single GOK item child element of type $elementName
+	 * to the element $container inside $this->doc and returns it.
 	 *
 	 * @author Sven-S. Porst
-	 * @param DOMDocument $doc document used to create the resulting element
-	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $doc)
+	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $this->doc)
 	 * @param string $elementName name of the element to insert into $container
 	 * @param Array $GOK
 	 * @param string $language ISO 639-1 language code
@@ -241,7 +232,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @param string|Null $extraClass class added to the appended links [defaults to Null]
 	 * @return DOMElement
 	 */
-	private function appendGOKTreeItem ($doc, $container, $elementName, $GOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel, $isInteractive = True, $extraClass = Null) {
+	private function appendGOKTreeItem ($container, $elementName, $GOK, $language, $objectID, $expandInfo, $expandMarker, $autoExpandLevel, $isInteractive = True, $extraClass = Null) {
 		$PPN = $GOK['ppn'];
 		$expand = $PPN;
 
@@ -254,15 +245,15 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		 * 2. The linked name
 		 * 3. If the item has child elements and is expanded, the list of child elements
 		 */
-		$item = $doc->createElement($elementName);
+		$item = $this->doc->createElement($elementName);
 		$container->appendChild($item);
 		$item->setAttribute('id', 'c' . $objectID . '-' . $PPN);
 
-		$openLink = $doc->createElement('a');
+		$openLink = $this->doc->createElement('a');
 		$openLink->setAttribute('id', 'openCloseLink-' . $objectID . '-' . $PPN);
 		$item->appendChild($openLink);
 
-		$control = $doc->createElement('span');
+		$control = $this->doc->createElement('span');
 		$openLink->appendChild($control);
 		$openLinkClass = 'plusMinus';
 		if ($isInteractive !== True) {
@@ -270,19 +261,19 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		}
 		$control->setAttribute('class', $openLinkClass);
 
-		$GOKIDSpan = $doc->createElement('span');
+		$GOKIDSpan = $this->doc->createElement('span');
 		$GOKIDSpan->setAttribute('class', 'GOKID');
-		$GOKIDSpan->appendChild($doc->createTextNode($GOK['gok']));
+		$GOKIDSpan->appendChild($this->doc->createTextNode($GOK['gok']));
 
-		$GOKNameSpan = $doc->createElement('span');
+		$GOKNameSpan = $this->doc->createElement('span');
 		$GOKNameSpan->setAttribute('class', 'GOKName');
-		$GOKNameSpan->appendChild($doc->createTextNode($this->GOKName($GOK, $language, True)));
+		$GOKNameSpan->appendChild($this->doc->createTextNode($this->GOKName($GOK, $language, True)));
 
-		$openLink->appendChild($doc->createTextNode(' '));
+		$openLink->appendChild($this->doc->createTextNode(' '));
 		$openLink->appendChild($GOKIDSpan);
-		$openLink->appendChild($doc->createTextNode(' '));
+		$openLink->appendChild($this->doc->createTextNode(' '));
 		$openLink->appendChild($GOKNameSpan);
-		$this->appendOpacLinksTo($GOK, $doc, $language, $item);
+		$this->appendOpacLinksTo($GOK, $language, $item);
 
 		$itemClass = '';
 		if ($extraClass !== Null) {
@@ -309,7 +300,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 							array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker) );
 
 					// recursively call self to get child UL
-					$this->appendGOKTreeChildren($PPN, $doc, $item, $language, $objectID, $expandInfo, $expand, $autoExpandLevel);
+					$this->appendGOKTreeChildren($PPN, $item, $language, $objectID, $expandInfo, $expand, $autoExpandLevel);
 				}
 				else {
 					$itemClass .= 'open';
@@ -330,7 +321,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 		$item->setAttribute('class', $itemClass);
 
-		$control->appendChild($doc->createTextNode($buttonText));
+		$control->appendChild($this->doc->createTextNode($buttonText));
 
 		return $item;
 	}
@@ -343,20 +334,19 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 *
 	 * @author Sven-S. Porst
 	 * @param Array $GOK GOK record
-	 * @param DOMDocument $doc document used to create the resulting element
 	 * @param string $language ISO 639-1 language code
 	 * @param DOMElement $container the link elements are appended to
 	 */
-	private function appendOpacLinksTo ($GOK, $doc, $language, $container) {
-		$opacLinkElement = $this->OPACLinkElement($GOK, $doc, $language, True);
+	private function appendOpacLinksTo ($GOK, $language, $container) {
+		$opacLinkElement = $this->OPACLinkElement($GOK, $language, True);
 		if ($opacLinkElement) {
-			$container->appendChild($doc->createTextNode(' '));
+			$container->appendChild($this->doc->createTextNode(' '));
 			$container->appendChild($opacLinkElement);
 		}
 
-		$opacLinkElement = $this->OPACLinkElement($GOK, $doc, $language, False);
+		$opacLinkElement = $this->OPACLinkElement($GOK, $language, False);
 		if ($opacLinkElement) {
-			$container->appendChild($doc->createTextNode(' '));
+			$container->appendChild($this->doc->createTextNode(' '));
 			$container->appendChild($opacLinkElement);
 		}
 	}
@@ -369,12 +359,11 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 *
 	 * @author Sven-S. Porst
 	 * @param Array $GOKData GOK record
-	 * @param DOMDocument $doc document used to create the resulting element
 	 * @param string $language ISO 639-1 language code
 	 * @param Boolean $deepSearch
 	 * @return DOMElement
 	 */
-	private function OPACLinkElement ($GOKData, $doc, $language, $deepSearch) {
+	private function OPACLinkElement ($GOKData, $language, $deepSearch) {
 		$opacLink = Null;
 		$hitCount = $GOKData['hitcount'];
 		$useDeepSearch = $deepSearch && ($GOKData['totalhitcount'] > 0);
@@ -383,7 +372,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		}
 		$URL = $this->opacGOKSearchURL($GOKData, $language, $deepSearch);
 		if ($hitCount != 0 && $URL) {
-			$opacLink = $doc->createElement('a');
+			$opacLink = $this->doc->createElement('a');
 			$opacLink->setAttribute('href', $URL);
 			$titleString = '';
 			if ($useDeepSearch === True && $GOKData['childcount'] != 0) {
@@ -399,11 +388,11 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			if ($hitCount > 0) {
 				// we know the number of results: display it
 				$numberString = number_format($hitCount, 0, $this->localise('decimal separator', $language), $this->localise('thousands separator', $language));
-				$opacLink->appendChild($doc->createTextNode(sprintf($this->localise('%s Treffer anzeigen', $language), $numberString)));
+				$opacLink->appendChild($this->doc->createTextNode(sprintf($this->localise('%s Treffer anzeigen', $language), $numberString)));
 			}
 			else {
 				// we don't know the number of results: display a general text
-				$opacLink->appendChild($doc->createTextNode($this->localise('Treffer anzeigen', $language)));
+				$opacLink->appendChild($this->doc->createTextNode($this->localise('Treffer anzeigen', $language)));
 			}
 
 			$linkClass= 'opacLink ' . (($deepSearch === True) ? 'deep' : 'shallow');

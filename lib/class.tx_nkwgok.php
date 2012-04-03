@@ -58,6 +58,15 @@ abstract class tx_nkwgok {
 
 
 	/**
+	 * DOMDocument used by subclasses to create their content. This variable
+	 * is initialised by the instantiateSubclassFor() method.
+	 * @var DOMDocument
+	 */
+	protected $doc;
+
+
+
+	/**
 	 * Implemented by subclasses.
 	 * Returns a DOMDocument with markup for the subject hierarchy based on the
 	 * settings passed to instantiateSubclassFor.
@@ -100,6 +109,7 @@ abstract class tx_nkwgok {
 		}
 
 		$subclass->arguments = $arguments;
+		$subclass->doc = DOMImplementation::createDocument();
 
 		return $subclass;
 	}
