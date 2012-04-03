@@ -76,6 +76,7 @@ class tx_nkwgok_pi1 extends tslib_pibase {
 		$arguments['showGOKID'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'showGOKID');
 		$arguments['objectID'] = $this->cObj->data['uid'];
 		$arguments['pageLink'] = $this->pi_getPageLink($GLOBALS['TSFE']->id);
+		$arguments['language'] = $GLOBALS['TSFE']->lang;
 
 		$nkwgok = tx_nkwgok::instantiateSubclassFor($arguments);
 		$doc = $nkwgok->getMarkup();		

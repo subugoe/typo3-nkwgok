@@ -57,6 +57,12 @@ abstract class tx_nkwgok {
 
 
 
+	/**
+	 * Language code to use for the localisation.
+	 * @var string ISO 639-1 language code 
+	 */
+	protected $language;
+
 
 	
 	/**
@@ -116,12 +122,17 @@ abstract class tx_nkwgok {
 			$subclass = t3lib_div::makeInstance('tx_nkwgok_horizontal');
 		}
 		else {
+			// Default to displaying the tree.
 			$subclass = t3lib_div::makeInstance('tx_nkwgok_tree');
 		}
 
-		$subclass->arguments = $arguments;
-		$subclass->doc = DOMImplementation::createDocument();
-		$subclass->objectID = $arguments['objectID'];
+		if ($subclass) {
+			// Configure the newly created instance.
+			$subclass->arguments = $arguments;
+			$subclass->doc = DOMImplementation::createDocument();
+			$subclass->objectID = $arguments['objectID'];
+			$subclass->language = $arguments['language'];
+		}
 
 		return $subclass;
 	}
@@ -139,10 +150,9 @@ abstract class tx_nkwgok {
 	 *
 	 * @author Sven-S. Porst
 	 * @param string $key key to look up in pi1/locallang.xml
-	 * @param string $language ISO 639-1 language code
 	 * @return string
 	 */
-	protected function localise ($key, $language) {
+	protected function localise ($key) {
 		$result = '';
 		
 		$filePath = t3lib_div::getFileAbsFileName('EXT:' . NKWGOKExtKey . '/pi1/locallang.xml');
@@ -158,7 +168,7 @@ abstract class tx_nkwgok {
 				 * array can also contain a 'source' key.
 				 */
 				$parser = t3lib_div::makeInstance('t3lib_l10n_parser_Llxml');
-				$this->localisation = $parser->getParsedData($filePath, $language);
+				$this->localisation = $parser->getParsedData($filePath, $this->language);
 			}
 			else {
 				/**
@@ -168,12 +178,12 @@ abstract class tx_nkwgok {
 				 * array('languageKey' => array('stringKey' => 'localisedString'))
 				 * It seems to contain languageKeys for all localisations in the XML file.
 				 */
-				$this->localisation = t3lib_div::readLLXMLfile($filePath, $language);
+				$this->localisation = t3lib_div::readLLXMLfile($filePath, $this->language);
 			}
 		}
 
-		$myLanguage = $language;
-		if (!array_key_exists($language, $this->localisation)) {
+		$myLanguage = $this->language;
+		if (!array_key_exists($this->language, $this->localisation)) {
 			$myLanguage = 'default';
 		}
 		
@@ -207,14 +217,13 @@ abstract class tx_nkwgok {
 	 *
 	 * @author Sven-S. Porst <porst@sub.uni-goettingen.de>
 	 * @param Array $gokRecord
-	 * @param string $language ISO-639-1 language code as used by Typo3 [defaults to 'de']
 	 * @param Boolean $simplify should the trailing {…} be removed? [defaults to False]
 	 * @return string
 	 */
-	protected function GOKName($gokRecord, $language='de', $simplify = False) {
+	protected function GOKName($gokRecord, $simplify = False) {
 		$displayName = $gokRecord['descr'];
 
-		if ($language == 'en') {
+		if ($this->language == 'en') {
 			$englishName = $gokRecord['descr_en'];
 
 			if ($englishName) {
