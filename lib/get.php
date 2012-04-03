@@ -34,32 +34,27 @@ if (!defined('PATH_typo3conf')) {
 }
 require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok.php');
 
+
 /**
  * @package default
  * @author Nils K. Windisch
  * */
-class tx_nkwgok_eid extends tx_nkwgok {
+class tx_nkwgok_eid {
 
 	/**
 	 * @return void
 	 * @author Nils K. Windisch
+	 * @author Sven-S. Porst <porst@sub.uni-goettingen.de>
 	 * */
 	function eid_main() {
+		$output = Null;
+
 		// initialize DB functions
 		tslib_eidtools::connectDB();
 
-		$get = t3lib_div::_GET();
-		$nkwgokArgs = $get['tx_nkwgok'];
-
-		$output = Null;
-		$nkwgok = t3lib_div::makeInstance('tx_nkwgok');
-		$PPN = $nkwgokArgs['expand'];
-		if ($nkwgokArgs['style'] === 'menu') {
-			$output = $nkwgok->AJAXGOKMenuChildren($PPN, (int)$nkwgokArgs['level'], $nkwgokArgs['language'], $nkwgokArgs['objectID']);
-		}
-		else {
-			$output = $nkwgok->AJAXGOKTreeChildren($PPN, $nkwgokArgs['language'], $nkwgokArgs['objectID']);
-		}
+		$arguments = t3lib_div::_GET('tx_nkwgok');
+		$nkwgok = tx_nkwgok::instantiateSubclassFor($arguments);
+		$output = $nkwgok->getAJAXMarkup();
 	
 		echo $output->saveHTML();
 	}
@@ -68,4 +63,5 @@ class tx_nkwgok_eid extends tx_nkwgok {
 
 $nkwgok_eid = t3lib_div::makeInstance('tx_nkwgok_eid');
 $nkwgok_eid->eid_main();
+
 ?>
