@@ -41,7 +41,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 	 * @return DOMElement containing the markup for a menu
 	 */
 	public function getMarkup () {
-		$this->addGOKMenuJSToElement($this->doc, $language, $this->arguments['objectID']);
+		$this->addGOKMenuJSToElement($this->doc, $language);
 
 		// Create the form and insert the first menu.
 		$container = $this->doc->createElement('div');
@@ -71,7 +71,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
 			$menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
-			$this->appendGOKMenuChildren($row['ppn'], $form, $language, $this->arguments['objectID'], $this->arguments, $menuInlineThreshold);
+			$this->appendGOKMenuChildren($row['ppn'], $form, $language, $this->arguments, $menuInlineThreshold);
 		}
 
 		$button = $this->doc->createElement('input');
@@ -92,10 +92,9 @@ class tx_nkwgok_menu extends tx_nkwgok {
 		$parentPPN = $this->arguments['expand'];
 		$level = (int)$nkwgokArgs['level'];
 		$language = $this->arguments['language'];
-		$objectID = $this->arguments['objectID'];
 
 		$menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
-		$this->appendGOKMenuChildren($parentPPN, $this->doc, $language, $objectID, Array(), $menuInlineThreshold, $level);
+		$this->appendGOKMenuChildren($parentPPN, $this->doc, $language, Array(), $menuInlineThreshold, $level);
 
 		return $this->doc;
 	}
@@ -104,16 +103,12 @@ class tx_nkwgok_menu extends tx_nkwgok {
 
 	/**
 	 * Helper function to insert JavaScript for the GOK Menu into the passed
-	 * $element.
-	 *
-	 * It seems we need to pass the DOMDocument here as using $element->ownerDocument
-	 * doesn't seem to work if $element is the DOMDocument itself.
+	 * $container element.
 	 *
 	 * @param DOMElement $container the <script> tag is inserted into
 	 * @param string $language ISO 639-1 language code
-	 * @param string $objectID ID of Typo3 content object
 	 */
-	private function addGOKMenuJSToElement ($container, $language, $objectID) {
+	private function addGOKMenuJSToElement ($container, $language) {
 		$scriptElement = $this->doc->createElement('script');
 		$container->appendChild($scriptElement);
 		$scriptElement->setAttribute('type', 'text/javascript');
@@ -123,19 +118,19 @@ class tx_nkwgok_menu extends tx_nkwgok {
 			jQuery('.gokMenuForm input[type=\'submit\']').hide();
 		});
 
-		function GOKMenuSelectionChanged" . $objectID . " (menu) {
+		function GOKMenuSelectionChanged" . $this->objectID . " (menu) {
 			var selectedOption = menu.options[menu.selectedIndex];
 			jQuery(menu).nextAll().remove();
 			if (selectedOption.getAttribute('haschildren') && !selectedOption.getAttribute('isautoexpanded')) {
-				newMenuForSelection" . $objectID . "(selectedOption);
+				newMenuForSelection" . $this->objectID . "(selectedOption);
 			}
 			if (selectedOption.value != 'pleaseselect') {
 				jQuery('option[value=\"pleaseselect\"]', menu).remove();
 			}
-			startSearch" . $objectID . "(selectedOption);
+			startSearch" . $this->objectID . "(selectedOption);
 		}
 
-		function newMenuForSelection" . $objectID . " (option) {
+		function newMenuForSelection" . $this->objectID . " (option) {
 			var URL = location.protocol + '//' + location.host + location.pathname;
 			var PPN = option.value;
 			var level = parseInt(option.parentNode.getAttribute('level')) + 1;
@@ -143,7 +138,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 				+ '&tx_" . NKWGOKExtKey . "[language]=" . $language . "&eID=" . NKWGOKExtKey . "'
 				+ '&tx_" . NKWGOKExtKey . "[level]=' + level
 				+ '&tx_" . NKWGOKExtKey . "[style]=menu'
-				+ '&tx_" . NKWGOKExtKey . "[objectID]=" . $objectID . "'
+				+ '&tx_" . NKWGOKExtKey . "[objectID]=" . $this->objectID . "'
 				+ '&tx_" . NKWGOKExtKey . "[menuInlineThreshold]=" . $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'] . "';
 
 			jQuery(option.parentNode).nextAll().remove();
@@ -170,7 +165,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 			};
 			jQuery.get(URL, parameters, downloadFinishedFunction);
 		}
-		function startSearch" . $objectID . " (option) {
+		function startSearch" . $this->objectID . " (option) {
 			nkwgokMenuSelected(option);
 		}
 ";
@@ -191,13 +186,12 @@ class tx_nkwgok_menu extends tx_nkwgok {
 	 * @param string $parentPPN
 	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $this->doc). Is expected to be a <select> element if the $autoExpandStep paramter is not 0 and a <form> element otherwise.
 	 * @param string $language ISO 639-1 language code
-	 * @param string $objectID ID of Typo3 content object
 	 * @param Array $getVars entries for keys tx_nkwgok[expand-#] for an integer # are the selected items on level #
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
 	 * @param int $level the depth in the menu hierarchy [defaults to 0]
 	 * @param int $autoExpandStep the depth of auto-expansion [defaults to 0]
 	 */
-	private function appendGOKMenuChildren($parentPPN, $container, $language, $objectID, $getVars, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0) {
+	private function appendGOKMenuChildren($parentPPN, $container, $language, $getVars, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0) {
 		$GOKs = $this->getChildren($parentPPN);
 		if (sizeof($GOKs) > 0) {
 			if ( (sizeof($GOKs) <= $autoExpandLevel) && ($level != 0) && $autoExpandStep == 0 ) {
@@ -213,9 +207,9 @@ class tx_nkwgok_menu extends tx_nkwgok {
 				// Create the containing <select> when we’re not auto-expanding.
 				$select = $this->doc->createElement('select');
 				$container->appendChild($select);
-				$select->setAttribute('id', 'select-' . $objectID . '-' . $parentPPN);
+				$select->setAttribute('id', 'select-' . $this->objectID . '-' . $parentPPN);
 				$select->setAttribute('name', 'tx_' . NKWGOKExtKey . '[expand-' . $level . ']');
-				$select->setAttribute('onchange', 'GOKMenuSelectionChanged' . $objectID . '(this);');
+				$select->setAttribute('onchange', 'GOKMenuSelectionChanged' . $this->objectID . '(this);');
 				$select->setAttribute('title', $this->localise('Fachgebiet auswählen', $language) . ' ('
 						. $this->localise('Ebene', $language) . ' ' . ($level + 1) . ')');
 				$select->setAttribute('level', $level);
@@ -272,13 +266,13 @@ class tx_nkwgok_menu extends tx_nkwgok {
 				$option->appendChild($this->doc->createTextNode($menuItemString));
 				if (($GOK['childcount'] > 0) && ($GOK['childcount'] <= $autoExpandLevel)) {
 					$option->setAttribute('isAutoExpanded', '');
-					$this->appendGOKMenuChildren($PPN, $select, $language, $objectID, $getVars, $autoExpandLevel, $level, $autoExpandStep + 1);
+					$this->appendGOKMenuChildren($PPN, $select, $language, $getVars, $autoExpandLevel, $level, $autoExpandStep + 1);
 				}
 
 				if ( $PPN == $getVars['expand-' . $level] ) {
 					// this item should be selected and the next menu should be added
 					$option->setAttribute('selected', 'selected');
-					$this->appendGOKMenuChildren($PPN, $container, $language, $objectID, $getVars, $autoExpandLevel, $level + 1);
+					$this->appendGOKMenuChildren($PPN, $container, $language, $getVars, $autoExpandLevel, $level + 1);
 					// remove the first/default item of the menu if we have a selection already
 				}
 			}

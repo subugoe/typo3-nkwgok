@@ -57,6 +57,17 @@ abstract class tx_nkwgok {
 
 
 
+
+	
+	/**
+	 * TYPO3 content object ID for our content element. This variable
+	 * is initialised by the instantiateSubclassFor() method.
+	 * @var string
+	 */
+	protected $objectID;
+
+
+
 	/**
 	 * DOMDocument used by subclasses to create their content. This variable
 	 * is initialised by the instantiateSubclassFor() method.
@@ -110,6 +121,7 @@ abstract class tx_nkwgok {
 
 		$subclass->arguments = $arguments;
 		$subclass->doc = DOMImplementation::createDocument();
+		$subclass->objectID = $arguments['objectID'];
 
 		return $subclass;
 	}
