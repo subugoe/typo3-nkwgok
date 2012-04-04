@@ -71,7 +71,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
 			$menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
-			$this->appendGOKMenuChildren($row['ppn'], $form, $this->arguments, $menuInlineThreshold);
+			$this->appendGOKMenuChildren($row['ppn'], $form, $menuInlineThreshold);
 		}
 
 		$button = $this->doc->createElement('input');
@@ -90,11 +90,11 @@ class tx_nkwgok_menu extends tx_nkwgok {
 	 * @return DOMDocument
 	 */
 	public function getAJAXMarkup () {
-		$parentPPN = $this->arguments['expand'];
-		$level = (int)$nkwgokArgs['level'];
-
 		$menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
-		$this->appendGOKMenuChildren($parentPPN, $this->doc, Array(), $menuInlineThreshold, $level);
+		$this->appendGOKMenuChildren( $this->arguments['expand'],
+										$this->doc,
+										$menuInlineThreshold,
+										(int)$this->arguments['level'] );
 
 		return $this->doc;
 	}
@@ -184,12 +184,12 @@ class tx_nkwgok_menu extends tx_nkwgok {
 	 *
 	 * @param string $parentPPN
 	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $this->doc). Is expected to be a <select> element if the $autoExpandStep paramter is not 0 and a <form> element otherwise.
-	 * @param Array $getVars entries for keys tx_nkwgok[expand-#] for an integer # are the selected items on level #
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
 	 * @param int $level the depth in the menu hierarchy [defaults to 0]
 	 * @param int $autoExpandStep the depth of auto-expansion [defaults to 0]
 	 */
-	private function appendGOKMenuChildren($parentPPN, $container, $getVars, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0) {
+	private function appendGOKMenuChildren($parentPPN, $container, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0) {
+		debugster(Array($parentPPN, $container, $autoExpandLevel, $level, $autoExpandStep));
 		$GOKs = $this->getChildren($parentPPN);
 		if (sizeof($GOKs) > 0) {
 			if ( (sizeof($GOKs) <= $autoExpandLevel) && ($level != 0) && $autoExpandStep == 0 ) {
@@ -237,7 +237,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 					}
 					$option->appendChild($this->doc->createTextNode($this->localise($label)));
 					$option->setAttribute('value', 'withchildren');
-					if (!$getVars['expand-' . $level]) {
+					if (!$this->arguments['expand-' . $level]) {
 						$option->setAttribute('selected', 'selected');
 					}
 
@@ -264,13 +264,13 @@ class tx_nkwgok_menu extends tx_nkwgok {
 				$option->appendChild($this->doc->createTextNode($menuItemString));
 				if (($GOK['childcount'] > 0) && ($GOK['childcount'] <= $autoExpandLevel)) {
 					$option->setAttribute('isAutoExpanded', '');
-					$this->appendGOKMenuChildren($PPN, $select, $getVars, $autoExpandLevel, $level, $autoExpandStep + 1);
+					$this->appendGOKMenuChildren($PPN, $select, $autoExpandLevel, $level, $autoExpandStep + 1);
 				}
 
-				if ( $PPN == $getVars['expand-' . $level] ) {
+				if ( $PPN == $this->arguments['expand-' . $level] ) {
 					// this item should be selected and the next menu should be added
 					$option->setAttribute('selected', 'selected');
-					$this->appendGOKMenuChildren($PPN, $container, $getVars, $autoExpandLevel, $level + 1);
+					$this->appendGOKMenuChildren($PPN, $container, $autoExpandLevel, $level + 1);
 					// remove the first/default item of the menu if we have a selection already
 				}
 			}
