@@ -76,6 +76,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 
 		$button = $this->doc->createElement('input');
 		$button->setAttribute('type', 'submit');
+		$button->setAttribute('value', $this->localise('Untergebiete anzeigen'));
 		$form->appendChild($button);
 
 		return $this->doc;

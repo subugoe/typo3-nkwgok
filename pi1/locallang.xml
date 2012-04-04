@@ -28,6 +28,7 @@
 			<label index="Bitte Fachgebiet auswählen:">Please select a subject:</label>
 			<label index="Treffer für diese Zwischenebene zeigen">Show results for this subject</label>
 			<label index="Treffer aller enthaltenen Untergebiete zeigen">Show results for all contained subjects</label>
+			<label index="Untergebiete anzeigen">Show subcategories</label>
 			<label index=" ...">…</label>
 			<label index="decimal separator">,</label>
 			<label index="thousands separator"></label>
@@ -57,6 +58,7 @@
 			<label index="Bitte Fachgebiet auswählen:">Bitte Fachgebiet auswählen:</label>
 			<label index="Treffer für diese Zwischenebene zeigen">Treffer zu diesem Thema zeigen</label>
 			<label index="Treffer aller enthaltenen Untergebiete zeigen">Treffer aller enthaltenen Untergebiete zeigen</label>
+			<label index="Untergebiete anzeigen">Untergebiete anzeigen</label>
 			<label index=" ..."> …</label>
 			<label index="decimal separator">,</label>
 			<label index="thousands separator"></label>
