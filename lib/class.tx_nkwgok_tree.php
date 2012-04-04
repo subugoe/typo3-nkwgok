@@ -276,7 +276,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			if ($GOK['childcount'] > 0) {
 				$JSCommand = '';
 				$noscriptLink = '#';
-				$mainTitle = $GOK['childcount'] . ' ' . $this->localise('Unterkategorien anzeigen');
+				$mainTitle = sprintf($this->localise('%s Unterkategorien anzeigen'), $GOK['childcount']);
 				$alternativeTitle = $this->localise('Unterkategorien ausblenden');
 
 				if ( ($expandInfo && in_array($PPN, $expandInfo)) || $GOK['childcount'] <= $autoExpandLevel) {

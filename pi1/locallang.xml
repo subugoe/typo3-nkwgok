@@ -20,7 +20,7 @@
 			<label index="%s Treffer anzeigen">show %s matching books</label>
 			<label index="Treffer anzeigen">show matching books</label>
 			<label index="keine Treffer">no matching books</label>
-			<label index="Unterkategorien anzeigen">Show subcategories</label>
+			<label index="%s Unterkategorien anzeigen">Show %s subcategories</label>
 			<label index="Unterkategorien ausblenden">Hide subcategories</label>
 			<label index="Laden ...">Loading…</label>
 			<label index="Fachgebiet auswählen">Select subject</label>
@@ -49,7 +49,7 @@
 			<label index="%s Treffer anzeigen">%s Treffer anzeigen</label>
 			<label index="Treffer anzeigen">Treffer anzeigen</label>
 			<label index="keine Treffer">keine Treffer</label>
-			<label index="Unterkategorien anzeigen">Unterkategorien anzeigen</label>
+			<label index="%s Unterkategorien anzeigen">%s Unterkategorien anzeigen</label>
 			<label index="Unterkategorien ausblenden">Unterkategorien ausblenden</label>
 			<label index="Laden ...">Laden …</label>
 			<label index="Fachgebiet auswählen">Fachgebiet auswählen</label>
