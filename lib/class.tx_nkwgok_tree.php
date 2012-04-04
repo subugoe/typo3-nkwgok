@@ -285,7 +285,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 					$mainTitle = $alternativeTitle;
 					$alternativeTitle = $tmpTitle;
 					$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
-							array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker) );
+							Array('tx_nkwgok' => Array('expand' => $expandMarker)) );
 
 					// recursively call self to get child UL
 					$this->appendGOKTreeChildren($PPN, $item, $expand, $autoExpandLevel);
@@ -295,8 +295,8 @@ class tx_nkwgok_tree extends tx_nkwgok {
 					$JSCommand = 'expandGOK' . $this->objectID;
 					$buttonText = '[+]';
 					$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
-							array('tx_' . NKWGOKExtKey . '[expand]' => $expand, 'no_cache' => 1) )
-							. '#c' . $PPN;
+							Array('tx_nkwgok' => Array('expand' => $expand), 'no_cache' => 1) )
+							. '#c' . $this->objectID . '-' .  $PPN;
 				}
 
 				$openLink->setAttribute('onclick',  $JSCommand . '("' . $PPN . '");return false;');
