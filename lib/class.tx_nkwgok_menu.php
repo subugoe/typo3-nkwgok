@@ -56,8 +56,8 @@ class tx_nkwgok_menu extends tx_nkwgok {
 		$pageID = $this->doc->createElement('input');
 		$form->appendChild($pageID);
 		$pageID->setAttribute('type', 'hidden');
-		$pageID->setAttribute('name', 'id');
-		$pageID->setAttribute('value', $GLOBALS['TSFE']->id);
+		$pageID->setAttribute('name', 'no_cache');
+		$pageID->setAttribute('value', 1); //$GLOBALS['TSFE']->id);
 
 		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->arguments['gok'], NKWGOKQueryTable) . ' AND statusID = 0';
 		// run query and collect result
