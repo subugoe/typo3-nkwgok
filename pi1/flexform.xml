@@ -39,6 +39,10 @@
 								<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleTree</numIndex>
 								<numIndex index="1">tree</numIndex>
 							</numIndex>
+							<numIndex index="1" type="array">
+								<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleColumn</numIndex>
+								<numIndex index="1">column</numIndex>
+							</numIndex>
 							<numIndex index="2" type="array">
 								<numIndex index="0">LLL:EXT:nkwgok/pi1/locallang.xml:styleMenu</numIndex>
 								<numIndex index="1">menu</numIndex>

@@ -10,6 +10,7 @@
 			<label index="altSource">Ignore the menu selection and start the tree at this GOK</label>
 			<label index="style">Display as</label>
 			<label index="styleTree">Tree</label>
+			<label index="styleColumn">Columns</label>
 			<label index="styleMenu">Menus</label>
 			<label index="showGOKID">Display GOK-ID (e.g. IA 663)</label>
 
@@ -40,6 +41,7 @@
 			<label index="altSource">Eigene GOK als Startknoten angeben (die Menüauswahl wird dann ignoriert)</label>
 			<label index="style">Anzeigen als</label>
 			<label index="styleTree">Baum</label>
+			<label index="styleColumn">Spalten</label>
 			<label index="styleMenu">Menüs</label>
 			<label index="showGOKID">GOK-ID (z.B. IA 663) anzeigen</label>
 
