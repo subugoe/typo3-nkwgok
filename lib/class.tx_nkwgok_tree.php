@@ -80,10 +80,10 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			}
 			$container->setAttribute('class', implode(' ', $containerClasses));
 
-			$topElement = $this->appendGOKTreeItem($container, 'span', $GOK, $this->arguments['expand'], '', 1, False);
+			$topElement = $this->appendGOKTreeItem($container, 'span', $GOK, '', 1, False);
 			$topElement->setAttribute('class', 'rootNode');
 
-			$this->appendGOKTreeChildren($GOK['ppn'], $container, $this->arguments['expand'], '', 1);
+			$this->appendGOKTreeChildren($GOK['ppn'], $container, '', 1);
 		}
 
 		return $this->doc;
@@ -172,25 +172,22 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @author Sven-S. Porst
 	 * @param string $parentPPN
 	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $this->doc)
-	 * @param Array $expandInfo information which PPNs need to be expanded
 	 * @param string $expandMarker list of PPNs of open parent elements, separated by '-'
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements
 	 * @return void
 	 * */
-	private function appendGOKTreeChildren($parentPPN, $container, $expandInfo, $expandMarker, $autoExpandLevel) {
+	private function appendGOKTreeChildren($parentPPN, $container, $expandMarker, $autoExpandLevel) {
 		$GOKs = $this->getChildren($parentPPN, True);
 		if (sizeof($GOKs) > 1) {
 			$ul = $this->doc->createElement('ul');
 			$container->appendChild($ul);
 			$ul->setAttribute('id', 'ul-' . $this->objectID . '-' . $parentPPN);
 
-			/* The first item in the array is the parent element. Fetch it
-			 * and
-			 */
+			// The first item in the array is the root element.
 			$firstGOK = array_shift($GOKs);
 			if ($firstGOK['hitcount'] > 0) {
 				$firstGOK['descr'] = $this->localise('Allgemeines');
-				$this->appendGOKTreeItem($ul, 'li', $firstGOK, $expandInfo, $expandMarker, $autoExpandLevel, False, 'general-items-node');
+				$this->appendGOKTreeItem($ul, 'li', $firstGOK, $expandMarker, $autoExpandLevel, False, 'general-items-node');
 			}
 
 			foreach ($GOKs as $GOK) {
@@ -199,7 +196,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				 * 2. it is known to have no matching hits
 				 */
 				if ($GOK['hitcount'] != 0 || $GOK['childcount'] != 0) {
-					$this->appendGOKTreeItem($ul, 'li', $GOK, $expandInfo, $expandMarker, $autoExpandLevel);
+					$this->appendGOKTreeItem($ul, 'li', $GOK, $expandMarker, $autoExpandLevel);
 				}
 			} // end foreach ($GOKs as $GOK)
 		}
@@ -215,14 +212,13 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $this->doc)
 	 * @param string $elementName name of the element to insert into $container
 	 * @param Array $GOK
-	 * @param Array $expandInfo information which PPNs need to be expanded
 	 * @param string $expandMarker list of PPNs of open parent elements, separated by '-' [defaults to '']
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
-	 * @param Boolean $isInteractive whether the element can be an expandable part of the tree and should have dynamic links [defaults to True]
-	 * @param string|Null $extraClass class added to the appended links [defaults to Null]
+	 * @param Boolean $isInteractive whether the element can be an expandable part of the tree and should have dynamic links [defaults to TRUE]
+	 * @param string|NULL $extraClass class added to the appended links [defaults to NULL]
 	 * @return DOMElement
 	 */
-	private function appendGOKTreeItem ($container, $elementName, $GOK, $expandInfo, $expandMarker, $autoExpandLevel, $isInteractive = True, $extraClass = Null) {
+	private function appendGOKTreeItem ($container, $elementName, $GOK, $expandMarker = '', $autoExpandLevel = 0, $isInteractive = TRUE, $extraClass = NULL) {
 		$PPN = $GOK['ppn'];
 		$expand = $PPN;
 
@@ -270,16 +266,18 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			$itemClass = $extraClass . ' ';
 		}
 
+		// Careful: These are three non-breaking spaces to get better alignment.
 		$buttonText = '   ';
 		if ($isInteractive === True) {
-			// Careful: These are three non-breaking spaces to get better alignment.
 			if ($GOK['childcount'] > 0) {
 				$JSCommand = '';
 				$noscriptLink = '#';
 				$mainTitle = sprintf($this->localise('%s Unterkategorien anzeigen'), $GOK['childcount']);
 				$alternativeTitle = $this->localise('Unterkategorien ausblenden');
 
-				if ( ($expandInfo && in_array($PPN, $expandInfo)) || $GOK['childcount'] <= $autoExpandLevel) {
+				if ((array_key_exists('expand', $this->arguments)
+							&& in_array($PPN, $this->arguments['expand']))
+						|| $GOK['childcount'] <= $autoExpandLevel) {
 					$itemClass .= 'close';
 					$JSCommand = 'hideGOK' . $this->objectID;
 					$buttonText = '[-]';
@@ -290,7 +288,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 							array('tx_' . NKWGOKExtKey . '[expand]' => $expandMarker) );
 
 					// recursively call self to get child UL
-					$this->appendGOKTreeChildren($PPN, $item, $expandInfo, $expand, $autoExpandLevel);
+					$this->appendGOKTreeChildren($PPN, $item, $expand, $autoExpandLevel);
 				}
 				else {
 					$itemClass .= 'open';
