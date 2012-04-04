@@ -118,11 +118,8 @@ abstract class tx_nkwgok {
 		if ($arguments['style'] === 'menu') {
 			$subclass = t3lib_div::makeInstance('tx_nkwgok_menu');
 		}
-		else if ($arguments['style'] === 'horizontal') {
-			$subclass = t3lib_div::makeInstance('tx_nkwgok_horizontal');
-		}
 		else {
-			// Default to displaying the tree.
+			// Default to displaying the tree. Expected for styles 'tree' and 'column'.
 			$subclass = t3lib_div::makeInstance('tx_nkwgok_tree');
 		}
 

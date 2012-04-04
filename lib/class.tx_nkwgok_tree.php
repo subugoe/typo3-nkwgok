@@ -71,7 +71,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			$container = $this->doc->createElement('div');
 			$this->doc->appendChild($container);
 
-			$containerClasses = Array('gokContainer', 'tree');
+			$containerClasses = Array('gokContainer', $this->arguments['style']);
 			if (!$this->arguments['showGOKID']) {
 				$containerClasses[] = 'hideGOKID';
 			}
