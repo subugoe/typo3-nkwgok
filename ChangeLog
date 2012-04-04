@@ -1,4 +1,8 @@
-2012-01-22 1.6.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+2012-04-?? 2.0.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* Clean up class structure
+	* Add option for column style display
+
+2012-02-22 1.6.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Make number of inline menu child elements configurable through the `menuInlineThreshold` TypoScript setting.
 
 2012-01-27 1.5.0 Sven-S. Porst <porst@sub.uni-goettingen.de>

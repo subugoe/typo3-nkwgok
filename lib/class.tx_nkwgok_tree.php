@@ -100,7 +100,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	public function getAJAXMarkup () {
 		$parentPPN = $this->arguments['expand'];
 
-		$this->appendGOKTreeChildren($parentPPN, $this->doc, Array($parentPPN), '', 1)->firstChild;
+		$this->appendGOKTreeChildren($parentPPN, $this->doc, Array($parentPPN), '', 1);
 
 		return $this->doc;
 	}
@@ -122,12 +122,16 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 		$js = "
 		function swapTitles" . $this->objectID . " (element) {
-			var jQElement = jQuery(element);
-			var otherTitle = jQElement.attr('alttitle');
-			jQElement.attr('alttitle', jQElement.attr('title'));
-			jQElement.attr('title', otherTitle);
+			var jElement = jQuery(element);
+			var otherTitle = jElement.attr('alttitle');
+			jElement.attr('alttitle', jElement.attr('title'));
+			jElement.attr('title', otherTitle);
 		}
+
 		function expandGOK" . $this->objectID . " (id) {
+			var jContainerLI = jQuery('#c" . $this->objectID . "-' + id);
+			selectGOK" . $this->objectID . "(id);
+			jContainerLI.removeClass('open').addClass('close');
 			var link = jQuery('#openCloseLink-" . $this->objectID ."-' + id);
 			var plusMinus = jQuery('.plusMinus', link);
 			swapTitles" . $this->objectID . "(link);
@@ -139,23 +143,54 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				{'eID': '" . NKWGOKExtKey . "', "
 				. "'tx_" . NKWGOKExtKey . "[language]': '" . $this->language . "', "
 				. "'tx_" . NKWGOKExtKey . "[expand]': id, "
-				. "'tx_" . NKWGOKExtKey . "[style]': 'tree', "
+				. "'tx_" . NKWGOKExtKey . "[style]': '" . $this->arguments['style'] . "', "
 				. "'tx_" . NKWGOKExtKey . "[objectID]': '" . $this->objectID . "'},
 				function (html) {
 					plusMinus.text('[-]');
-					jQuery('#c" . $this->objectID . "-' + id).append(html);
+					jContainerLI.append(html);
 				}
 			);
-		};
-		function hideGOK". $this->objectID . " (id) {
+		};";
+
+		$js .= "
+		function hideGOK" . $this->objectID . " (id) {
 			jQuery('#ul-" . $this->objectID . "-' + id).remove();
+			jQuery('#c" . $this->objectID . "-' + id).removeClass('close').addClass('open');
 			var link = jQuery('#openCloseLink-" . $this->objectID . "-' + id);
 			jQuery('.plusMinus', link).text('[+]');
 			swapTitles" . $this->objectID . "(link);
 			var	functionText = 'expandGOK" . $this->objectID . "(\"' + id + '\");return false;';
 			link[0].onclick = new Function(functionText);
-		};
-";
+		}";
+
+		if ($this->arguments['style'] === 'column') {
+			$js .= "
+		function unselectSiblings" . $this->objectID . " (jElement) {
+			jElement.siblings('.close').each( function() {
+					var siblingID = this.id.substr(" . (strlen($this->objectID) + 2) . ");
+					hideGOK" . $this->objectID . "(siblingID);
+				}
+			);
+			jElement.siblings('.selected').removeClass('selected');
+		}
+		function selectGOK" . $this->objectID . "(id) {
+			var element = document.getElementById('c" . $this->objectID . "-' + id);
+			var jElement = jQuery(element);
+			jElement.addClass('selected');
+			unselectSiblings" . $this->objectID . "(jElement);
+			if (window.nkwgokItemSelected !== undefined) {
+				window.nkwgokItemSelected(element);
+			}
+		}";
+		}
+		else {
+			$js .= "
+		function unselectSiblings" . $this->objectID . " (jElement) { }
+		function selectGOK" . $this->objectID . "(id) {}
+			";
+		}
+
+
 		$scriptElement->appendChild($this->doc->createTextNode($js));
 	}
 
@@ -185,6 +220,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 			// The first item in the array is the root element.
 			$firstGOK = array_shift($GOKs);
+			$ul->setAttribute('class', 'level-' . $firstGOK['hierarchy']);
 			if ($firstGOK['hitcount'] > 0) {
 				$firstGOK['descr'] = $this->localise('Allgemeines');
 				$this->appendGOKTreeItem($ul, 'li', $firstGOK, $expandMarker, $autoExpandLevel, False, 'general-items-node');
@@ -234,6 +270,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$item = $this->doc->createElement($elementName);
 		$container->appendChild($item);
 		$item->setAttribute('id', 'c' . $this->objectID . '-' . $PPN);
+		$item->setAttribute('query', $GOK['search']);
 
 		$openLink = $this->doc->createElement('a');
 		$openLink->setAttribute('id', 'openCloseLink-' . $this->objectID . '-' . $PPN);
@@ -261,16 +298,12 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$openLink->appendChild($GOKNameSpan);
 		$this->appendOpacLinksTo($GOK, $item);
 
-		$itemClass = '';
-		if ($extraClass !== Null) {
-			$itemClass = $extraClass . ' ';
-		}
-
 		// Careful: These are three non-breaking spaces to get better alignment.
 		$buttonText = '   ';
+		$JSCommand = '';
+		$itemClass = 'nochildren';
 		if ($isInteractive === True) {
 			if ($GOK['childcount'] > 0) {
-				$JSCommand = '';
 				$noscriptLink = '#';
 				$mainTitle = sprintf($this->localise('%s Unterkategorien anzeigen'), $GOK['childcount']);
 				$alternativeTitle = $this->localise('Unterkategorien ausblenden');
@@ -278,7 +311,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				if ((array_key_exists('expand', $this->arguments)
 							&& in_array($PPN, $this->arguments['expand']))
 						|| $GOK['childcount'] <= $autoExpandLevel) {
-					$itemClass .= 'close';
+					$itemClass = 'close';
 					$JSCommand = 'hideGOK' . $this->objectID;
 					$buttonText = '[-]';
 					$tmpTitle = $mainTitle;
@@ -291,7 +324,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 					$this->appendGOKTreeChildren($PPN, $item, $expand, $autoExpandLevel);
 				}
 				else {
-					$itemClass .= 'open';
+					$itemClass = 'open';
 					$JSCommand = 'expandGOK' . $this->objectID;
 					$buttonText = '[+]';
 					$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
@@ -299,14 +332,24 @@ class tx_nkwgok_tree extends tx_nkwgok {
 							. '#c' . $this->objectID . '-' .  $PPN;
 				}
 
-				$openLink->setAttribute('onclick',  $JSCommand . '("' . $PPN . '");return false;');
 				$openLink->setAttribute('href', $noscriptLink);
 				$openLink->setAttribute('rel', 'nofollow');
 				$openLink->setAttribute('title', $mainTitle);
 				$openLink->setAttribute('alttitle', $alternativeTitle);
 			}
+			else if ($this->arguments['style'] === 'column') {
+				$openLink->setAttribute('href', '#');
+				$JSCommand = 'selectGOK' . $this->objectID;
+			}
 		}
 
+		if ($JSCommand) {
+			$openLink->setAttribute('onclick',  $JSCommand . '("' . $PPN . '");return false;');
+		}
+
+		if ($extraClass !== NULL) {
+			$itemClass .= ' ' . $extraClass;
+		}
 		$item->setAttribute('class', $itemClass);
 
 		$control->appendChild($this->doc->createTextNode($buttonText));

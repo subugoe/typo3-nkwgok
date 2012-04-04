@@ -31,7 +31,7 @@
 
 define('NKWGOKExtKey', 'nkwgok');
 define('NKWGOKQueryTable', 'tx_nkwgok_data');
-define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, childcount, hitcount, totalhitcount, fromopac');
+define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, hierarchy, childcount, hitcount, totalhitcount, fromopac');
 
 /**
  * Class tx_nkwgok: provides output for the nkwgok extension.

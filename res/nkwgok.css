@@ -118,9 +118,60 @@ a:hover .GOKID {
 }
 
 
-/*
-Styles for the GOK Menu
-*/
+
+/*  Styles for the GOK Columns  */
+
+.gokContainer.column {
+    background: #eee;
+    overflow: visible;
+}
+
+.gokContainer.column ul {
+    position: relative;
+    width: 22%;
+    margin: 0;
+    padding: 0 10px 0 0 ;
+    list-style-type: none;
+    background: #eef;
+    border-left: 1px solid #999;
+}
+
+.gokContainer.column ul ul {
+    position: absolute;
+    top: 0px;
+    left: 100%;
+    width: 100%;
+    background: #ffe;
+}
+
+.gokContainer.column li {
+	margin: 0;
+    border-bottom: 1px dotted #999;
+}
+
+.gokContainer.column li a {
+    display: block;
+    padding: 4px 0px 4px 6px;
+}
+
+/* Hide unnecessary elements */
+.gokContainer.column .plusMinus,
+.gokContainer.column a.opacLink,
+.gokContainer.column .general-items-node,
+.gokContainer.column .rootNode,
+.gokContainer.column ul.level-0 .GOKID {
+    display: none;
+}
+
+.gokContainer.column .close,
+.gokContainer.column .selected {
+    background: red;
+}
+
+
+
+/*  Styles for the GOK Menu  */
+
 .gokMenuForm select {
 	width: 50%;
 	display:block;
