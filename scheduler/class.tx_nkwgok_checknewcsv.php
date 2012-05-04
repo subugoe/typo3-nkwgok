@@ -52,7 +52,7 @@ class tx_nkwgok_checkNewCSV extends tx_scheduler_Task {
 		$CSVFiles = glob(PATH_site . 'fileadmin/gok/csv/*.csv');
 		foreach ($CSVFiles as $CSVPath) {
 			$CSVPathInfo = pathinfo($CSVPath);
-			$XMLPath = PATH_site . 'fileadmin/gok/xml/' . $CSVPathInfo['filename'] . '.xml';
+			$XMLPath = PATH_site . 'fileadmin/gok/xml/' . $CSVPathInfo['filename'] . '-0.xml';
 			if (!file_exists($XMLPath)) {
 				t3lib_div::devLog('Need to convert CSV files because ' . $XMLPath . ' is missing.' , 'nkwgok', 1);
 				$needsUpdate = True;
