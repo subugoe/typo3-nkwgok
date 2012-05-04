@@ -165,7 +165,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 			jQuery.get(URL, parameters, downloadFinishedFunction);
 		}
 		function startSearch" . $this->objectID . " (option) {
-			nkwgokMenuSelected(option);
+			nkwgokItemSelected(option);
 		}
 ";
 		$scriptElement->appendChild($this->doc->createTextNode($js));
