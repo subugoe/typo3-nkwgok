@@ -112,7 +112,7 @@ abstract class tx_nkwgok {
 	 * @param Array $arguments
 	 * @return tx_nkwgok
 	 */
-	public function instantiateSubclassFor ($arguments) {
+	public static function instantiateSubclassFor ($arguments) {
 		$subclass = NULL;
 
 		if ($arguments['style'] === 'menu') {
