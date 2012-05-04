@@ -1,6 +1,6 @@
 <?php
 /**
- * Typo3 Scheduler task to process CSV files with subject tree information.
+ * TYPO3 Scheduler task to process CSV files with subject tree information.
  *
  * The file format is described in the processCSVFile function.
  *

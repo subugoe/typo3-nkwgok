@@ -231,7 +231,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			$GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_nkwgok_data', 'statusID = 0');
 			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_nkwgok_data', 'statusID = 1', Array('statusID' => 0));
 
-			t3lib_div::devLog('loadXML Scheduler Task: Import of GOK XML to Typo3 database completed', 'nkwgok', 1);
+			t3lib_div::devLog('loadXML Scheduler Task: Import of GOK XML to TYPO3 database completed', 'nkwgok', 1);
 			$result = True;
 		}
 		else {

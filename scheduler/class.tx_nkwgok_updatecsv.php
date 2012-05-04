@@ -1,8 +1,8 @@
 <?php
 /**
- * Typo3 Scheduler task to automatically our scheduler tasks for converting and importing CSV data.
+ * TYPO3 Scheduler task to automatically our scheduler tasks for converting and importing CSV data.
  * 1. Convert CSV Data to XML
- * 2. Import all the XML to the Typo3 Database
+ * 2. Import all the XML to the TYPO3 Database
  *
  * 2011-2012 Sven-S. Porst <porst@sub.uni-goettingen.de>
  */
@@ -31,7 +31,7 @@ class tx_nkwgok_updateCSV extends tx_scheduler_Task {
 			$loadxmlTask = t3lib_div::makeInstance('tx_nkwgok_loadxml');
 			$success = $loadxmlTask->execute();
 			if (!$success) {
-				t3lib_div::devLog('updateCSV Scheduler Task: could not import XML to Typo3 database.' , 'nkwgok', 3);
+				t3lib_div::devLog('updateCSV Scheduler Task: could not import XML to TYPO3 database.' , 'nkwgok', 3);
 			}
 		}
 

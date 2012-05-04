@@ -22,7 +22,7 @@
 			<label index="scheduler.updateCSV.description">Converts CSV files in fileadmin/gok/csv/ with subject tree information to Pica-XML and re-imports all XML files in fileadmin/gok/xml/ to the TYPO3 database.</label>
 
 			<label index="scheduler.importAll.name">1+2+3: Download, convert and import LKL data</label>
-			<label index="scheduler.importAll.description">Downloads Pica-XML GOK records from Opac, converts CSV files in fileadmin/gok/csv/ with subject tree information information to Pica-XML and then imports all of them into the Typo3 database.</label>
+			<label index="scheduler.importAll.description">Downloads Pica-XML GOK records from Opac, converts CSV files in fileadmin/gok/csv/ with subject tree information information to Pica-XML and then imports all of them into the TYPO3 database.</label>
 
 			<label index="scheduler.convertCSV.startPageId">Page ID where your root TypoScript is inserted (usually 1)</label>
 		</languageKey>
@@ -35,7 +35,7 @@
 			<label index="scheduler.convertCSV.description">Konvertiert CSV Dateien mit GOK Informationen in fileadmin/gok/csv/ zu Pica-XML Dateien in fileadmin/gok/xml, die in die Datenbank importiert werden können.</label>
 
 			<label index="scheduler.loadxml.name">3: GOK XML Dateien importieren</label>
-			<label index="scheduler.loadxml.description">Importiert GOK Pica-XML Dateien in fileadmin/gok/xml/ in die Typo3-Datenbank.</label>
+			<label index="scheduler.loadxml.description">Importiert GOK Pica-XML Dateien in fileadmin/gok/xml/ in die TYPO3-Datenbank.</label>
 
 			<label index="scheduler.checkNewCSV.name">auto 2+3: Prüfen, ob die CSV Dateien aktualisiert wurden und konvertieren/reimportieren wenn sie es sind</label>
 			<label index="scheduler.checkNewCSV.description">Prüft, ob die CSV Dateien in fileadmin/gok/csv/ seit dem letzten Import aktualisiert wurden. Falls sie neuer sind, werden sie konvertiert und die XML Dateien in fileadmin/gok/xml neu in die TYPO3-Datenbank importiert.</label>

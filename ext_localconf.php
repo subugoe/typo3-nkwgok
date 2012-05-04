@@ -41,7 +41,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_conve
 	'additionalFields' => 'tx_nkwgok_scheduler_convertcsvadditionalparameters'
 );
 
-// Scheduler task for importing GOK XML files into Typo3 database.
+// Scheduler task for importing GOK XML files into TYPO3 database.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadxml'] = array(
 	'extension'        => $_EXTKEY,
 	'title'            => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadxml.name',
