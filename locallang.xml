@@ -15,7 +15,7 @@
 			<label index="scheduler.loadxml.name">3: Import GOK XML</label>
 			<label index="scheduler.loadxml.description">Imports Pica-XML files in fileadmin/gok/xml/ with subject tree information into the TYPO3 database.</label>
 
-			<label index="scheduler.checkNewCSV.name">auto 2+3: Check whether CSV files have been updated, convert and update if it has</label>
+			<label index="scheduler.checkNewCSV.name">auto 2+3: Check whether CSV files have been updated, convert and update if they have</label>
 			<label index="scheduler.checkNewCSV.description">Checks whether CSV files in fileadmin/gok/csv/ have been updated. If they have, converts the CSV files to Pica-XML and re-imports all XML files in fileadmin/gok/xml/ to the TYPO3 database.</label>
 
 			<label index="scheduler.updateCSV.name">2+3: Convert CSV and re-import all XML</label>
