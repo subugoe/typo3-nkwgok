@@ -68,8 +68,7 @@ class tx_nkwgok_pi1 extends tslib_pibase {
 
 		// unique expand array
 		if (array_key_exists('expand', $arguments)) {
-			$tmpArr = explode('-', $arguments['expand']);
-			$arguments['expand'] = array_unique($tmpArr);
+			$arguments['expand'] = array_unique($arguments['expand']);
 		}
 
 		$arguments['style'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'style', 'sDEF');

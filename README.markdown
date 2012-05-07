@@ -1,7 +1,8 @@
 # GOK
 Importiert Daten aus Fächerhierarchien wie der Göttinger Online
 Klassifikation (GOK) und zeigt sie in einem Content-Element an.
-Die Anzeige kann als Baum oder über Menüs erfolgen.
+
+Die Anzeige kann als Baum, Spalten oder Menüs erfolgen.
 Es gibt Scheduler Tasks, um die benötigten Daten zu importieren.
 
 
@@ -22,9 +23,11 @@ Jeder Seitenhinhalt mit GOK Plug-In hat drei Einstellungsmöglichkeiten:
 	1. Durch Auswahl eines GOK Wurzelknotens aus dem Popup-Menü ‘GOK-Hierarchie beginnen mit’
 	2. Durch Eingabe der GOK des Wurzelknotens in das Feld ‘Eigene GOK als Startknoten angeben’
 2. Anzeigestil:
-	1. Baum - hierarchische Baumstruktur
-	2. Menüs - es erscheint ein Menü mit den Untergebieten. Nach Auswahl eines
-	Menüpunktes erscheint ein weiteres Menü mit den Untergebieten des ausgewählten Faches
+	1. Baum – hierarchische Baumstruktur
+	2. Spalten – hierarchische Struktur als Spalten abgebildet. Nach Auswahl eines
+	Themengebietes, werden dessen Untergebiete in einer neuen Spalte angezeigt.
+	3. Menüs – es erscheint ein Menü mit den Untergebieten. Nach Auswahl eines
+	Menüpunktes erscheint ein weiteres Menü mit den Untergebieten des ausgewählten Faches.
 3. GOK-ID anzeigen: hiermit kann die Anzeige der GOK-IDs wie ‘IA 663’ an- bzw. abgestellt werden
 
 Weitere Einstellungsmöglichkeiten mit TypoScript `plugin.tx_nkwgok_pi1.`
@@ -155,5 +158,6 @@ das abschließende ‘csv’ durch ‘xml’ ersetzt ist.
 Überschreibt die Daten in der GOK Tabelle in der TYPO3-Datenbank und
 mit neuen Daten aus den XML-Dateien in fileadmin/gok/xml/*.xml.
 
-Der Vorgang dauert je nach Rechnergeschwindigkeit und Datenbankanbindung
-30-300 Sekunden.
+Die Dauer dieses Imports hängt von der Anzahl der Datensätze, der
+Rechnergeschwindigkeit und der Datenbankanbindung ab. Für den Import aller
+aller 40000 GOK-Normsätze werden typischerweise 30-300 Sekunden benötigt.

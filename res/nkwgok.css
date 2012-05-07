@@ -134,19 +134,27 @@ a:hover .GOKID {
     list-style-type: none;
     background: #eef;
     border-left: 1px solid #999;
-}
-
-.gokContainer.column ul ul {
-    position: absolute;
-    top: 0px;
-    left: 100%;
-    width: 100%;
-    background: #ffe;
+	float: left;
 }
 
 .gokContainer.column li {
+	position: relative;
 	margin: 0;
     border-bottom: 1px dotted #999;
+}
+
+.gokContainer.column li.close a,
+.gokContainer.column li.close:after{
+	color: #900;
+}
+
+.gokContainer.column li.open:after,
+.gokContainer.column li.close:after {
+	display: block;
+	position: absolute;
+	top: 0.3em;
+	right: 0px;
+	content: '»';
 }
 
 .gokContainer.column li a {
@@ -162,12 +170,6 @@ a:hover .GOKID {
 .gokContainer.column ul.level-0 .GOKID {
     display: none;
 }
-
-.gokContainer.column .close,
-.gokContainer.column .selected {
-    background: red;
-}
-
 
 
 /*  Styles for the GOK Menu  */

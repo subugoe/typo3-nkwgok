@@ -49,7 +49,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadx
 );
 
 // Scheduler task to determine whether we need to run the scheduler task for
-//converting and importing CSV, and doing that if we do.
+// converting and importing CSV, and doing that if we do.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_checkNewCSV'] = array(
 	'extension'        => $_EXTKEY,
 	'title'            => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.checkNewCSV.name',

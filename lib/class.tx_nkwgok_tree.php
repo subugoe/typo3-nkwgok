@@ -42,10 +42,12 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * - a string element 'gok' which can either be 'all' (to display the
 	 *		complete GOK tree) or a GOK string of the node to be used as the
 	 *		root of the tree
-	 * - an array element 'getVars' with:
-	 *   * an array element 'expand'. Each of that array’s elements are PPNs of
-	 *     the GOK elements displaying their child elements
-	 *   * an array element 'showGOKID' indicating whether GOK IDs are shown or hidden
+	 * - a string element 'style' which may take tha values 'tree' or 'column'
+	 * - an array element 'expand' listing the IDs of subjects to be expanded
+	 *
+	 * Further array elements can be:
+	 * - 'showGOKID', determining whether the subject’s ID is displayed along
+	 *		with its name
 	 *
 	 * @author Sven-S. Porst
 	 * @return DOMDocument
@@ -81,10 +83,10 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			$container->setAttribute('class', implode(' ', $containerClasses));
 			$container->setAttribute('id', 'tx_nkwgok-' . $this->objectID);
 
-			$topElement = $this->appendGOKTreeItem($container, 'span', $GOK, '', 1, False);
+			$topElement = $this->appendGOKTreeItem($container, 'span', $GOK, Array(), 1, False);
 			$topElement->setAttribute('class', 'rootNode');
 
-			$this->appendGOKTreeChildren($GOK['ppn'], $container, '', 1);
+			$this->appendGOKTreeChildren($GOK['ppn'], $container, Array(), 1);
 		}
 
 		return $this->doc;
@@ -99,9 +101,9 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @return DOMDocument
 	 */
 	public function getAJAXMarkup () {
-		$parentPPN = $this->arguments['expand'];
+		$parentPPN = $this->arguments['expand'][0];
 
-		$this->appendGOKTreeChildren($parentPPN, $this->doc, Array($parentPPN), '', 1);
+		$this->appendGOKTreeChildren($parentPPN, $this->doc, Array($parentPPN), 1);
 
 		return $this->doc;
 	}
@@ -127,13 +129,24 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			var otherTitle = jElement.attr('alttitle');
 			jElement.attr('alttitle', jElement.attr('title'));
 			jElement.attr('title', otherTitle);
+		}";
+
+		$HTMLInsertionTarget = 'jContainerLI';
+		if ($this->arguments['style'] === 'column') {
+			$HTMLInsertionTarget = 'jQuery("#tx_nkwgok-' . $this->objectID .'")';
 		}
 
+		$js .= "
 		function expandGOK" . $this->objectID . " (id) {
 			var jContainerLI = jQuery('#c" . $this->objectID . "-' + id);
 			selectGOK" . $this->objectID . "(id);
 			jContainerLI.removeClass('open').addClass('close');
-			var link = jQuery('#openCloseLink-" . $this->objectID ."-' + id);
+			var link = jQuery('#openCloseLink-" . $this->objectID ."-' + id);";
+		if ($this->arguments['style'] === 'column') {
+			$js .= "
+			jContainerLI.parent().nextAll('ul').remove();";
+		}
+		$js .= "
 			var plusMinus = jQuery('.plusMinus', link);
 			swapTitles" . $this->objectID . "(link);
 			plusMinus.text('[*]');
@@ -143,15 +156,15 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				. "'" . t3lib_div::getIndpEnv('TYPO3_SITE_URL') . "index.php',
 				{'eID': '" . NKWGOKExtKey . "', "
 				. "'tx_" . NKWGOKExtKey . "[language]': '" . $this->language . "', "
-				. "'tx_" . NKWGOKExtKey . "[expand]': id, "
+				. "'tx_" . NKWGOKExtKey . "[expand][0]': id, "
 				. "'tx_" . NKWGOKExtKey . "[style]': '" . $this->arguments['style'] . "', "
 				. "'tx_" . NKWGOKExtKey . "[objectID]': '" . $this->objectID . "'},
 				function (html) {
 					plusMinus.text('[-]');
-					jContainerLI.append(html);
+					" . $HTMLInsertionTarget . ".append(html);
 				}
 			);
-		};";
+		}";
 
 		$js .= "
 		function hideGOK" . $this->objectID . " (id) {
@@ -191,7 +204,6 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			";
 		}
 
-
 		$scriptElement->appendChild($this->doc->createTextNode($js));
 	}
 
@@ -208,7 +220,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @author Sven-S. Porst
 	 * @param string $parentPPN
 	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $this->doc)
-	 * @param string $expandMarker list of PPNs of open parent elements, separated by '-'
+	 * @param Array $expandMarker list of PPNs of open parent elements
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements
 	 * @return void
 	 * */
@@ -249,18 +261,18 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @param DOMElement $container the created markup is appended to (needs to be a child element of $this->doc)
 	 * @param string $elementName name of the element to insert into $container
 	 * @param Array $GOK
-	 * @param string $expandMarker list of PPNs of open parent elements, separated by '-' [defaults to '']
+	 * @param Array $expandMarker list of PPNs of open parent elements [defaults to Array()]
 	 * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
 	 * @param Boolean $isInteractive whether the element can be an expandable part of the tree and should have dynamic links [defaults to TRUE]
 	 * @param string|NULL $extraClass class added to the appended links [defaults to NULL]
 	 * @return DOMElement
 	 */
-	private function appendGOKTreeItem ($container, $elementName, $GOK, $expandMarker = '', $autoExpandLevel = 0, $isInteractive = TRUE, $extraClass = NULL) {
+	private function appendGOKTreeItem ($container, $elementName, $GOK, $expandMarker = Array(), $autoExpandLevel = 0, $isInteractive = TRUE, $extraClass = NULL) {
 		$PPN = $GOK['ppn'];
-		$expand = $PPN;
+		$expand = Array($PPN);
 
-		if ($expandMarker != '') {
-			$expand = $expandMarker . '-' . $PPN;
+		if (count($expandMarker) > 0) {
+			$expand = array_merge($expandMarker, $expand);
 		}
 
 		/* Display in each list item:
@@ -297,8 +309,11 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$openLink->appendChild($GOKIDSpan);
 		$openLink->appendChild($this->doc->createTextNode(' '));
 		$openLink->appendChild($GOKNameSpan);
-		$this->appendOpacLinksTo($GOK, $item);
 
+		// Add Opac links when not in column mode.
+		if ($this->arguments['style'] !== 'column') {
+			$this->appendOpacLinksTo($GOK, $item);
+		}
 		// Careful: These are three non-breaking spaces to get better alignment.
 		$buttonText = '   ';
 		$JSCommand = '';
@@ -308,6 +323,11 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				$noscriptLink = '#';
 				$mainTitle = sprintf($this->localise('%s Unterkategorien anzeigen'), $GOK['childcount']);
 				$alternativeTitle = $this->localise('Unterkategorien ausblenden');
+				$urlComponents = parse_url(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'));
+				$baseURL = $urlComponents['scheme'] .  '://' . $urlComponents['host'] . $urlComponents['path'];
+				$queryComponents = Array();
+				parse_str($urlComponents['query'], $queryComponents);
+				$queryComponents['no_cache'] = 1;
 
 				if ((array_key_exists('expand', $this->arguments)
 							&& in_array($PPN, $this->arguments['expand']))
@@ -318,19 +338,25 @@ class tx_nkwgok_tree extends tx_nkwgok {
 					$tmpTitle = $mainTitle;
 					$mainTitle = $alternativeTitle;
 					$alternativeTitle = $tmpTitle;
-					$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
-							Array('tx_nkwgok' => Array('expand' => $expandMarker)) );
+					$queryComponents['tx_nkwgok']['expand'] = $expandMarker;
+					$noscriptLink = t3lib_div::linkThisUrl($baseURL, $queryComponents);
 
-					// recursively call self to get child UL
-					$this->appendGOKTreeChildren($PPN, $item, $expand, $autoExpandLevel);
+					// Recursively add opened subject list.
+					// Add it into the current item for the default tree style.
+					// Add it as a sibling to our parent node in column style.
+					$childListContainer = $item;
+					if ($this->arguments['style'] === 'column') {
+						$childListContainer = $container->parentNode;
+					}
+					$this->appendGOKTreeChildren($PPN, $childListContainer, $expand, $autoExpandLevel);
 				}
 				else {
 					$itemClass = 'open';
 					$JSCommand = 'expandGOK' . $this->objectID;
 					$buttonText = '[+]';
-					$noscriptLink = t3lib_div::linkThisUrl(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'),
-							Array('tx_nkwgok' => Array('expand' => $expand), 'no_cache' => 1) )
-							. '#c' . $this->objectID . '-' .  $PPN;
+					$queryComponents['tx_nkwgok']['expand'] = $expand;
+					$noscriptLink = t3lib_div::linkThisUrl($baseURL, $queryComponents)
+						. '#c' . $this->objectID . '-' .  $PPN;
 				}
 
 				$openLink->setAttribute('href', $noscriptLink);
