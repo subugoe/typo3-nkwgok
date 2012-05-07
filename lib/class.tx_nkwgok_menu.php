@@ -189,7 +189,6 @@ class tx_nkwgok_menu extends tx_nkwgok {
 	 * @param int $autoExpandStep the depth of auto-expansion [defaults to 0]
 	 */
 	private function appendGOKMenuChildren($parentPPN, $container, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0) {
-		debugster(Array($parentPPN, $container, $autoExpandLevel, $level, $autoExpandStep));
 		$GOKs = $this->getChildren($parentPPN);
 		if (sizeof($GOKs) > 0) {
 			if ( (sizeof($GOKs) <= $autoExpandLevel) && ($level != 0) && $autoExpandStep == 0 ) {
