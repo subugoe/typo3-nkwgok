@@ -206,7 +206,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 				$select = $this->doc->createElement('select');
 				$container->appendChild($select);
 				$select->setAttribute('id', 'select-' . $this->objectID . '-' . $parentPPN);
-				$select->setAttribute('name', 'tx_' . NKWGOKExtKey . '[expand-' . $level . ']');
+				$select->setAttribute('name', 'tx_' . NKWGOKExtKey . '[expand][' . $level . ']');
 				$select->setAttribute('onchange', 'GOKMenuSelectionChanged' . $this->objectID . '(this);');
 				$select->setAttribute('title', $this->localise('Fachgebiet auswählen') . ' ('
 						. $this->localise('Ebene') . ' ' . ($level + 1) . ')');
@@ -237,7 +237,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 					}
 					$option->appendChild($this->doc->createTextNode($this->localise($label)));
 					$option->setAttribute('value', 'withchildren');
-					if (!$this->arguments['expand-' . $level]) {
+					if (count($this->arguments['expand']) < $level) {
 						$option->setAttribute('selected', 'selected');
 					}
 
@@ -267,7 +267,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 					$this->appendGOKMenuChildren($PPN, $select, $autoExpandLevel, $level, $autoExpandStep + 1);
 				}
 
-				if ( $PPN == $this->arguments['expand-' . $level] ) {
+				if ( $PPN === $this->arguments['expand'][$level] ) {
 					// this item should be selected and the next menu should be added
 					$option->setAttribute('selected', 'selected');
 					$this->appendGOKMenuChildren($PPN, $container, $autoExpandLevel, $level + 1);
