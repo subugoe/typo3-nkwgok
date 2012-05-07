@@ -79,6 +79,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				$containerClasses[] = 'shallowLinks';
 			}
 			$container->setAttribute('class', implode(' ', $containerClasses));
+			$container->setAttribute('id', 'tx_nkwgok-' . $this->objectID);
 
 			$topElement = $this->appendGOKTreeItem($container, 'span', $GOK, '', 1, False);
 			$topElement->setAttribute('class', 'rootNode');

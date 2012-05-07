@@ -47,6 +47,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 		$container = $this->doc->createElement('div');
 		$this->doc->appendChild($container);
 		$container->setAttribute('class', 'gokContainer menu');
+		$container->setAttribute('id', 'tx_nkwgok-' . $this->objectID);
 		$form = $this->doc->createElement('form');
 		$container->appendChild($form);
 		$form->setAttribute('class', 'gokMenuForm no-JS');
