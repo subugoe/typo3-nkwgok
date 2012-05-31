@@ -154,29 +154,14 @@ abstract class tx_nkwgok {
 		
 		$filePath = t3lib_div::getFileAbsFileName('EXT:' . NKWGOKExtKey . '/pi1/locallang.xml');
 		if (!$this->localisation) {
-			if (t3lib_div::int_from_ver(TYPO3_version) >= 4006000) {
-				/**
-				 * In TYPO3 >=4.6 t3lib_l10n_parser_Llxml is recommended for reading
-				 * localisations.
-				 *
-				 * The returned $localisation seems to have the following structure:
-				 * array('languageKey' => array('stringKey' => array(array('target' => 'localisedString'))))
-				 * Only the requested languageKey seems to be present and the innermost
-				 * array can also contain a 'source' key.
-				 */
-				$parser = t3lib_div::makeInstance('t3lib_l10n_parser_Llxml');
-				$this->localisation = $parser->getParsedData($filePath, $this->language);
-			}
-			else {
-				/**
-				 * In TYPO3 <4.6 use t3lib_div::readLLXMLfile.
-				 *
-				 * The returned $localisation has the following structure:
-				 * array('languageKey' => array('stringKey' => 'localisedString'))
-				 * It seems to contain languageKeys for all localisations in the XML file.
-				 */
-				$this->localisation = t3lib_div::readLLXMLfile($filePath, $this->language);
-			}
+			/**
+			 * The returned $localisation seems to have the following structure:
+			 * array('languageKey' => array('stringKey' => array(array('target' => 'localisedString'))))
+			 * Only the requested languageKey seems to be present and the innermost
+			 * array can also contain a 'source' key.
+			 */
+			$parser = t3lib_div::makeInstance('t3lib_l10n_parser_Llxml');
+			$this->localisation = $parser->getParsedData($filePath, $this->language);
 		}
 
 		$myLanguage = $this->language;

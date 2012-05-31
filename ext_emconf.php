@@ -34,14 +34,14 @@ $EM_CONF[$_EXTKEY] = array(
 	'constraints' => array(
 		'depends' => array(
 			'php' => '5.3.0-0.0.0',
-			'typo3' => '4.5.3-0.0.0',
+			'typo3' => '4.6.0-0.0.0',
 			't3jquery' => '1.8.15-0.0.0',
 		),
 		'conflicts' => array(
 		),
 		'suggests' => array(
 			'php' => '5.3.8-0.0.0',
-			'typo3' => '4.6.4',
+			'typo3' => '4.6.7',
 		),
 	),
 	'_md5_values_when_last_written' => 'a:29:{s:9:"ChangeLog";s:4:"afd9";s:15:"README.markdown";s:4:"1d53";s:16:"ext_autoload.php";s:4:"ea75";s:21:"ext_conf_template.txt";s:4:"7399";s:12:"ext_icon.gif";s:4:"c8ca";s:17:"ext_localconf.php";s:4:"696c";s:14:"ext_tables.php";s:4:"e7e1";s:14:"ext_tables.sql";s:4:"7ad0";s:23:"icon_tx_nkwgok_data.gif";s:4:"614f";s:13:"locallang.xml";s:4:"e552";s:16:"locallang_db.xml";s:4:"bca4";s:12:"t3jquery.txt";s:4:"1bfe";s:7:"tca.php";s:4:"0fcc";s:23:"lib/class.tx_nkwgok.php";s:4:"ac88";s:26:"lib/class.tx_nkwgok_ff.php";s:4:"2c7b";s:11:"lib/get.php";s:4:"2d32";s:27:"pi1/class.tx_nkwgok_pi1.php";s:4:"66fd";s:16:"pi1/flexform.xml";s:4:"07f8";s:17:"pi1/locallang.xml";s:4:"205e";s:14:"res/nkwgok.css";s:4:"4c75";s:41:"scheduler/class.tx_nkwgok_checknewcsv.php";s:4:"fe87";s:40:"scheduler/class.tx_nkwgok_convertcsv.php";s:4:"90dd";s:39:"scheduler/class.tx_nkwgok_importall.php";s:4:"8aef";s:42:"scheduler/class.tx_nkwgok_loadfromopac.php";s:4:"777c";s:37:"scheduler/class.tx_nkwgok_loadxml.php";s:4:"d72d";s:70:"scheduler/class.tx_nkwgok_scheduler_convertcsvadditionalparameters.php";s:4:"343b";s:39:"scheduler/class.tx_nkwgok_updatecsv.php";s:4:"12b2";s:23:"scheduler/locallang.xml";s:4:"2d37";s:16:"static/setup.txt";s:4:"2ac2";}',
