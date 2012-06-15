@@ -146,10 +146,10 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 *
 	 * Columns in the file are:
 	 * 1:	PPN -> 003@ $0
-	 * 2:	parent PPN -> 038D $9
-	 * 3:	GOK name (German) -> 044E $a
+	 * 2:	parent PPN -> 045C $9
+	 * 3:	GOK name (German) -> 045A $j
 	 * 4:	search query -> str $a
-	 * 5:	GOK name (English) -> 044K $a [optional]
+	 * 5:	GOK name (English) -> 044F $a [optional]
 	 * 6:	Tags (comma-separated list of strings) -> tags $a [optional]
 	 *
 	 * @param string $CSVPath path to CSV file whose name should end in .csv and contain no other dots
@@ -196,16 +196,21 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 					$shorttitle->appendChild($record);
 					$parentPPN = trim($fields[1]);
 					$this->appendFieldForDataTo('003@', '0', $PPN, $record, $doc);
-					$this->appendFieldForDataTo('045A', 'a', $PPN, $record, $doc);
-					$this->appendFieldForDataTo('038D', '9', $parentPPN, $record, $doc);
-					$this->appendFieldForDataTo('044E', 'a', trim($fields[2]), $record, $doc);
+					$d045 = $this->appendFieldForDataTo('045A', 'a', $PPN, $record, $doc);
+					if (trim($fields[2]) !== NULL) {
+						$subfield = $doc->createElement('subfield');
+						$subfield->setAttribute('code', 'j');
+						$d045->appendChild($subfield);
+						$subfield->appendChild($doc->createTextNode(trim($fields[2])));
+					}
+					$this->appendFieldForDataTo('045C', '9', $parentPPN, $record, $doc);
 					if (count($fields) > 3) {
 						// Search query
 						$this->appendFieldForDataTo('str', 'a', trim($fields[3]), $record, $doc);
 
 						if (count($fields) > 4) {
 							// English GOK Name
-							$this->appendFieldForDataTo('044K', 'a', trim($fields[4]), $record, $doc);
+							$this->appendFieldForDataTo('044F', 'a', trim($fields[4]), $record, $doc);
 
 							if (count($fields > 5)) {
 								$this->appendFieldForDataTo('tags', 'a', trim($fields[5]), $record, $doc);
@@ -263,7 +268,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * @param string $content text put into the subfield
 	 * @param DOMElement $container the datafield is appended to
 	 * @param DOMDocument $doc of $container
-	 * @return DOMElement|Null The datafield tha was inserted
+	 * @return DOMElement|Null The datafield that was inserted
 	 */
 	private function appendFieldForDataTo ($fieldName, $subfieldName, $content, $container, $doc) {
 		$datafield = Null;

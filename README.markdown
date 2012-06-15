@@ -138,14 +138,14 @@ können von Anführungszeichen (") umschlossen sein.
 Jede Zeile muß mindestens 3 Spalten enthalten:
 
 1. PPN des Datensatzen (wie `003@ $0` in Tev-Sätzen)
-2. PPN der Eltern-GOK (`038D $9`)
-3. deutscher Name der GOK (`044E $a`)
+2. PPN der Eltern-GOK (`045C $9`)
+3. deutscher Name der GOK (`045A $j`)
 4. CCL Suchabfrage für diesen Eintrag [möglicherweise leer/nicht vorhanden]
 	Stücke dieser Suchabfragen haben die Form Suchschlüssel=Begriff?. Sie können
 	geklammert und mit `and`, `not` und `or` verbunden werden. Es ist wichtig, für die
 	Suchschlüssel dieselbe Groß- und Kleinschreibung wie in den pazpar2 Einstellungen
 	zu verwenden (unsere Konvention: Kleinbuchstaben).
-5. englischer Name der GOK (`044K $a`) [möglicherweise leer/nicht vorhanden]
+5. englischer Name der GOK (`044F $a`) [möglicherweise leer/nicht vorhanden]
 6. komma-separierte Liste von Tags zur beliebigen Nutzung [möglicherweise leer/nicht vorhanden]
 
 Ausgabedateien: Die CSV-Dateien werden zunächst in XML-Dateien im Format der

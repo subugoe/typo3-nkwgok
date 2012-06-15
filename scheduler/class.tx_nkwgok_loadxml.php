@@ -118,9 +118,11 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							// GOK coming from standard Opac record.
 							$fromOpac = True;
 							
-							if (array_key_exists('045G', $GOK) && array_key_exists('C', $GOK['045G']) && $GOK['045G']['C'] === 'MSC') {
+							if (array_key_exists('044H', $GOK)
+								&& array_key_exists('2', $GOK['044H'])
+								&& strtolower($GOK['044H']['2']) === 'msc') {
 								// Maths type GOK with an MSC type search term.
-								$search = 'msc=' . $GOK['045G']['a'];
+								$search = 'msc=' . $GOK['044H']['2'];
 							}
 							else if (array_key_exists('045A', $GOK) && array_key_exists ('a', $GOK['045A']) && $GOK['045A']['a']) {
 								// Generic GOK search, using the LKL index.
@@ -156,17 +158,17 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						}
 
 						$GOKString = trim($GOK['045A']['a']);
-						$descr = trim($GOK['044E']['a']);
+						$descr = trim($GOK['045A']['j']);
 						$search = trim($search);
 						$descr_en = '';
 						$tags = $GOK['tags']['a'];
 						$hitCount = -1;
 						$totalHitCount = -1;
 
-						// English translation of the GOK’s name is in field 044K $a.
+						// English translation of the GOK’s name is in field 044F $a.
 						// This field is designated for the _English_ version.
-						if (array_key_exists('044K', $GOK) && array_key_exists('a', $GOK['044K'])) {
-							$descr_en = trim($GOK['044K']['a']);
+						if (array_key_exists('044F', $GOK) && array_key_exists('a', $GOK['044F'])) {
+							$descr_en = trim($GOK['044F']['a']);
 						}
 
 						// Hit keys are lowercase.
@@ -174,8 +176,10 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						// * for GOK and MSC-type records: try to use hitcount
 						// * for CSV-type records: if only one LKL query, try to use hitcount, else use -1
 						// * otherwise: use 0
-						if (array_key_exists('045G', $GOK) && array_key_exists('C', $GOK['045G']) && $GOK['045G']['C'] === 'MSC') {
-							$hitCount = $this->hitCounts[strtolower($GOK['045G']['a'])];
+						if (array_key_exists('044H', $GOK)
+							&& array_key_exists('2', $GOK['044H'])
+							&& strtolower($GOK['044H']['2']) === 'msc') {
+							$hitCount = $this->hitCounts[strtolower($GOK['044H']['2'])];
 						}
 						else if (array_key_exists(strtolower($GOKString), $this->hitCounts)) {
 							$hitCount = $this->hitCounts[strtolower($GOKString)];
@@ -260,7 +264,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			$fieldName = trim((string) $field->attributes());
 
 			// Process just the fields we need.
-			$wantedFieldNames = Array('003@', '044E', '044K', '045A', '045G', 'str', 'tags');
+			$wantedFieldNames = Array('003@', '044F', '044H', '045A', '045C', 'str', 'tags');
 			if (in_array($fieldName, $wantedFieldNames)) {
 				foreach ($field->xpath('subfield') as $subfield) {
 					$subfieldName = (string) $subfield['code'];
@@ -310,7 +314,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					$tree[$PPN] = Array('children' => Array());
 				}
 
-				$myParentPPNs = $record->xpath('datafield[@tag="038D"]/subfield[@code="9"]');
+				$myParentPPNs = $record->xpath('datafield[@tag="045C"]/subfield[@code="9"]');
 				if ($myParentPPNs && count($myParentPPNs) > 0) {
 					// Child record: store its PPN in the list of its parent’s children…
 					$parentPPN = (string)($myParentPPNs[0]);

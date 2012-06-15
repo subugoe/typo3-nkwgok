@@ -3,6 +3,7 @@
 	* Add option for column style display.
 	* Reduce superfluous CSV file imports.
 	* Drop TYPO3 4.5 compatibility
+	* Change field names in Tev records according to the GND format
 
 2012-02-22 1.6.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Make number of inline menu child elements configurable through the `menuInlineThreshold` TypoScript setting.
