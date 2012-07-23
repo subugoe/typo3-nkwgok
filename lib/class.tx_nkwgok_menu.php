@@ -60,7 +60,12 @@ class tx_nkwgok_menu extends tx_nkwgok {
 		$pageID->setAttribute('name', 'no_cache');
 		$pageID->setAttribute('value', 1); //$GLOBALS['TSFE']->id);
 
-		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->arguments['gok'], NKWGOKQueryTable) . ' AND statusID = 0';
+		$startNodes = explode(',', $this->arguments['gok']);
+		if (count($startNodes) > 1) {
+			t3lib_div::devLog('several start nodes given (' . $this->arguments['gok'] . ') but only the first is used in menu mode' , 'nkwgok', 2);
+		}
+		$startNodeGOK = trim($startNodes[0]);
+		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK, NKWGOKQueryTable) . ' AND statusID = 0';
 		// run query and collect result
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,

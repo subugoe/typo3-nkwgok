@@ -6,13 +6,13 @@
 	</meta>
 	<data type="array">
 		<languageKey index="en" type="array">
-			<label index="source">Show GOK-Part</label>
-			<label index="altSource">Ignore the menu selection and start the tree at this GOK</label>
+			<label index="source">Show subject-hierarchy beginning with</label>
+			<label index="altSource">Alternatively: Enter subject codes for the top level (e.g. »IA XXX,IB XXX,IC XXX«)</label>
 			<label index="style">Display as</label>
 			<label index="styleTree">Tree</label>
 			<label index="styleColumn">Columns</label>
 			<label index="styleMenu">Menus</label>
-			<label index="showGOKID">Display GOK-ID (e.g. IA 663)</label>
+			<label index="showGOKID">Display subject code (e.g. »IA 663«) along with the name</label>
 
 			<label index="Allgemeines">General Works</label>
 			<label index="Bücher zu diesem Thema im Opac anzeigen">Show books on this subject in the catalogue (opens in new window)</label>
@@ -31,19 +31,19 @@
 			<label index="Treffer aller enthaltenen Untergebiete zeigen">Show results for all contained subjects</label>
 			<label index="Untergebiete anzeigen">Show subcategories</label>
 			<label index=" ...">…</label>
-			<label index="decimal separator">,</label>
-			<label index="thousands separator"></label>
+			<label index="decimal separator">.</label>
+			<label index="thousands separator">,</label>
 		</languageKey>
 
 
 		<languageKey index="de" type="array">
-			<label index="source">GOK-Hierarchie beginnen mit</label>
-			<label index="altSource">Eigene GOK als Startknoten angeben (die Menüauswahl wird dann ignoriert)</label>
+			<label index="source">Fachhierarchie beginnen mit</label>
+			<label index="altSource">alternativ: Notation(en) für die Startknoten angeben (z.B. »IA XXX,IB XXX,IC XXX«)</label>
 			<label index="style">Anzeigen als</label>
 			<label index="styleTree">Baum</label>
 			<label index="styleColumn">Spalten</label>
 			<label index="styleMenu">Menüs</label>
-			<label index="showGOKID">GOK-ID (z.B. IA 663) anzeigen</label>
+			<label index="showGOKID">Notation (z.B. »IA 663«) zusammen mit der Beschreibung anzeigen</label>
 
 			<label index="Allgemeines">Allgemeines und Nachschlagewerke</label>
 			<label index="Bücher zu diesem Thema im Opac anzeigen">Bücher zu diesem Thema im Katalog anzeigen (öffnet ein neues Fenster)</label>

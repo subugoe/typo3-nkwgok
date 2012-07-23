@@ -55,37 +55,38 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	public function getMarkup () {
 		$this->addGOKTreeJSToElement($this->doc);
 
-		// Get start node.
-		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($this->arguments['gok'], NKWGOKQueryTable) . ' AND statusID = 0';
+		// Create container.
+		$container = $this->doc->createElement('div');
+		$this->doc->appendChild($container);
+
+		$containerClasses = Array('gokContainer', $this->arguments['style']);
+		if (!$this->arguments['showGOKID']) {
+			$containerClasses[] = 'hideGOKID';
+		}
+		if ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowSearch'] == 1) {
+			$containerClasses[] = 'shallowLinks';
+		}
+		$container->setAttribute('class', implode(' ', $containerClasses));
+		$container->setAttribute('id', 'tx_nkwgok-' . $this->objectID);
+
+		// Get and insert start nodes.
+		$startNodes = explode(',', $this->arguments['gok']);
+		$queryParts = Array();
+		foreach ($startNodes as $startNodeGOK) {
+			$queryParts[] = 'gok = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr(trim($startNodeGOK), NKWGOKQueryTable);
+		}
+		$query = implode(' OR ', $queryParts) . ' AND statusID = 0';
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
 					NKWGOKQueryTable,
-					$firstNodeCondition,
+					$query,
 					'',
 					'gok ASC',
 					'');
-		$GOKs = Array();
-		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
-			$GOKs[] = $row;
-		}
-
-		foreach ($GOKs as $GOK) {
-			$container = $this->doc->createElement('div');
-			$this->doc->appendChild($container);
-
-			$containerClasses = Array('gokContainer', $this->arguments['style']);
-			if (!$this->arguments['showGOKID']) {
-				$containerClasses[] = 'hideGOKID';
-			}
-			if ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowSearch'] == 1) {
-				$containerClasses[] = 'shallowLinks';
-			}
-			$container->setAttribute('class', implode(' ', $containerClasses));
-			$container->setAttribute('id', 'tx_nkwgok-' . $this->objectID);
-
+		
+		while ($GOK = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
 			$topElement = $this->appendGOKTreeItem($container, 'span', $GOK, Array(), 1, False);
 			$topElement->setAttribute('class', 'rootNode');
-
 			$this->appendGOKTreeChildren($GOK['ppn'], $container, Array(), 1);
 		}
 

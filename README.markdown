@@ -1,9 +1,10 @@
 # GOK
-Importiert Daten aus Fächerhierarchien wie der Göttinger Online
-Klassifikation (GOK) und zeigt sie in einem Content-Element an.
+Importiert Daten aus Fächerhierarchien und zeigt sie in einem Content-Element an.
+Die Fächerhierarchien können in einer CSV-Datei hinterlegt werden. Für die SUB
+Göttingen ist ein automatischer Import aus dem Opac implementiert.
 
-Die Anzeige kann als Baum, Spalten oder Menüs erfolgen.
-Es gibt Scheduler Tasks, um die benötigten Daten zu importieren.
+Die Hierarchien können als Baum, Spalten oder Menüs dargestellt werden.
+Es gibt Scheduler Tasks, um die benötigten Daten automatisch neu zu importieren.
 
 
 ## Grundeinstellungen im Extension Manager
@@ -20,8 +21,8 @@ und Menüdarstellung [Standardwert: leer, die CSS-Datei der Extension wird genut
 Jeder Seitenhinhalt mit GOK Plug-In hat drei Einstellungsmöglichkeiten:
 
 1. Startknoten: Der Startknoten kann auf zwei Arten festgelegt werden:
-	1. Durch Auswahl eines GOK Wurzelknotens aus dem Popup-Menü ‘GOK-Hierarchie beginnen mit’
-	2. Durch Eingabe der GOK des Wurzelknotens in das Feld ‘Eigene GOK als Startknoten angeben’
+	1. ‘Fachhierarchie beginnen mit’: Knoten der oberen 2 Ebenen der Hierarchie auswählbar
+	2. ‘Notation(en) für die Startknoten angeben’: Eine durch Komma getrennte Liste der Notationen für die Anzeige eingeben
 2. Anzeigestil:
 	1. Baum – hierarchische Baumstruktur
 	2. Spalten – hierarchische Struktur als Spalten abgebildet. Nach Auswahl eines
@@ -95,8 +96,8 @@ Die geladenen Daten sind im XML-Format des Opac (URL-Optionen `XML=1/PRS=XML`)
 und enthalten Pica-Daten. Sie werden im Ordner `fileadmin/gok/xml/` abgelegt. Der
 Inhalt dieses Ordners wird beim Start des Scheduler Tasks gelöscht.
 
-Die Abfrage der Trefferzahlen geschieht über ein Browsing des LKL Index. Die 
-resultierenden XML Dateien werden im Ordner `fileadmin/gok/hitcounts/` abgelegt.
+Die Abfrage der Trefferzahlen geschieht über ein Browsing der LKL und MSC Indexe.
+Die resultierenden XML Dateien werden im Ordner `fileadmin/gok/hitcounts/` abgelegt.
 Der Inhalt dieses Ordners wird beim Start des Scheduler Tasks gelöscht.
 
 
