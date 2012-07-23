@@ -73,6 +73,7 @@ class tx_nkwgok_pi1 extends tslib_pibase {
 
 		$arguments['style'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'style', 'sDEF');
 		$arguments['showGOKID'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'showGOKID');
+		$arguments['omitXXX'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'omitXXX');
 		$arguments['objectID'] = $this->cObj->data['uid'];
 		$arguments['pageLink'] = $this->pi_getPageLink($GLOBALS['TSFE']->id);
 		$arguments['language'] = $GLOBALS['TSFE']->lang;

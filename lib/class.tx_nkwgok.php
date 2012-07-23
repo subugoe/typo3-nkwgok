@@ -238,6 +238,9 @@ abstract class tx_nkwgok {
 			$includeParentSelectCondition = ' OR ppn = ' . $parentEscaped;
 		}
 		$whereClause = '(parent = ' . $parentEscaped . $includeParentSelectCondition . ') AND statusID = 0';
+		if ($this->arguments['omitXXX']) {
+			$whereClause .= ' AND NOT gok LIKE "%XXX"';
+		}
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
 					NKWGOKQueryTable,

@@ -13,6 +13,7 @@
 			<label index="styleColumn">Columns</label>
 			<label index="styleMenu">Menus</label>
 			<label index="showGOKID">Display subject code (e.g. »IA 663«) along with the name</label>
+			<label index="omitXXX">Omit subjects whose code ends in »XXX«</label>
 
 			<label index="Allgemeines">General Works</label>
 			<label index="Bücher zu diesem Thema im Opac anzeigen">Show books on this subject in the catalogue (opens in new window)</label>
@@ -44,6 +45,7 @@
 			<label index="styleColumn">Spalten</label>
 			<label index="styleMenu">Menüs</label>
 			<label index="showGOKID">Notation (z.B. »IA 663«) zusammen mit der Beschreibung anzeigen</label>
+			<label index="omitXXX">Fachgebiete deren Notation mit »XXX« endet auslassen</label>
 
 			<label index="Allgemeines">Allgemeines und Nachschlagewerke</label>
 			<label index="Bücher zu diesem Thema im Opac anzeigen">Bücher zu diesem Thema im Katalog anzeigen (öffnet ein neues Fenster)</label>
