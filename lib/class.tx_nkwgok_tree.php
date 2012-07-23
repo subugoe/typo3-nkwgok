@@ -83,11 +83,25 @@ class tx_nkwgok_tree extends tx_nkwgok {
 					'',
 					'gok ASC',
 					'');
-		
+
+		$resultCount = $GLOBALS['TYPO3_DB']->sql_num_rows($queryResult);
+		$topElementType = 'span';
+		$topItemContainer = $container;
+		if ($resultCount > 1) {
+			$topElementType = 'li';
+			$ul = $this->doc->createElement('ul');
+			$container->appendChild($ul);
+			$topItemContainer = $ul;
+		}
+
 		while ($GOK = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
-			$topElement = $this->appendGOKTreeItem($container, 'span', $GOK, Array(), 1, False);
+			$topElement = $this->appendGOKTreeItem($topItemContainer, $topElementType, $GOK, Array(), 1, ($resultCount > 1));
 			$topElement->setAttribute('class', 'rootNode');
-			$this->appendGOKTreeChildren($GOK['ppn'], $container, Array(), 1);
+
+			if ($resultCount === 1) {
+				// There is a single element: display expanded tree without controls at top level.
+				$this->appendGOKTreeChildren($GOK['ppn'], $container, Array(), 1);
+			}
 		}
 
 		return $this->doc;
@@ -159,6 +173,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				. "'tx_" . NKWGOKExtKey . "[language]': '" . $this->language . "', "
 				. "'tx_" . NKWGOKExtKey . "[expand][0]': id, "
 				. "'tx_" . NKWGOKExtKey . "[style]': '" . $this->arguments['style'] . "', "
+				. "'tx_" . NKWGOKExtKey . "[omitXXX]': '" . $this->arguments['omitXXX'] . "', "
 				. "'tx_" . NKWGOKExtKey . "[objectID]': '" . $this->objectID . "'},
 				function (html) {
 					plusMinus.text('[-]');

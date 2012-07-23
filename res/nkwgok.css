@@ -40,7 +40,6 @@ Styles for the GOK Tree
 	text-align: right;
 	color: #999;
 	position: relative;
-	left: -9.5em;
 }
 
 .gokContainer.tree.hideGOKID ul li {
@@ -58,6 +57,11 @@ Styles for the GOK Tree
 
 .gokContainer.tree .rootNode .GOKID {
 	left: -0.5em;
+}
+
+.gokContainer.tree a .GOKID,
+.gokContainer.tree ul .rootNode .GOKID {
+	left: -9.5em
 }
 
 a:hover .GOKID {
