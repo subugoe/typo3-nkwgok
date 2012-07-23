@@ -122,7 +122,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 								&& array_key_exists('2', $GOK['044H'])
 								&& strtolower($GOK['044H']['2']) === 'msc') {
 								// Maths type GOK with an MSC type search term.
-								$search = 'msc=' . $GOK['044H']['2'];
+								$search = 'msc="' . $GOK['044H']['a'] . '"';
 							}
 							else if (array_key_exists('045A', $GOK) && array_key_exists ('a', $GOK['045A']) && $GOK['045A']['a']) {
 								// Generic GOK search, using the LKL index.
@@ -179,7 +179,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						if (array_key_exists('044H', $GOK)
 							&& array_key_exists('2', $GOK['044H'])
 							&& strtolower($GOK['044H']['2']) === 'msc') {
-							$hitCount = $this->hitCounts[strtolower($GOK['044H']['2'])];
+							$hitCount = $this->hitCounts[strtolower($GOK['044H']['a'])];
 						}
 						else if (array_key_exists(strtolower($GOKString), $this->hitCounts)) {
 							$hitCount = $this->hitCounts[strtolower($GOKString)];
