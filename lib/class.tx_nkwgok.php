@@ -233,14 +233,15 @@ abstract class tx_nkwgok {
 	 */
 	protected function getChildren($parentPPN, $includeParent = False) {
 		$parentEscaped = $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, NKWGOKQueryTable);
-		$includeParentSelectCondition = '';
-		if ($includeParent) {
-			$includeParentSelectCondition = ' OR ppn = ' . $parentEscaped;
-		}
-		$whereClause = '(parent = ' . $parentEscaped . $includeParentSelectCondition . ') AND statusID = 0';
+		$whereClause = 'parent = ' . $parentEscaped;
 		if ($this->arguments['omitXXX']) {
 			$whereClause .= ' AND NOT gok LIKE "%XXX"';
 		}
+		$whereClause = '(' . $whereClause . ')';
+		if ($includeParent) {
+			$whereClause = '(' . $whereClause . ' OR ppn = ' . $parentEscaped . ')';
+		}
+		$whereClause .= ' AND statusID = 0';
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
 					NKWGOKQueryTable,
