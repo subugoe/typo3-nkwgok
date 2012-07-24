@@ -173,7 +173,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				. "'tx_" . NKWGOKExtKey . "[language]': '" . $this->language . "', "
 				. "'tx_" . NKWGOKExtKey . "[expand][0]': id, "
 				. "'tx_" . NKWGOKExtKey . "[style]': '" . $this->arguments['style'] . "', "
-				. "'tx_" . NKWGOKExtKey . "[omitXXX]': '" . $this->arguments['omitXXX'] . "', "
+				. (($this->arguments['omitXXX']) ? ("'tx_" . NKWGOKExtKey . "[omitXXX]': '" . $this->arguments['omitXXX'] . "', ") : (''))
 				. "'tx_" . NKWGOKExtKey . "[objectID]': '" . $this->objectID . "'},
 				function (html) {
 					plusMinus.text('[-]');
