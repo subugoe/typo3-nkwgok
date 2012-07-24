@@ -63,9 +63,16 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		if (!$this->arguments['showGOKID']) {
 			$containerClasses[] = 'hideGOKID';
 		}
-		if ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowSearch'] == 1) {
+
+		$useShallowLinks = ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowSearch'] == 1);
+		if ($this->arguments['omitXXX']) {
+			$useShallowLinks = TRUE;
+			t3lib_div::devLog('Configured to use deep links together with omitXXX. This will not work as the totalhitcount is incorrect when we arbitrarily leave out child elements. Using shallow links instead.' , 'nkwgok', 2);
+		}
+		if ($useShallowLinks)  {
 			$containerClasses[] = 'shallowLinks';
 		}
+		
 		$container->setAttribute('class', implode(' ', $containerClasses));
 		$container->setAttribute('id', 'tx_nkwgok-' . $this->objectID);
 
