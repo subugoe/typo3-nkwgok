@@ -1,4 +1,4 @@
-2012-07-?? 2.1.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+2012-07-27 2.1.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Change field names in Tev records according to the GND format
 	* Add ability to start the tree with more than one element at the root level
 	* Add option to omit subjects whose code ends with »XXX« (Flexform)
