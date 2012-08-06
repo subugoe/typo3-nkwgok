@@ -49,15 +49,16 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	 * Stores the subject tree. Keys are PPNs, values are Arrays with:
 	 * * children => Array of strings (PPNs of child elements)
 	 * * [parent => string (PPN of parent element)]
-	 * * GOK => string
+	 * * notation [GOK|msc|bkl|…] => string
 	 * @var Array
 	 */
 	private $subjectTree;
 
 
 	/**
-	 * Stores the hitcount for each GOK.
-	 * Key: GOK string => Value: integer
+	 * Stores the hitcount for each notation.
+	 * Key: classifiaction system string => Value: Array with
+	 *		Key: notation => Value: hits for this notation
 	 * @var Array
 	 */
 	private $hitCounts;
@@ -86,7 +87,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		if (count($fileList) > 0) {
 			// Parse XML files to extract just the tree structure.
 			$this->subjectTree = $this->loadSubjectTree($fileList);
-			
+
 			// Load hit count information and compute total hit count sums.
 			$this->hitCounts = $this->loadHitCounts();
 			$totalHitCounts = $this->computeTotalHitCounts(NKWGOKGOKRootNode);
@@ -178,11 +179,17 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						// * otherwise: use 0
 						if (array_key_exists('044H', $GOK)
 							&& array_key_exists('2', $GOK['044H'])
-							&& strtolower($GOK['044H']['2']) === 'msc') {
-							$hitCount = $this->hitCounts[strtolower($GOK['044H']['a'])];
+							&& array_key_exists('a', $GOK['044H'])
+							&& in_array(strtolower($GOK['044H']['2']), Array('msc'))) {
+							$type = strtolower($GOK['044H']['2']);
+							$notation = strtolower($GOK['044H']['a']);
+							if (array_key_exists($type, $this->hitCounts)
+									&& array_key_exists($notation, $this->hitCounts[$type])) {
+								$hitCount = $this->hitCounts[$type][$notation];
+							}
 						}
-						else if (array_key_exists(strtolower($GOKString), $this->hitCounts)) {
-							$hitCount = $this->hitCounts[strtolower($GOKString)];
+						else if (array_key_exists(strtolower($GOKString), $this->hitCounts['lkl'])) {
+							$hitCount = $this->hitCounts['lkl'][strtolower($GOKString)];
 						}
 						else if ($GOK['str']['a']) {
 							$foundGOKs = Array();
@@ -190,8 +197,8 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							preg_match($pattern, $GOK['str']['a'], $foundGOKs);
 							$foundGOK = strtolower($foundGOKs[1]);
 
-							if (count($foundGOKs) > 1 && $foundGOK && array_key_exists($foundGOK, $this->hitCounts)) {
-								$hitCount = $this->hitCounts[$foundGOK];
+							if (count($foundGOKs) > 1 && $foundGOK && array_key_exists($foundGOK, $this->hitCounts['lkl'])) {
+								$hitCount = $this->hitCounts['lkl'][$foundGOK];
 							}
 						}
 						else {
@@ -292,12 +299,12 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	 * @author Sven-S. Porst
 	 *
 	 * @param Array $fileList list of XML files to read
-	 * @return Array containing subject tree structure
+	 * @return Array containing the subject tree structure
 	 */
 	private function loadSubjectTree ($fileList) {
 		$tree = Array();
-		$tree[NKWGOKRootNode] = Array('children' => Array());
 		$tree[NKWGOKGOKRootNode] = Array('children' => Array(), 'parent' => NKWGOKRootNode);
+		$tree[NKWGOKRootNode] = Array('children' => Array(NKWGOKGOKRootNode));
 
 		// Run through all files once to gather information about the
 		// structure of the data we process.
@@ -339,11 +346,24 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					}
 				}
 
+				// Store notation information.
+				// GOK
 				$GOKStrings = $record->xpath('datafield[@tag="045A"]/subfield[@code="a"]');
 				if (count($GOKStrings) > 0) {
 					$GOKString = (string)($GOKStrings[0]);
 					$tree[$PPN]['GOK'] = strtolower(trim($GOKString));
 				}
+				// Store the last additional notation information (044H) of
+				// each type (given in $2). In particular used for MSC.
+				$extraNotations = $record->xpath('datafield[@tag="044H"]');
+				foreach ($extraNotations as $extraNotation) {
+					$extraNotationTexts = $extraNotation->xpath('subfield[@code="a"]');
+					$extraNotationLabels = $extraNotation->xpath('subfield[@code="2"]');
+					if ($extraNotationTexts && $extraNotationLabels) {
+						$tree[$PPN][strtolower(trim($extraNotationLabels[0]))] = strtolower(trim($extraNotationTexts[0]));
+					}
+				}
+
 			} // end foreach $records
 		} // end foreach $fileList
 
@@ -353,13 +373,13 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 
 	/**
-	 * Load LKL hit counts from fileadmin/gok/hitcounts/*.xml.
+	 * Load hitcounts from fileadmin/gok/hitcounts/*.xml.
 	 * These files are downloaded from the Opac by the loadFromOpac
 	 * Scheduler task.
 	 *
 	 * @author Sven-S. Porst
 	 *
-	 * @return Array with Key: LKL entries => Value: integer with the hit count for the entry
+	 * @return Array with Key: classifiaction system string => Value: Array with Key: notation => Value: hits for this notation
 	 */
 	private function loadHitCounts () {
 		$hitCounts = Array();
@@ -372,6 +392,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				foreach ($scanlines as $scanline) {
 					$hits = Null;
 					$description = Null;
+					$hitCountType = Null;
 					foreach($scanline->attributes() as $name => $value) {
 						if ($name === 'hits') {
 							$hits = (int)$value;
@@ -379,9 +400,15 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						else if ($name === 'description') {
 							$description = (string)$value;
 						}
+						else if ($name === 'mnemonic') {
+							$hitCountType = strtolower((string)$value);
+						}
 					}
-					if ($hits !== Null && $description !== Null) {
-						$hitCounts[$description] = $hits;
+					if ($hits !== Null && $description !== Null && $hitCountType !== Null) {
+						if (!array_key_exists($hitCountType, $hitCounts)) {
+							$hitCounts[$hitCountType] = Array();
+						}
+						$hitCounts[$hitCountType][$description] = $hits;
 					}
 				}
 			}
@@ -390,7 +417,9 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			}
 		} // end foreach
 
-		t3lib_div::devLog('loadXML Scheduler Task: Loaded ' . count($hitCounts) . ' hit count entries.', 'nkwgok', 1);
+		foreach ($hitCounts as $type => $array) {
+			t3lib_div::devLog('loadXML Scheduler Task: Loaded ' . count($array) . ' ' . $type . ' hit count entries.', 'nkwgok', 1);
+		}
 
 		return $hitCounts;
 	}
@@ -410,12 +439,17 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	 */
 	private function computeTotalHitCounts ($startPPN) {
 		$totalHitCounts = Array();
-		$GOK = Null;
+		$notation = Null;
 		$myHitCount = 0;
 
 		if (array_key_exists($startPPN, $this->subjectTree)) {
 			$record = $this->subjectTree[$startPPN];
-			$GOK = $record['GOK'];
+			$hitCountType = 'lkl';
+			$notation = $record['GOK'];
+			if (array_key_exists('msc', $record)) {
+				$hitCountType = 'msc';
+				$notation = $record['msc'];
+			}
 
 			if (count($record['children']) > 0) {
 				// A parent node: recursively collect and add up the hit counts.
@@ -427,14 +461,14 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					$totalHitCounts += $childHitCounts;
 				}
 
-				if (array_key_exists($GOK, $this->hitCounts)) {
-					$myHitCount += $this->hitCounts[$GOK];
+				if (array_key_exists($notation, $this->hitCounts[$hitCountType])) {
+					$myHitCount += $this->hitCounts[$hitCountType][$notation];
 				}
 			}
 			else {
 				// A leaf node: just store its hit count.
-				if (array_key_exists($GOK, $this->hitCounts)) {
-					$myHitCount += $this->hitCounts[$GOK];
+				if (array_key_exists($notation, $this->hitCounts[$hitCountType])) {
+					$myHitCount += $this->hitCounts[$hitCountType][$notation];
 				}
 			}
 		}

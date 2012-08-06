@@ -1,3 +1,6 @@
+2012-08-?? 2.2.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* Generalise hitcount analysis to enable recursive hitcounts for MSC and other classification systems
+
 2012-08-06 2.1.1 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Fix jQuery vs IE problem with animations in menu display style
 	* Fix HTML vs JavaScript escaping problem for … in menu display style
