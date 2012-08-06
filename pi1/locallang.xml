@@ -24,7 +24,7 @@
 			<label index="keine Treffer">no matching books</label>
 			<label index="%s Unterkategorien anzeigen">Show %s subcategories</label>
 			<label index="Unterkategorien ausblenden">Hide subcategories</label>
-			<label index="Laden ...">Loading…</label>
+			<label index="Laden ...">Loading\u2026</label> <!-- needs JavaScript Unicode escaping -->
 			<label index="Fachgebiet auswählen">Select subject</label>
 			<label index="Ebene">Level</label>
 			<label index="Bitte Fachgebiet auswählen:">Please select a subject:</label>
@@ -56,7 +56,7 @@
 			<label index="keine Treffer">keine Treffer</label>
 			<label index="%s Unterkategorien anzeigen">%s Unterkategorien anzeigen</label>
 			<label index="Unterkategorien ausblenden">Unterkategorien ausblenden</label>
-			<label index="Laden ...">Laden …</label>
+			<label index="Laden ...">Laden \u2026</label> <!-- needs JavaScript Unicode escaping -->
 			<label index="Fachgebiet auswählen">Fachgebiet auswählen</label>
 			<label index="Ebene">Ebene</label>
 			<label index="Bitte Fachgebiet auswählen:">Bitte Fachgebiet auswählen:</label>
