@@ -121,6 +121,10 @@ abstract class tx_nkwgok {
 		else {
 			// Default to displaying the tree. Expected for styles 'tree' and 'column'.
 			$subclass = t3lib_div::makeInstance('tx_nkwgok_tree');
+			if (!array_key_exists($arguments, 'style')) {
+				// Default to tree style if style is not set.
+				$arguments['style'] = 'tree';
+			}
 		}
 
 		if ($subclass) {
