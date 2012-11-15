@@ -37,26 +37,33 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 		// Create lkl folder if necessary and remove all files whose names begin with a digit.
 		// (This is a simple heuristic to delete all the files we downloaded and keep
 		// the CSV files whose names begin with a letter.)
-		$LKLDir = $baseDir . 'xml/';
-		$fileList = glob($LKLDir . '[0-9]*');
-		foreach ($fileList as $file) {
+		$XMLDir = $baseDir . 'xml/';
+		$XMLFileList = glob($XMLDir . '*.xml');
+		foreach ($XMLFileList as $file) {
 			unlink($file);
 		}
 
 		$opacLKLURL = $opacBaseURL . 'CMD?ACT=SRCHA/IKT=8600/TRM=tev+not+LKL+p%3F/REC=2/PRS=XML/NORND=1';
-		$success = $this->downloadLKLDataFromOpacToFolder($opacLKLURL, $LKLDir);
+		$GOKFileBaseName = 'gok';
+		$success = $this->downloadAuthorityDataFromOpacToFolder($opacLKLURL, $XMLDir, $GOKFileBaseName);
+
+		$opacBRKURL = $opacBaseURL . 'CMD?ACT=SRCHA/IKT=8600/TRM=tov/REC=2/PRS=XML/NORND=1';
+		$BRKFileBaseName = 'brk';
+		$success &= $this->downloadAuthorityDataFromOpacToFolder($opacBRKURL, $XMLDir, $BRKFileBaseName);
+
 
 		// Create the hitcounts folder if necessary and delete all files inside it if it exists.
 		t3lib_div::mkdir(PATH_site, 'fileadmin/gok/hitcounts');
 		$hitCountDir = $baseDir . 'hitcounts/';
-		$fileList = glob($hitCountDir . '*');
-		foreach ($fileList as $file) {
+		$hitCountFileList = glob($hitCountDir . '*');
+		foreach ($hitCountFileList as $file) {
 			unlink($file);
 		}
 
 		$opacHitCountURL = $opacBaseURL . 'CMD?ACT=BRWS&SCNST=' . NKWGOKImportChunkSize;
 		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, 'lkl', $hitCountDir);
 		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, 'msc', $hitCountDir);
+		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, 'brk', $hitCountDir);
 
 		return $success;
 	}
@@ -64,14 +71,15 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 
 
 	/**
-	 * Downloads batches of local classification Normdaten from Opac as
+	 * Downloads batches of local authority records from Opac as
 	 * Pica XML records and writes them into our fileadmin folder.
 	 *
 	 * @param string $opacBaseURL
 	 * @param string $folderPath
+	 * @param string $fileBaseName
 	 * @return boolean sucess status of the download
 	 */
-	private function downloadLKLDataFromOpacToFolder($opacBaseURL, $folderPath) {
+	private function downloadAuthorityDataFromOpacToFolder($opacBaseURL, $folderPath, $fileBaseName) {
 		$success = True;
 		$firstRecord = 1; // Pica result indexing is 1 based
 		$hitsAttribute = simplexml_load_file($opacBaseURL)->xpath('/RESULT/SET/@hits');
@@ -81,7 +89,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 			$URL = $opacBaseURL . '/SHRTST=' . NKWGOKImportChunkSize . '/FRST=' . $firstRecord;
 			$opacDownload = file_get_contents($URL);
 			if ($opacDownload) {
-				$targetFilePath = $folderPath . $firstRecord . '.xml';
+				$targetFilePath = $folderPath . $fileBaseName . '-' . $firstRecord . '.xml';
 				$targetFile = fopen($targetFilePath, 'w');
 				if ($targetFile) {
 					fwrite($targetFile, $opacDownload);
@@ -122,8 +130,11 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 		/* Begin scanning the index at 0, except for LKL (which only start at a and have a lot of
 			junk entries starting with digits. */
 		$scanNext = '0';
-		if ($indexName == 'lkl') {
+		if ($indexName === 'lkl') {
 			$scanNext = 'a';
+		}
+		else if ($indexName === 'brk') {
+			$scanNext = '01';
 		}
 		$index = 0;
 
