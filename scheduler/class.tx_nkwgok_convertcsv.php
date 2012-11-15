@@ -194,8 +194,11 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 					$set->appendChild($shorttitle);
 					$record = $doc->createElement('record');
 					$shorttitle->appendChild($record);
-					$parentPPN = trim($fields[1]);
+					// 002@ is the Pica record type, put our made-up 'csv' there.
+					$this->appendFieldForDataTo('002@', '0', 'csv', $record, $doc);
+					// 003@ is the Pica record ID, PPN.
 					$this->appendFieldForDataTo('003@', '0', $PPN, $record, $doc);
+					// 045A contains the subject notation in $a and subject name in $j.
 					$d045 = $this->appendFieldForDataTo('045A', 'a', $PPN, $record, $doc);
 					if (trim($fields[2]) !== NULL) {
 						$subfield = $doc->createElement('subfield');
@@ -203,16 +206,20 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 						$d045->appendChild($subfield);
 						$subfield->appendChild($doc->createTextNode(trim($fields[2])));
 					}
+					// 045C $9 is the parent record’s PPN.
+					$parentPPN = trim($fields[1]);
 					$this->appendFieldForDataTo('045C', '9', $parentPPN, $record, $doc);
 					if (count($fields) > 3) {
 						// Search query
+						// Write custom search query in the made-up field str $a.
 						$this->appendFieldForDataTo('str', 'a', trim($fields[3]), $record, $doc);
 
 						if (count($fields) > 4) {
-							// English GOK Name
+							// 044F $a contains the subject name’s English translation.
 							$this->appendFieldForDataTo('044F', 'a', trim($fields[4]), $record, $doc);
 
 							if (count($fields > 5)) {
+								// Use made-up field tags $a for tags string.
 								$this->appendFieldForDataTo('tags', 'a', trim($fields[5]), $record, $doc);
 							}
 						}
