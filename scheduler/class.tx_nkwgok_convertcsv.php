@@ -123,7 +123,6 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 					// Only overwrite local file if the file contents have changed.
 					if (file_put_contents($localPath, $remoteData)) {
 						t3lib_div::devLog('convertCSV Scheduler Task: replaced file ' . $localPath . '.', 'nkwgok', 1);
-						$filePaths[] = $localPath;
 					}
 					else {
 						t3lib_div::devLog('convertCSV Scheduler Task: failed to write downloaded file to ' . $localPath . '.', 'nkwgok', 2, Array($localData, $remoteData));
