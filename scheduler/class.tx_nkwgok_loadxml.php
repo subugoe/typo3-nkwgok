@@ -41,6 +41,7 @@
 
 define('NKWGOKRootNode', 'Root');
 define('NKWGOKGOKRootNode', 'GOK-Root');
+define('NKWGOKBRKRootNode', 'BRK-Root');
 define('NKWGOKMaxHierarchy', 31);
 
 class tx_nkwgok_loadxml extends tx_scheduler_Task {
@@ -107,29 +108,41 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					if ($PPN !== '' && array_key_exists($PPN, $this->subjectTree)) {
 						$treeElement = $this->subjectTree[$PPN];
 
-						$fromOpac = False;
+						$recordType = $GOK['002@']['0'];
 						$search = '';
-						if (array_key_exists('str', $GOK) && array_key_exists('a', $GOK['str'])) {
+						if ($recordType === 'csv') {
 							// GOK coming from CSV file with a CCL search query in the 'str/a' field.
-							if ($GOK['str']['a']) {
+							if (array_key_exists('str', $GOK) && array_key_exists('a', $GOK['str']) && $GOK['str']['a']) {
 								$search = $GOK['str']['a'];
 							}
 						}
 						else {
-							// GOK coming from standard Opac record.
-							$fromOpac = True;
-							
+							// GOK coming from an Opac Pica authority record.
 							if (array_key_exists('044H', $GOK)
 								&& array_key_exists('2', $GOK['044H'])
 								&& strtolower($GOK['044H']['2']) === 'msc') {
 								// Maths type GOK with an MSC type search term.
 								$search = 'msc="' . $GOK['044H']['a'] . '"';
 							}
-							else if (array_key_exists('045A', $GOK) && array_key_exists ('a', $GOK['045A']) && $GOK['045A']['a']) {
-								// Generic GOK search, using the LKL index.
-								// Requires quotation marks around the search term as GOKs can begin
+							else if (array_key_exists('045A', $GOK)
+									 && array_key_exists ('a', $GOK['045A'])
+									 && $GOK['045A']['a']) {
+
+								$indexName;
+								if ($recordType[1] === 'e') {
+									// Te-record: GOK search, using the LKL index.
+									$indexName = 'lkl';
+								}
+								else if ($recordType[1] === 'o') {
+									// To-record: Bandrealkatalog search, using the BRK index.
+									$indexName = 'brk';
+								}
+								else {
+									t3lib_div::devLog('loadXML Scheduler Task: Unknown record type »' . $recordType . '« in record PPN ' . $PPN . '.', 'nkwgok', 3, $GOK);
+								}
+								// Requires quotation marks around the search term as notations can begin
 								// with three character strings that could be mistaken for index names.
-								$search = 'lkl="' . $GOK['045A']['a'] . '"';
+								$search = $indexName . '="' . $GOK['045A']['a'] . '"';
 							}
 						}
 
@@ -159,6 +172,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						}
 
 						$GOKString = trim($GOK['045A']['a']);
+						$GOKLower = strtolower($GOKString);
 						$descr = trim($GOK['045A']['j']);
 						$search = trim($search);
 						$descr_en = '';
@@ -166,15 +180,17 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						$hitCount = -1;
 						$totalHitCount = -1;
 
-						// English translation of the GOK’s name is in field 044F $a.
-						// This field is designated for the _English_ version.
-						if (array_key_exists('044F', $GOK) && array_key_exists('a', $GOK['044F'])) {
+						// English translation of the GOK’s name is in field 044F $a if $S is »d«.
+						if (array_key_exists('044F', $GOK)
+							&& array_key_exists('a', $GOK['044F'])
+							&& array_key_exists('S', $GOK['044F'])
+							&& $GOK['044F']['S'] === 'd') {
 							$descr_en = trim($GOK['044F']['a']);
 						}
 
 						// Hit keys are lowercase.
 						// Set result count information:
-						// * for GOK and MSC-type records: try to use hitcount
+						// * for GOK, BRK, and MSC-type records: try to use hitcount
 						// * for CSV-type records: if only one LKL query, try to use hitcount, else use -1
 						// * otherwise: use 0
 						if (array_key_exists('044H', $GOK)
@@ -188,8 +204,13 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 								$hitCount = $this->hitCounts[$type][$notation];
 							}
 						}
-						else if (array_key_exists(strtolower($GOKString), $this->hitCounts['lkl'])) {
-							$hitCount = $this->hitCounts['lkl'][strtolower($GOKString)];
+						else if ($recordType[1] === 'e' 
+								 && array_key_exists($GOKLower, $this->hitCounts['lkl'])) {
+							$hitCount = $this->hitCounts['lkl'][$GOKLower];
+						}
+						else if ($recordType[1] === 'o'
+								 && array_key_exists($GOKLower, $this->hitCounts['brk'])) {
+							$hitCount = $this->hitCounts['brk'][$GOKLower];
 						}
 						else if ($GOK['str']['a']) {
 							$foundGOKs = Array();
@@ -210,6 +231,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							$totalHitCount = $totalHitCounts[$PPN];
 						}
 
+						$fromOpac = ($type !== 'csv');
 						$rows[] = Array($PPN, $hierarchy, $GOKString, $parent, $descr, $search, $descr_en, $tags, $childCount, $fromOpac, $hitCount, $totalHitCount, time(), time(), 1);
 					}
 				} // end of loop over GOKs
@@ -236,6 +258,26 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				'tstamp' => time(),
 				'statusID' => 1
 			);
+
+			// Add the Bandrealkatalog root node.
+			$row = array(
+				'ppn' => NKWGOKBRKRootNode,
+				'hierarchy' => 0,
+				'gok' => NKWGOKBRKRootNode,
+				'parent' => NKWGOKRootNode,
+				'descr' => 'Göttinger Bandrealkatalog',
+				'search' => '',
+				'descr_en' => 'Göttingen Bandrealkatalog',
+				'tags' => '',
+				'childcount' => count($this->tree[NKWGOKBRKRootNode]),
+				'fromopac' => True,
+				'hitcount' => -1,
+				'totalhitcount' => -1,
+				'crdate' => time(),
+				'tstamp' => time(),
+				'statusID' => 1
+			);
+
 			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $row);
 
 			// Delete all old records with statusID 1, then switch all new records to statusID 0.
@@ -271,7 +313,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			$fieldName = trim((string) $field->attributes());
 
 			// Process just the fields we need.
-			$wantedFieldNames = Array('003@', '044F', '044H', '045A', '045C', 'str', 'tags');
+			$wantedFieldNames = Array('002@','003@', '044F', '044H', '045A', '045C', 'str', 'tags');
 			if (in_array($fieldName, $wantedFieldNames)) {
 				foreach ($field->xpath('subfield') as $subfield) {
 					$subfieldName = (string) $subfield['code'];
@@ -304,7 +346,8 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	private function loadSubjectTree ($fileList) {
 		$tree = Array();
 		$tree[NKWGOKGOKRootNode] = Array('children' => Array(), 'parent' => NKWGOKRootNode);
-		$tree[NKWGOKRootNode] = Array('children' => Array(NKWGOKGOKRootNode));
+		$tree[NKWGOKBRKRootNode] = Array('children' => Array(), 'parent' => NKWGOKRootNode);
+		$tree[NKWGOKRootNode] = Array('children' => Array(NKWGOKGOKRootNode, NKWGOKBRKRootNode));
 
 		// Run through all files once to gather information about the
 		// structure of the data we process.
@@ -335,14 +378,27 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				}
 				else {
 					// has no parent record
-					$fromOpac = (count($record->xpath('datafield[@tag="str"]')) === 0);
-					if ($fromOpac) {
-						$tree[NKWGOKGOKRootNode]['children'][] = $PPN;
-						$tree[$PPN]['parent'] = NKWGOKGOKRootNode;
+					$recordTypes = $record->xpath('datafield[@tag="002@"]/subfield[@code="0"]');
+					if ($recordTypes && count($recordTypes) === 1) {
+						$recordType = (string)$recordTypes[0];
+						if ($recordType[1] === 'e') {
+							// GOK Tev record.
+							$parentPPN = NKWGOKGOKROOTNODE;
+						}
+						else if ($recordType[1] === 'o') {
+							// BRK Tov record.
+							$parentPPN = NKWGOKBRKRootNode;
+						}
+						else {
+							// Other record: goes in at top level.
+							$parentPPN = NKWGOKROOTNode;
+						}
+
+						$tree[$parentPPN]['children'][] = $PPN;
+						$tree[$PPN]['parent'] = $parentPPN;
 					}
 					else {
-						$tree[NKWGOKRootNode]['children'][] = $PPN;
-						$tree[$PPN]['parent'] = NKWGOKRootNode;
+						t3lib_div::devLog('loadXML Scheduler Task: could not determine record type for PPN ' . $PPN, 'nkwgok', 3, Array($record->saveXML()));
 					}
 				}
 
