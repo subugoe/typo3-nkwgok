@@ -29,7 +29,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 	public function execute() {
 		set_time_limit(1200);
 
-		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
+		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][tx_nkwgok_utility::extKey]);
 		$opacBaseURL = $conf['opacBaseURL'] . 'XML=1/';
 		$baseDir = PATH_site . 'fileadmin/gok/';
 
@@ -97,18 +97,18 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 					$firstRecord += NKWGOKImportChunkSize;
 				}
 				else {
-					t3lib_div::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , 'nkwgok', 3);
+					t3lib_div::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , tx_nkwgok_utility::extKey, 3);
 					$success = False;
 				}
 			}
 			else {
-				t3lib_div::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, 'nkwgok', 3);
+				t3lib_div::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, tx_nkwgok_utility::extKey, 3);
 				$success = False;
 			}
 		}
 
 		if ($success) {
-			t3lib_div::devLog('loadFromOpac Scheduler Task: LKL download succeeded', 'nkwgok', 1);
+			t3lib_div::devLog('loadFromOpac Scheduler Task: LKL download succeeded', tx_nkwgok_utility::extKey, 1);
 		}
 
 		return $success;
@@ -150,7 +150,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 					fclose($targetFile);
 				}
 				else {
-					t3lib_div::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , 'nkwgok', 3);
+					t3lib_div::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , tx_nkwgok_utility::extKey, 3);
 					$success = False;
 				}
 
@@ -158,13 +158,13 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 				$scanNext = $termAttribute[0];
 			}
 			else {
-				t3lib_div::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, 'nkwgok', 3);
+				t3lib_div::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, tx_nkwgok_utility::extKey, 3);
 				$success = False;
 			}
 		}
 
 		if ($success) {
-			t3lib_div::devLog('loadFromOpac Scheduler Task: hitcount download for index ' . $indexName . ' succeeded', 'nkwgok', 1);
+			t3lib_div::devLog('loadFromOpac Scheduler Task: hitcount download for index ' . $indexName . ' succeeded', tx_nkwgok_utility::extKey, 1);
 		}
 
 		return $success;

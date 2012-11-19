@@ -27,7 +27,7 @@
  */
 class tx_nkwgok_ff {
 	function addFields($config) {
-		$rootNodes = $this->queryForChildrenOf('Root');
+		$rootNodes = $this->queryForChildrenOf(tx_nkwgok_utility::rootNode);
 
 		$options = array();
 		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($rootNodes)) {
@@ -59,7 +59,7 @@ class tx_nkwgok_ff {
 	private function queryForChildrenOf ($parentGOK) {
 		$queryResults = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 			'*',
-			'tx_nkwgok_data',
+			tx_nkwgok_utility::dataTable,
 			"parent = '" . $parentGOK . "'",
 			'',
 			'gok ASC',

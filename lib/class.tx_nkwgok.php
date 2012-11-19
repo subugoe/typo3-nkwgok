@@ -29,9 +29,7 @@
  */
 
 
-define('NKWGOKExtKey', 'nkwgok');
-define('NKWGOKQueryTable', 'tx_nkwgok_data');
-define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, hierarchy, childcount, hitcount, totalhitcount, fromopac');
+define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, parent, hierarchy, childcount, hitcount, totalhitcount, type');
 
 /**
  * Class tx_nkwgok: provides output for the nkwgok extension.
@@ -156,7 +154,7 @@ abstract class tx_nkwgok {
 	protected function localise ($key) {
 		$result = '';
 		
-		$filePath = t3lib_div::getFileAbsFileName('EXT:' . NKWGOKExtKey . '/pi1/locallang.xml');
+		$filePath = t3lib_div::getFileAbsFileName('EXT:' . tx_nkwgok_utility::extKey . '/pi1/locallang.xml');
 		if (!$this->localisation) {
 			/**
 			 * The returned $localisation seems to have the following structure:
@@ -236,7 +234,7 @@ abstract class tx_nkwgok {
 	 * @return Array of GOK records of the $parentPPN’s children
 	 */
 	protected function getChildren($parentPPN, $includeParent = False) {
-		$parentEscaped = $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, NKWGOKQueryTable);
+		$parentEscaped = $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, tx_nkwgok_utility::dataTable);
 		$whereClause = 'parent = ' . $parentEscaped;
 		if ($this->arguments['omitXXX']) {
 			$whereClause .= ' AND NOT gok LIKE "%XXX"';
@@ -248,7 +246,7 @@ abstract class tx_nkwgok {
 		$whereClause .= ' AND statusID = 0';
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
-					NKWGOKQueryTable,
+					tx_nkwgok_utility::dataTable,
 					$whereClause,
 					'',
 					'hierarchy,gok ASC',

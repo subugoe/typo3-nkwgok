@@ -39,14 +39,9 @@
  * @subpackage	tx_nkwgok
  */
 
-define('NKWGOKRootNode', 'Root');
-define('NKWGOKGOKRootNode', 'GOK-Root');
-define('NKWGOKBRKRootNode', 'BRK-Root');
+
 define('NKWGOKMaxHierarchy', 31);
-define('NKWGOKRecordTypeGOK', 'gok');
-define('NKWGOKRecordTypeBRK', 'brk');
-define('NKWGOKRecordTypeCSV', 'csv');
-define('NKWGOKRecordTypeUnknown', 'unknown');
+
 
 
 class tx_nkwgok_loadxml extends tx_scheduler_Task {
@@ -70,24 +65,24 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 		// Remove records with statusID 1. These should not be around, but can
 		// exist if a previous run of this task was cancelled.
-		$GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_nkwgok_data', 'statusID = 1');
+		$GLOBALS['TYPO3_DB']->exec_DELETEquery(tx_nkwgok_utility::dataTable, 'statusID = 1');
 
 		// Load hit counts.
 		$this->hitCounts = $this->loadHitCounts();
 
 		// Load XML files. Process those coming from csv files first as they can
 		// be quite large and we are less likely to run into memory limits this way.
-		$result = $this->loadXMLForType(NKWGOKRecordTypeCSV);
-		$result &= $this->loadXMLForType(NKWGOKRecordTypeGOK);
-		$result &= $this->loadXMLForType(NKWGOKRecordTypeBRK);
+		$result = $this->loadXMLForType(tx_nkwgok_utility::recordTypeCSV);
+		$result &= $this->loadXMLForType(tx_nkwgok_utility::recordTypeGOK);
+		$result &= $this->loadXMLForType(tx_nkwgok_utility::recordTypeBRK);
 
 		$this->addRootNodes();
 
 		// Delete all old records with statusID 1, then switch all new records to statusID 0.
-		$GLOBALS['TYPO3_DB']->exec_DELETEquery('tx_nkwgok_data', 'statusID = 0');
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_nkwgok_data', 'statusID = 1', Array('statusID' => 0));
+		$GLOBALS['TYPO3_DB']->exec_DELETEquery(tx_nkwgok_utility::dataTable, 'statusID = 0');
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(tx_nkwgok_utility::dataTable, 'statusID = 1', Array('statusID' => 0));
 
-		t3lib_div::devLog('loadXML Scheduler Task: Import of subject hierarchy XML to TYPO3 database completed', 'nkwgok', 1);
+		t3lib_div::devLog('loadXML Scheduler Task: Import of subject hierarchy XML to TYPO3 database completed', tx_nkwgok_utility::extKey, 1);
 
 		return $result;
 	}
@@ -110,8 +105,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			$subjectTree = $this->loadSubjectTree($fileList);
 
 			// Compute total hit count sums.
-	file_put_contents('/tmp/printr-'. $type . '.text',print_r(Array($subjectTree, $this->hitCounts, $type), TRUE));
-			$totalHitCounts = $this->computeTotalHitCounts(NKWGOKRootNode, $subjectTree, $this->hitCounts);
+			$totalHitCounts = $this->computeTotalHitCounts(tx_nkwgok_utility::rootNode, $subjectTree, $this->hitCounts);
 
 			// Run through the files again, read all data, add the information
 			// about parent elements and store it to our table in the database.
@@ -126,10 +120,8 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 					// Discard records without a PPN.
 					$PPN = trim($GOK['003@']['0']);
 					if ($PPN !== '' && array_key_exists($PPN, $subjectTree)) {
-						$treeElement = $subjectTree[$PPN];
-
 						$search = '';
-						if ($GOK['type'] === 'csv') {
+						if ($GOK['type'] === tx_nkwgok_utility::recordTypeCSV) {
 							// Subject coming from CSV file with a CCL search query in the 'str/a' field.
 							if (array_key_exists('str', $GOK) && array_key_exists('a', $GOK['str']) && $GOK['str']['a']) {
 								$search = $GOK['str']['a'];
@@ -147,12 +139,12 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 									 && array_key_exists ('a', $GOK['045A'])
 									 && $GOK['045A']['a']) {
 
-								if ($GOK['type'] === NKWGOKRecordTypeGOK || $GOK['type'] === NKWGOKRecordTypeBRK) {
+								if ($GOK['type'] === tx_nkwgok_utility::recordTypeGOK || $GOK['type'] === tx_nkwgok_utility::recordTypeBRK) {
 									// GOK or BRK Opac search, using the corresponding index.
 									$indexName = $this->typeToIndexName($GOK['type']);
 								}
 								else {
-									t3lib_div::devLog('loadXML Scheduler Task: Unknown record type »' . $GOK['type'] . '« in record PPN ' . $PPN . '. Skipping.', 'nkwgok', 3, $GOK);
+									t3lib_div::devLog('loadXML Scheduler Task: Unknown record type »' . $GOK['type'] . '« in record PPN ' . $PPN . '. Skipping.', tx_nkwgok_utility::extKey, 3, $GOK);
 									continue;
 								}
 								// Requires quotation marks around the search term as notations can begin
@@ -161,26 +153,26 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							}
 						}
 
-						$childCount = count($treeElement['children']);
-						$parent = $treeElement['parent'];
+						$treeElement = $subjectTree[$PPN];
+						$parentID = $treeElement['parent'];
 
 						// Use stored subject tree to determine hierarchy level.
 						// The hierarchy typically is no deeper than 12 levels:
 						// cut off at 32 to prevent an infinite loop.
 						$hierarchy = 0;
-						$nextParent = $parent;
-						while ($nextParent !== Null && $nextParent !== NKWGOKRootNode) {
+						$nextParent = $parentID;
+						while ($nextParent !== Null && $nextParent !== tx_nkwgok_utility::rootNode) {
 							$hierarchy++;
 							if (array_key_exists($nextParent, $subjectTree)) {
 								$nextParent = $subjectTree[$nextParent]['parent'];
 							}
 							else {
-								t3lib_div::devLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN ' . $nextParent . ' for record PPN ' . $PPN . '. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', 'nkwgok', 3, $GOK);
+								t3lib_div::devLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN ' . $nextParent . ' for record PPN ' . $PPN . '. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', tx_nkwgok_utility::extKey, 3, $GOK);
 								$hierarchy = -1;
 								break;
 							}
 							if ($hierarchy > NKWGOKMaxHierarchy) {
-								t3lib_div::devLog('loadXML Scheduler Task: Hierarchy level for PPN ' . $PPN . ' exceeds the maximum limit of ' . NKWGOKMaxHierarchy . ' levels. This needs to be fixed, the subject tree may contain an infinite loop.', 'nkwgok', 3, $GOK);
+								t3lib_div::devLog('loadXML Scheduler Task: Hierarchy level for PPN ' . $PPN . ' exceeds the maximum limit of ' . NKWGOKMaxHierarchy . ' levels. This needs to be fixed, the subject tree may contain an infinite loop.', tx_nkwgok_utility::extKey, 3, $GOK);
 								$hierarchy = -1;
 								break;
 							}
@@ -219,22 +211,31 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 								$hitCount = $this->hitCounts[$type][$notation];
 							}
 						}
-						else if ($GOK['type'] === NKWGOKRecordTypeGOK
-								 && array_key_exists($GOKLower, $this->hitCounts[NKWGOKRecordTypeGOK])) {
-							$hitCount = $this->hitCounts[NKWGOKRecordTypeGOK][$GOKLower];
-						}
-						else if ($GOK['type'] === NKWGOKRecordTypeBRK
-								 && array_key_exists($GOKLower, $this->hitCounts[NKWGOKRecordTypeBRK])) {
-							$hitCount = $this->hitCounts[NKWGOKRecordTypeBRK][$GOKLower];
+						else if (($GOK['type'] === tx_nkwgok_utility::recordTypeGOK
+									|| $GOK['type'] === tx_nkwgok_utility::recordTypeBRK)
+								 && array_key_exists($GOKLower, $this->hitCounts[$GOK['type']])) {
+							$hitCount = $this->hitCounts[$GOK['type']][$GOKLower];
 						}
 						else if ($GOK['str']['a']) {
+							// Try to detect simple GOK and MSC queries from CSV files so hit counts can be displayed for them.
 							$foundGOKs = Array();
-							$pattern = '/lkl=([a-zA-Z]*\s?[.X0-9]*)$/';
-							preg_match($pattern, $GOK['str']['a'], $foundGOKs);
+							$GOKPattern = '/^lkl=([a-zA-Z]*\s?[.X0-9]*)$/';
+							preg_match($GOKPattern, $GOK['str']['a'], $foundGOKs);
 							$foundGOK = strtolower($foundGOKs[1]);
 
-							if (count($foundGOKs) > 1 && $foundGOK && array_key_exists($foundGOK, $this->hitCounts[NKWGOKRecordTypeGOK])) {
-								$hitCount = $this->hitCounts[NKWGOKRecordTypeGOK][$foundGOK];
+							$foundMSCs = Array();
+							$MSCPattern = '/^msc=([0-9Xx][0-9Xx][A-Z-]*[0-9Xx]*)/';
+							preg_match($MSCPattern, $GOK['str']['a'], $foundMSCs);
+							$foundMSC = strtolower($foundMSCs[1]);
+
+							if (count($foundGOKs) > 1 && $foundGOK
+								&& array_key_exists($foundGOK, $this->hitCounts[tx_nkwgok_utility::recordTypeGOK])) {
+								$hitCount = $this->hitCounts[tx_nkwgok_utility::recordTypeGOK][$foundGOK];
+							}
+							else if (count($foundMSCs) > 1 && $foundMSC
+								&& array_key_exists($foundMSC, $this->hitCounts[tx_nkwgok_utility::recordTypeMSC])) {
+								$hitCount = $this->hitCounts[tx_nkwgok_utility::recordTypeMSC][$foundMSC];
+								$GOK['type'] = tx_nkwgok_utility::recordTypeMSC;
 							}
 						}
 						else {
@@ -246,19 +247,20 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							$totalHitCount = $totalHitCounts[$PPN];
 						}
 
-						$fromOpac = ($GOK['type'] !== 'csv');
-						$rows[] = Array($PPN, $hierarchy, $GOKString, $parent, $descr, $search, $descr_en, $tags, $childCount, $fromOpac, $hitCount, $totalHitCount, time(), time(), 1);
+						$childCount = count($treeElement['children']);
+
+						$rows[] = Array($PPN, $hierarchy, $GOKString, $parentID, $descr, $search, $descr_en, $tags, $childCount, $GOK['type'], $hitCount, $totalHitCount, time(), time(), 1);
 					}
 				} // end of loop over GOKs
-				$keyNames = Array('ppn', 'hierarchy', 'gok', 'parent', 'descr', 'search', 'descr_en', 'tags', 'childcount', 'fromopac', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
-				$result = $GLOBALS['TYPO3_DB']->exec_INSERTmultipleRows('tx_nkwgok_data', $keyNames, $rows);
+				$keyNames = Array('ppn', 'hierarchy', 'gok', 'parent', 'descr', 'search', 'descr_en', 'tags', 'childcount', 'type', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
+				$result = $GLOBALS['TYPO3_DB']->exec_INSERTmultipleRows(tx_nkwgok_utility::dataTable, $keyNames, $rows);
 
 			} // end of loop over files
 
 			$result = True;
 		}
 		else {
-			t3lib_div::devLog('loadXML Scheduler Task: Found no XML files for type ' . $type . '.', 'nkwgok', 3);
+			t3lib_div::devLog('loadXML Scheduler Task: Found no XML files for type ' . $type . '.', tx_nkwgok_utility::extKey, 3);
 			$result = True;
 		}
 
@@ -272,44 +274,44 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	 */
 	private function addRootNodes () {
 		// Add the GOK root node.
-		$row = array(
-			'ppn' => NKWGOKGOKRootNode,
+		$GOKRootRow = array(
+			'ppn' => tx_nkwgok_utility::GOKRootNode,
 			'hierarchy' => 0,
-			'gok' => NKWGOKGOKRootNode,
-			'parent' => NKWGOKRootNode,
+			'gok' => tx_nkwgok_utility::GOKRootNode,
+			'parent' => tx_nkwgok_utility::rootNode,
 			'descr' => 'Göttinger Online Klassifikation (GOK)',
 			'search' => '',
 			'descr_en' => 'Göttingen Online Classification (GOK)',
 			'tags' => '',
-			'childcount' => count($this->tree[NKWGOKGOKRootNode]),
-			'fromopac' => True,
+			'childcount' => count($this->tree[tx_nkwgok_utility::GOKRootNode]),
+			'type' => tx_nkwgok_utility::recordTypeGOK,
 			'hitcount' => -1,
 			'totalhitcount' => -1,
 			'crdate' => time(),
 			'tstamp' => time(),
 			'statusID' => 1
 		);
-		$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $row);
+		$GLOBALS['TYPO3_DB']->exec_INSERTquery(tx_nkwgok_utility::dataTable, $GOKRootRow);
 
 		// Add the Bandrealkatalog root node.
-		$row = array(
-			'ppn' => NKWGOKBRKRootNode,
+		$BRKRootRow = array(
+			'ppn' => tx_nkwgok_utility::BRKRootNode,
 			'hierarchy' => 0,
-			'gok' => NKWGOKBRKRootNode,
-			'parent' => NKWGOKRootNode,
+			'gok' => tx_nkwgok_utility::BRKRootNode,
+			'parent' => tx_nkwgok_utility::rootNode,
 			'descr' => 'Göttinger Bandrealkatalog',
 			'search' => '',
 			'descr_en' => 'Göttingen Bandrealkatalog',
 			'tags' => '',
-			'childcount' => count($this->tree[NKWGOKBRKRootNode]),
-			'fromopac' => True,
+			'childcount' => count($this->tree[tx_nkwgok_utility::BRKRootNode]),
+			'type' => tx_nkwgok_utility::recordTypeBRK,
 			'hitcount' => -1,
 			'totalhitcount' => -1,
 			'crdate' => time(),
 			'tstamp' => time(),
 			'statusID' => 1
 		);
-		$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_nkwgok_data', $row);
+		$GLOBALS['TYPO3_DB']->exec_INSERTquery(tx_nkwgok_utility::dataTable, $BRKRootRow);
 	}
 
 
@@ -369,9 +371,9 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	 */
 	private function loadSubjectTree ($fileList) {
 		$tree = Array();
-		$tree[NKWGOKGOKRootNode] = Array('children' => Array(), 'parent' => NKWGOKRootNode, 'type' => NKWGOKRecordTypeGOK);
-		$tree[NKWGOKBRKRootNode] = Array('children' => Array(), 'parent' => NKWGOKRootNode, 'type' => NKWGOKRecordTypeBRK);
-		$tree[NKWGOKRootNode] = Array('children' => Array(NKWGOKGOKRootNode, NKWGOKBRKRootNode));
+		$tree[tx_nkwgok_utility::GOKRootNode] = Array('children' => Array(), 'parent' => tx_nkwgok_utility::rootNode, 'type' => tx_nkwgok_utility::recordTypeGOK);
+		$tree[tx_nkwgok_utility::BRKRootNode] = Array('children' => Array(), 'parent' => tx_nkwgok_utility::rootNode, 'type' => tx_nkwgok_utility::recordTypeBRK);
+		$tree[tx_nkwgok_utility::rootNode] = Array('children' => Array(tx_nkwgok_utility::GOKRootNode, tx_nkwgok_utility::BRKRootNode));
 
 		// Run through all files once to gather information about the
 		// structure of the data we process.
@@ -382,12 +384,14 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			foreach ($records as $record) {
 				$PPNs = $record->xpath('datafield[@tag="003@"]/subfield[@code="0"]');
 				$PPN = (string)($PPNs[0]);
-				$recordType = $this->typeOfRecord($record);
 
 				// Create entry in the tree array if necessary.
 				if (!array_key_exists($PPN, $tree)) {
-					$tree[$PPN] = Array('children' => Array(), 'type' => $recordType);
+					$tree[$PPN] = Array('children' => Array());
 				}
+
+				$recordType = $this->typeOfRecord($record);
+				$tree[$PPN]['type'] = $recordType;
 
 				$myParentPPNs = $record->xpath('datafield[@tag="045C"]/subfield[@code="9"]');
 				if ($myParentPPNs && count($myParentPPNs) > 0) {
@@ -403,29 +407,43 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				}
 				else {
 					// has no parent record
-					if ($recordType === NKWGOKRecordTypeGOK) {
+					if ($recordType === tx_nkwgok_utility::recordTypeGOK) {
 						// GOK subject authority record.
-						$parentPPN = NKWGOKGOKRootNode;
+						$parentPPN = tx_nkwgok_utility::GOKRootNode;
 					}
-					else if ($recordType === NKWGOKRecordTypeBRK) {
+					else if ($recordType === tx_nkwgok_utility::recordTypeBRK) {
 						// BRK subject authoriy record.
-						$parentPPN = NKWGOKBRKRootNode;
+						$parentPPN = tx_nkwgok_utility::BRKRootNode;
 					}
 					else {
 						// Other record: goes in at top level.
-						$parentPPN = NKWGOKRootNode;
+						$parentPPN = tx_nkwgok_utility::rootNode;
 					}
 
 					$tree[$parentPPN]['children'][] = $PPN;
 					$tree[$PPN]['parent'] = $parentPPN;
 				}
 
-				// Store notation information.
-				$notationStrings = $record->xpath('datafield[@tag="045A"]/subfield[@code="a"]');
-				if (count($notationStrings) > 0) {
-					$notationString = (string)($notationStrings[0]);
-					$notation = strtolower(trim($notationString));
-					$tree[$PPN][$recordType] = $notation;
+				if ($recordType === tx_nkwgok_utility::recordTypeGOK || $recordType === tx_nkwgok_utility::recordTypeBRK) {
+					// Store notation information.
+					$notationStrings = $record->xpath('datafield[@tag="045A"]/subfield[@code="a"]');
+					if (count($notationStrings) > 0) {
+						$notationString = (string)($notationStrings[0]);
+						$notation = strtolower(trim($notationString));
+						$tree[$PPN][$recordType] = $notation;
+					}
+				}
+				else {
+					$queries = $record->xpath('datafield[@tag="str"]/subfield[@code="a"]');
+					if (count($queries) === 1) {
+						$query = (string)($queries[0]);
+						$foundQueries = NULL;
+						if (preg_match('/^msc=([^ ]*)$/', $query, $foundQueries) && count($foundQueries) === 2) {
+							$msc = $foundQueries[1];
+							$tree[$PPN][tx_nkwgok_utility::recordTypeMSC] = $msc;
+							$tree[$PPN]['type'] = tx_nkwgok_utility::recordTypeMSC;
+						}
+					}
 				}
 
 				// Store the last additional notation information (044H) of
@@ -488,12 +506,12 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				}
 			}
 			else {
-				t3lib_div::devLog('loadXML Scheduler Task: could not load/parse XML from ' . $xmlPath, 'nkwgok', 3);
+				t3lib_div::devLog('loadXML Scheduler Task: could not load/parse XML from ' . $xmlPath, tx_nkwgok_utility::extKey, 3);
 			}
 		} // end foreach
 
 		foreach ($hitCounts as $hitCountType => $array) {
-			t3lib_div::devLog('loadXML Scheduler Task: Loaded ' . count($array) . ' ' . $hitCountType . ' hit count entries.', 'nkwgok', 1);
+			t3lib_div::devLog('loadXML Scheduler Task: Loaded ' . count($array) . ' ' . $hitCountType . ' hit count entries.', tx_nkwgok_utility::extKey, 1);
 		}
 
 		return $hitCounts;
@@ -515,15 +533,14 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	private function computeTotalHitCounts ($startPPN, $subjectTree, $hitCounts) {
 		$totalHitCounts = Array();
 		$myHitCount = 0;
-
 		if (array_key_exists($startPPN, $subjectTree)) {
 			$record = $subjectTree[$startPPN];
 			$type = $record['type'];
-			$notation = $record[$type];
-			if (array_key_exists('msc', $record)
-				&& $type === NKWGOKRecordTypeGOK) {
-				$type = 'msc';
-				$notation = $record['msc'];
+			$notation = strtolower($record[$type]);
+			if (array_key_exists(tx_nkwgok_utility::recordTypeMSC, $record)
+				&& $type !== tx_nkwgok_utility::recordTypeBRK) {
+				$type = tx_nkwgok_utility::recordTypeMSC;
+				$notation = strtolower($record[tx_nkwgok_utility::recordTypeMSC]);
 			}
 
 			if (count($record['children']) > 0) {
@@ -573,13 +590,13 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		if ($type === 'all') {
 			$fileList = glob($basePath . '*.xml');
 		}
-		else if ($type === NKWGOKRecordTypeGOK || $type === NKWGOKRecordTypeBRK) {
+		else if ($type === tx_nkwgok_utility::recordTypeGOK || $type === tx_nkwgok_utility::recordTypeBRK) {
 			$fileList = glob($basePath . $type . '-*.xml');
 		}
 		else {
 			$allFiles = glob($basePath . '*.xml');
-			$gokFiles = glob($basePath . NKWGOKRecordTypeGOK . '-*.xml');
-			$brkFiles = glob($basePath . NKWGOKRecordTypeBRK . '-*.xml');
+			$gokFiles = glob($basePath . tx_nkwgok_utility::recordTypeGOK . '-*.xml');
+			$brkFiles = glob($basePath . tx_nkwgok_utility::recordTypeBRK . '-*.xml');
 			$fileList = array_diff($allFiles, $gokFiles, $brkFiles);
 		}
 
@@ -596,25 +613,34 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	 * @return string - gok|brk|csv|unknown
 	 */
 	private function typeOfRecord ($record) {
-		$recordType = NKWGOKRecordTypeUnknown;
+		$recordType = tx_nkwgok_utility::recordTypeUnknown;
 		$recordTypes = $record->xpath('datafield[@tag="002@"]/subfield[@code="0"]');
 
 		if ($recordTypes && count($recordTypes) === 1) {
 			$recordTypeCode = (string)$recordTypes[0];
 
 			if ($recordTypeCode === 'Tev') {
-				$recordType = NKWGOKRecordTypeGOK;
+				$recordType = tx_nkwgok_utility::recordTypeGOK;
 			}
 			else if ($recordTypeCode === 'Tov') {
-				$recordType = NKWGOKRecordTypeBRK;
+				$recordType = tx_nkwgok_utility::recordTypeBRK;
 			}
 			else if ($recordTypeCode === 'csv') {
-				$recordType = NKWGOKRecordTypeCSV;
+				$queryElements = $record->xpath('datafield[@tag="str"]/subfield[@code="a"]');
+				if ($queryElements && count($queryElements) === 1
+					&& preg_match('/^msc=[0-9A-Zx-]*/', (string)$queryElements[0] > 0)) {
+					// Special case: an MSC record.
+					$recordType = tx_nkwgok_utility::recordTypeMSC;
+				}
+				else {
+					// Regular case: a standard CSV record.
+					$recordType = tx_nkwgok_utility::recordTypeCSV;
+				}
 			}
 		}
 
-		if ($recordType === NKWGOKRecordTypeUnknown) {
-			t3lib_div::devLog('loadXML Scheduler Task: Record of unknown type.', 'nkwgok', 1, Array($record->saveXML()));
+		if ($recordType === tx_nkwgok_utility::recordTypeUnknown) {
+			t3lib_div::devLog('loadXML Scheduler Task: Record of unknown type.', tx_nkwgok_utility::extKey, 1, Array($record->saveXML()));
 		}
 
 		return $recordType;

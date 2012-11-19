@@ -25,13 +25,13 @@ class tx_nkwgok_updateCSV extends tx_scheduler_Task {
 		$convertCSVTask = t3lib_div::makeInstance('tx_nkwgok_convertCSV');
 		$success = $convertCSVTask->execute($this->nkwgokStartPageId);
 		if (!$success) {
-			t3lib_div::devLog('updateCSV Scheduler Task: Problem during conversion of CSV files. Stopping.' , 'nkwgok', 3);
+			t3lib_div::devLog('updateCSV Scheduler Task: Problem during conversion of CSV files. Stopping.' , tx_nkwgok_utility::extKey, 3);
 		}
 		else {
 			$loadxmlTask = t3lib_div::makeInstance('tx_nkwgok_loadxml');
 			$success = $loadxmlTask->execute();
 			if (!$success) {
-				t3lib_div::devLog('updateCSV Scheduler Task: could not import XML to TYPO3 database.' , 'nkwgok', 3);
+				t3lib_div::devLog('updateCSV Scheduler Task: could not import XML to TYPO3 database.' , tx_nkwgok_utility::extKey, 3);
 			}
 		}
 

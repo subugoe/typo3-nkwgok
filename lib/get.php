@@ -32,7 +32,6 @@
 if (!defined('PATH_typo3conf')) {
 	die('Could not access this script directly!');
 }
-require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok.php');
 
 
 /**
@@ -47,8 +46,6 @@ class tx_nkwgok_eid {
 	 * @author Sven-S. Porst <porst@sub.uni-goettingen.de>
 	 * */
 	function eid_main() {
-		$output = Null;
-
 		// initialize DB functions
 		tslib_eidtools::connectDB();
 

@@ -58,7 +58,7 @@ class tx_nkwgok_scheduler_convertcsvadditionalparameters implements tx_scheduler
 			$fieldId = 'task_nkwgok' . ucfirst($field);
 			$fieldHtml = '<input type="text" name="tx_scheduler[nkwgok'
 				. ucfirst($field) . ']" id="' . $fieldId . '" value="'
-				. $taskInfo['nkwgok' . ucfirst($field)] . '" size="10" />';
+				. $taskInfo[tx_nkwgok_utility::extKey . ucfirst($field)] . '" size="10" />';
 
 			$additionalFields[$fieldId] = array(
 				'code'     => $fieldHtml,

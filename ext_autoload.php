@@ -18,5 +18,6 @@ return array(
 	'tx_nkwgok_loadxml' => $extensionPath . 'scheduler/class.tx_nkwgok_loadxml.php',
 	'tx_nkwgok_scheduler_convertcsvadditionalparameters' => $extensionPath . 'scheduler/class.tx_nkwgok_scheduler_convertcsvadditionalparameters.php',
 	'tx_nkwgok_updatecsv' => $extensionPath . 'scheduler/class.tx_nkwgok_updatecsv.php',
+	'tx_nkwgok_utility' => $extensionPath . 'lib/class.tx_nkwgok_utility.php',
 );
 ?>

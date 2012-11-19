@@ -62,14 +62,14 @@ class tx_nkwgok_menu extends tx_nkwgok {
 
 		$startNodes = explode(',', $this->arguments['gok']);
 		if (count($startNodes) > 1) {
-			t3lib_div::devLog('several start nodes given (' . $this->arguments['gok'] . ') but only the first is used in menu mode' , 'nkwgok', 2);
+			t3lib_div::devLog('several start nodes given (' . $this->arguments['gok'] . ') but only the first is used in menu mode' , tx_nkwgok_utility::extKey, 2);
 		}
 		$startNodeGOK = trim($startNodes[0]);
-		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK, NKWGOKQueryTable) . ' AND statusID = 0';
+		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK, tx_nkwgok_utility::dataTable) . ' AND statusID = 0';
 		// run query and collect result
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
-					NKWGOKQueryTable,
+					tx_nkwgok_utility::dataTable,
 					$firstNodeCondition,
 					'',
 					'gok ASC',
@@ -139,12 +139,12 @@ class tx_nkwgok_menu extends tx_nkwgok {
 			var URL = location.protocol + '//' + location.host + location.pathname;
 			var PPN = option.value;
 			var level = parseInt(option.parentNode.getAttribute('level')) + 1;
-			var parameters = location.search.replace(/^\?/, '') + '&tx_" . NKWGOKExtKey . "[expand]=' + PPN
-				+ '&tx_" . NKWGOKExtKey . "[language]=" . $this->language . "&eID=" . NKWGOKExtKey . "'
-				+ '&tx_" . NKWGOKExtKey . "[level]=' + level
-				+ '&tx_" . NKWGOKExtKey . "[style]=menu'
-				+ '&tx_" . NKWGOKExtKey . "[objectID]=" . $this->objectID . "'
-				+ '&tx_" . NKWGOKExtKey . "[menuInlineThreshold]=" . $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'] . "';
+			var parameters = location.search.replace(/^\?/, '') + '&tx_" . tx_nkwgok_utility::extKey . "[expand]=' + PPN
+				+ '&tx_" . tx_nkwgok_utility::extKey . "[language]=" . $this->language . "&eID=" . tx_nkwgok_utility::extKey . "'
+				+ '&tx_" . tx_nkwgok_utility::extKey . "[level]=' + level
+				+ '&tx_" . tx_nkwgok_utility::extKey . "[style]=menu'
+				+ '&tx_" . tx_nkwgok_utility::extKey . "[objectID]=" . $this->objectID . "'
+				+ '&tx_" . tx_nkwgok_utility::extKey . "[menuInlineThreshold]=" . $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'] . "';
 
 			jQuery(option.parentNode).nextAll().remove();
 			var newSelect = document.createElement('select');
@@ -215,7 +215,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 				$select = $this->doc->createElement('select');
 				$container->appendChild($select);
 				$select->setAttribute('id', 'select-' . $this->objectID . '-' . $parentPPN);
-				$select->setAttribute('name', 'tx_' . NKWGOKExtKey . '[expand][' . $level . ']');
+				$select->setAttribute('name', 'tx_' . tx_nkwgok_utility::extKey . '[expand][' . $level . ']');
 				$select->setAttribute('onchange', 'GOKMenuSelectionChanged' . $this->objectID . '(this);');
 				$select->setAttribute('title', $this->localise('Fachgebiet auswählen') . ' ('
 						. $this->localise('Ebene') . ' ' . ($level + 1) . ')');
@@ -238,7 +238,8 @@ class tx_nkwgok_menu extends tx_nkwgok {
 					$option = $this->doc->createElement('option');
 					$select->appendChild($option);
 					$label = '';
-					if ($GOKs[0]['fromopac']) {
+					if ($GOKs[0]['type'] === tx_nkwgok_utility::recordTypeGOK
+						|| $GOKs[0]['type'] === tx_nkwgok_utility::recordTypeBRK) {
 						$label = 'Treffer für diese Zwischenebene zeigen';
 					}
 					else {

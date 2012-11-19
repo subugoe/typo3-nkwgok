@@ -67,7 +67,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$useShallowLinks = ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowSearch'] == 1);
 		if ($this->arguments['omitXXX']) {
 			$useShallowLinks = TRUE;
-			t3lib_div::devLog('Configured to use deep links together with omitXXX. This will not work as the totalhitcount is incorrect when we arbitrarily leave out child elements. Using shallow links instead.' , 'nkwgok', 2);
+			t3lib_div::devLog('Configured to use deep links together with omitXXX. This will not work as the totalhitcount is incorrect when we arbitrarily leave out child elements. Using shallow links instead.' , tx_nkwgok_utility::extKey, 2);
 		}
 		if ($useShallowLinks)  {
 			$containerClasses[] = 'shallowLinks';
@@ -80,12 +80,12 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$startNodes = explode(',', $this->arguments['gok']);
 		$queryParts = Array();
 		foreach ($startNodes as $startNodeGOK) {
-			$queryParts[] = 'gok = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr(trim($startNodeGOK), NKWGOKQueryTable);
+			$queryParts[] = 'gok = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr(trim($startNodeGOK), tx_nkwgok_utility::dataTable);
 		}
 		$query = implode(' OR ', $queryParts) . ' AND statusID = 0';
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
-					NKWGOKQueryTable,
+					tx_nkwgok_utility::dataTable,
 					$query,
 					'',
 					'gok ASC',
@@ -176,12 +176,12 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			link[0].onclick = new Function(functionText);
 			jQuery.get("
 				. "'" . t3lib_div::getIndpEnv('TYPO3_SITE_URL') . "index.php',
-				{'eID': '" . NKWGOKExtKey . "', "
-				. "'tx_" . NKWGOKExtKey . "[language]': '" . $this->language . "', "
-				. "'tx_" . NKWGOKExtKey . "[expand][0]': id, "
-				. "'tx_" . NKWGOKExtKey . "[style]': '" . $this->arguments['style'] . "', "
-				. (($this->arguments['omitXXX']) ? ("'tx_" . NKWGOKExtKey . "[omitXXX]': '" . $this->arguments['omitXXX'] . "', ") : (''))
-				. "'tx_" . NKWGOKExtKey . "[objectID]': '" . $this->objectID . "'},
+				{'eID': '" . tx_nkwgok_utility::extKey . "', "
+				. "'tx_" . tx_nkwgok_utility::extKey . "[language]': '" . $this->language . "', "
+				. "'tx_" . tx_nkwgok_utility::extKey . "[expand][0]': id, "
+				. "'tx_" . tx_nkwgok_utility::extKey . "[style]': '" . $this->arguments['style'] . "', "
+				. (($this->arguments['omitXXX']) ? ("'tx_" . tx_nkwgok_utility::extKey . "[omitXXX]': '" . $this->arguments['omitXXX'] . "', ") : (''))
+				. "'tx_" . tx_nkwgok_utility::extKey . "[objectID]': '" . $this->objectID . "'},
 				function (html) {
 					plusMinus.text('[-]');
 					" . $HTMLInsertionTarget . ".append(html);
@@ -498,11 +498,13 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	private function opacGOKSearchURL($GOKData, $deepSearch) {
 		$GOKSearchURL = Null;
 
-		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
+		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][tx_nkwgok_utility::extKey]);
 		$picaLanguageCode = ($this->language === 'en') ? 'EN' : 'DU';
 		$GOKSearchURL = $conf['opacBaseURL'] . 'LNG=' . $picaLanguageCode;
 
-		if ($deepSearch === True && $GOKData['fromopac'] == 1 && $GOKData['ppn'] !== 'GOK-Root') {
+		if ($deepSearch === True
+			&& ($GOKData['type'] === tx_nkwgok_utility::recordTypeGOK || $GOKData['type'] === tx_nkwgok_utility::recordTypeBRK)
+			&& $GOKData['ppn'] !== tx_nkwgok_utility::GOKRootNode && $GOKData['ppn'] !== tx_nkwgok_utility::BRKRootNode) {
 			// Use special command to do the hierarchical search for records related
 			// to the Normsatz PPN.
 			$GOKSearchURL .= '/EPD?PPN=' . $GOKData['ppn'] . '&FRM=';

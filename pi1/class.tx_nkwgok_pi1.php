@@ -27,7 +27,6 @@
  * Changes 2011-2012 by Sven-S. Porst <porst@sub.uni-goettingen.de>
  * See the ChangeLog or git repository for details.
  */
-require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok.php');
 
 
 /**
@@ -95,13 +94,13 @@ class tx_nkwgok_pi1 extends tslib_pibase {
 	 * @return void
 	 */
 	protected function addStylesheet () {
-		$nkwgokGlobalConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
+		$nkwgokGlobalConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][tx_nkwgok_utility::extKey]);
 		$cssPath = $nkwgokGlobalConf['CSSPath'];
 		if (!$cssPath) {
 			$cssPath = 'EXT:nkwgok/res/nkwgok.css';
 		}
 
-		$GLOBALS['TSFE']->pSetup['includeCSS.']['nkwgok'] = $cssPath;
+		$GLOBALS['TSFE']->pSetup['includeCSS.'][tx_nkwgok_utility::extKey] = $cssPath;
 	}
 
 }
