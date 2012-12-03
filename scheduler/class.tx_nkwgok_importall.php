@@ -27,19 +27,19 @@ class tx_nkwgok_importAll extends tx_scheduler_Task {
 		$loadFromOpacTask = t3lib_div::makeInstance('tx_nkwgok_loadFromOpac');
 		$success = $loadFromOpacTask->execute();
 		if (!$success) {
-			t3lib_div::devLog('importALL Scheduler Task: could not load Opac data. Stopping.' , tx_nkwgok_utility::extKey, 3);
+			t3lib_div::sysLog('importALL Scheduler Task: could not load Opac data. Stopping.' , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_FATAL);
 		}
 		else {
 			$convertCSVTask = t3lib_div::makeInstance('tx_nkwgok_convertCSV');
 			$success = $convertCSVTask->execute($this->nkwgokStartPageId);
 			if (!$success) {
-				t3lib_div::devLog('importAll Scheduler Task: Problem during conversion of CSV files. Stopping.' , tx_nkwgok_utility::extKey, 3);
+				t3lib_div::sysLog('importAll Scheduler Task: Problem during conversion of CSV files. Stopping.' , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_FATAL);
 			}
 			else {
 				$loadxmlTask = t3lib_div::makeInstance('tx_nkwgok_loadxml');
 				$success = $loadxmlTask->execute();
 				if (!$success) {
-					t3lib_div::devLog('importAll Scheduler Task: could not import XML to TYPO3 database.' , tx_nkwgok_utility::extKey, 3);
+					t3lib_div::sysLog('importAll Scheduler Task: could not import XML to TYPO3 database.' , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_FATAL);
 				}
 			}
 		}

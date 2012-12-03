@@ -43,7 +43,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 			$this->downloadURLs($URLList);
 		}
 		else {
-			t3lib_div::devLog('convertCSV Scheduler Task: no URLs for downloading CSV files set up in the Scheduler task', tx_nkwgok_utility::extKey, 1);
+			t3lib_div::sysLog('convertCSV Scheduler Task: no URLs for downloading CSV files set up in the Scheduler task', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_INFO);
 		}
 
 		$success = true;
@@ -122,15 +122,15 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 				if ($localData != $remoteData) {
 					// Only overwrite local file if the file contents have changed.
 					if (file_put_contents($localPath, $remoteData)) {
-						t3lib_div::devLog('convertCSV Scheduler Task: replaced file ' . $localPath . '.', tx_nkwgok_utility::extKey, 1);
+						t3lib_div::sysLog('convertCSV Scheduler Task: replaced file ' . $localPath . '.', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_INFO);
 					}
 					else {
-						t3lib_div::devLog('convertCSV Scheduler Task: failed to write downloaded file to ' . $localPath . '.', tx_nkwgok_utility::extKey, 2, Array($localData, $remoteData));
+						t3lib_div::sysLog('convertCSV Scheduler Task: failed to write downloaded file to ' . $localPath . '.', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_WARNING);
 					}
 				}
 			}
 			else {
-				t3lib_div::devLog('convertCSV Scheduler Task: failed to download ' . $URL . '.', tx_nkwgok_utility::extKey, 2);
+				t3lib_div::sysLog('convertCSV Scheduler Task: failed to download ' . $URL . '.', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_WARNING);
 			}
 		}
 	}
@@ -225,18 +225,18 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 					}
 
 					if ($this->PPNList[$PPN]) {
-						t3lib_div::devLog('convertCSV Scheduler Task: Duplicate PPN "' . $PPN. '" in file ' . $CSVPath, tx_nkwgok_utility::extKey, 2);
+						t3lib_div::sysLog('convertCSV Scheduler Task: Duplicate PPN "' . $PPN. '" in file ' . $CSVPath, tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_WARNING);
 					}
 
 					// Add current PPN to PPN list.
 					$this->PPNList[$PPN] = True;
 				}
 				else {
-					t3lib_div::devLog('convertCSV Scheduler Task: Blank PPN  in line: "' . implode(';', $fields) .'" of file ' . $CSVPath, tx_nkwgok_utility::extKey, 2);
+					t3lib_div::sysLog('convertCSV Scheduler Task: Blank PPN  in line: "' . implode(';', $fields) .'" of file ' . $CSVPath, tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_WARNING);
 				} // if ($PPN != '')
 			}
 			else if (count($fields) > 1 && trim(implode('', $fields)) !== '') {
-				t3lib_div::devLog('convertCSV Scheduler Task: Line "' . implode(';', $fields) . '" of file ' . $CSVPath . ' contains less than 3 fields.', tx_nkwgok_utility::extKey, 2);
+				t3lib_div::sysLog('convertCSV Scheduler Task: Line "' . implode(';', $fields) . '" of file ' . $CSVPath . ' contains less than 3 fields.', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_WARNING);
 			} // (count($fields) >= 3)
 
 
@@ -249,11 +249,10 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 				$resultPath = PATH_site. 'fileadmin/gok/xml/' . $XMLFileName;
 
 				if ($doc->save($resultPath) === False) {
-					t3lib_div::devLog('convertCSV Scheduler Task: Failed to write XML file' . $resultPath , tx_nkwgok_utility::extKey, 3);
+					t3lib_div::sysLog('convertCSV Scheduler Task: Failed to write XML file' . $resultPath , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_FATAL);
 					break;
 				}
 				else {
-					// t3lib_div::devLog('convertCSV Scheduler Task: Successfully wrote XML file ' . $resultPath , tx_nkwgok_utility::rootNode, 1);
 					$success = True;
 				}
 				$doc = Null;
@@ -292,7 +291,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 			$subfield->appendChild($doc->createTextNode($content));
 		}
 		else {
-			t3lib_div::devLog('convertCSV Scheduler Task: Some parameter was Null in appendFieldForDataTo' , tx_nkwgok_utility::extKey, 3);
+			t3lib_div::sysLog('convertCSV Scheduler Task: Some parameter was Null in appendFieldForDataTo' , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_FATAL);
 		}
 		
 		return $datafield;

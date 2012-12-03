@@ -82,7 +82,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery(tx_nkwgok_utility::dataTable, 'statusID = 0');
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(tx_nkwgok_utility::dataTable, 'statusID = 1', Array('statusID' => 0));
 
-		t3lib_div::devLog('loadXML Scheduler Task: Import of subject hierarchy XML to TYPO3 database completed', tx_nkwgok_utility::extKey, 1);
+		t3lib_div::sysLog('loadXML Scheduler Task: Import of subject hierarchy XML to TYPO3 database completed', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_INFO);
 
 		return $result;
 	}
@@ -144,7 +144,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 									$indexName = $this->typeToIndexName($GOK['type']);
 								}
 								else {
-									t3lib_div::devLog('loadXML Scheduler Task: Unknown record type »' . $GOK['type'] . '« in record PPN ' . $PPN . '. Skipping.', tx_nkwgok_utility::extKey, 3, $GOK);
+									t3lib_div::sysLog('loadXML Scheduler Task: Unknown record type »' . $GOK['type'] . '« in record PPN ' . $PPN . '. Skipping.', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_WARNING);
 									continue;
 								}
 								// Requires quotation marks around the search term as notations can begin
@@ -167,12 +167,12 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 								$nextParent = $subjectTree[$nextParent]['parent'];
 							}
 							else {
-								t3lib_div::devLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN ' . $nextParent . ' for record PPN ' . $PPN . '. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', tx_nkwgok_utility::extKey, 3, $GOK);
+								t3lib_div::sysLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN ' . $nextParent . ' for record PPN ' . $PPN . '. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_WARNING);
 								$hierarchy = -1;
 								break;
 							}
 							if ($hierarchy > NKWGOKMaxHierarchy) {
-								t3lib_div::devLog('loadXML Scheduler Task: Hierarchy level for PPN ' . $PPN . ' exceeds the maximum limit of ' . NKWGOKMaxHierarchy . ' levels. This needs to be fixed, the subject tree may contain an infinite loop.', tx_nkwgok_utility::extKey, 3, $GOK);
+								t3lib_div::sysLog('loadXML Scheduler Task: Hierarchy level for PPN ' . $PPN . ' exceeds the maximum limit of ' . NKWGOKMaxHierarchy . ' levels. This needs to be fixed, the subject tree may contain an infinite loop.', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_WARNING);
 								$hierarchy = -1;
 								break;
 							}
@@ -260,7 +260,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			$result = True;
 		}
 		else {
-			t3lib_div::devLog('loadXML Scheduler Task: Found no XML files for type ' . $type . '.', tx_nkwgok_utility::extKey, 3);
+			t3lib_div::sysLog('loadXML Scheduler Task: Found no XML files for type ' . $type . '.', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_INFO);
 			$result = True;
 		}
 
@@ -506,12 +506,12 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				}
 			}
 			else {
-				t3lib_div::devLog('loadXML Scheduler Task: could not load/parse XML from ' . $xmlPath, tx_nkwgok_utility::extKey, 3);
+				t3lib_div::sysLog('loadXML Scheduler Task: could not load/parse XML from ' . $xmlPath, tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_WARNING);
 			}
 		} // end foreach
 
 		foreach ($hitCounts as $hitCountType => $array) {
-			t3lib_div::devLog('loadXML Scheduler Task: Loaded ' . count($array) . ' ' . $hitCountType . ' hit count entries.', tx_nkwgok_utility::extKey, 1);
+			t3lib_div::sysLog('loadXML Scheduler Task: Loaded ' . count($array) . ' ' . $hitCountType . ' hit count entries.', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_INFO);
 		}
 
 		return $hitCounts;
@@ -640,7 +640,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		}
 
 		if ($recordType === tx_nkwgok_utility::recordTypeUnknown) {
-			t3lib_div::devLog('loadXML Scheduler Task: Record of unknown type.', tx_nkwgok_utility::extKey, 1, Array($record->saveXML()));
+			t3lib_div::sysLog('loadXML Scheduler Task: Record of unknown type.', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_WARNING);
 		}
 
 		return $recordType;

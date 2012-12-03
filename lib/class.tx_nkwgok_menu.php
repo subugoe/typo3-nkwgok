@@ -62,7 +62,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 
 		$startNodes = explode(',', $this->arguments['gok']);
 		if (count($startNodes) > 1) {
-			t3lib_div::devLog('several start nodes given (' . $this->arguments['gok'] . ') but only the first is used in menu mode' , tx_nkwgok_utility::extKey, 2);
+			t3lib_div::sysLog('several start nodes given (' . $this->arguments['gok'] . ') but only the first is used in menu mode' , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_WARNING);
 		}
 		$startNodeGOK = trim($startNodes[0]);
 		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK, tx_nkwgok_utility::dataTable) . ' AND statusID = 0';

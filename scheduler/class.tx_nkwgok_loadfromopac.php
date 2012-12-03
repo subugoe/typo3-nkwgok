@@ -97,18 +97,18 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 					$firstRecord += NKWGOKImportChunkSize;
 				}
 				else {
-					t3lib_div::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , tx_nkwgok_utility::extKey, 3);
+					t3lib_div::sysLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_FATAL);
 					$success = False;
 				}
 			}
 			else {
-				t3lib_div::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, tx_nkwgok_utility::extKey, 3);
+				t3lib_div::sysLog('loadFromOpac Scheduler Task: failed to load ' . $URL, tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_FATAL);
 				$success = False;
 			}
 		}
 
 		if ($success) {
-			t3lib_div::devLog('loadFromOpac Scheduler Task: LKL download succeeded', tx_nkwgok_utility::extKey, 1);
+			t3lib_div::sysLog('loadFromOpac Scheduler Task: subject authority download succeeded', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_INFO);
 		}
 
 		return $success;
@@ -150,7 +150,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 					fclose($targetFile);
 				}
 				else {
-					t3lib_div::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , tx_nkwgok_utility::extKey, 3);
+					t3lib_div::sysLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_FATAL);
 					$success = False;
 				}
 
@@ -158,13 +158,13 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 				$scanNext = $termAttribute[0];
 			}
 			else {
-				t3lib_div::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, tx_nkwgok_utility::extKey, 3);
+				t3lib_div::sysLog('loadFromOpac Scheduler Task: failed to load ' . $URL, tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_FATAL);
 				$success = False;
 			}
 		}
 
 		if ($success) {
-			t3lib_div::devLog('loadFromOpac Scheduler Task: hitcount download for index ' . $indexName . ' succeeded', tx_nkwgok_utility::extKey, 1);
+			t3lib_div::sysLog('loadFromOpac Scheduler Task: hitcount download for index ' . $indexName . ' succeeded', tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_INFO);
 		}
 
 		return $success;
