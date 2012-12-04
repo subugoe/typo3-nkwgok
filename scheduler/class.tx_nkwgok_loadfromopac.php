@@ -30,7 +30,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 		set_time_limit(1200);
 
 		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][tx_nkwgok_utility::extKey]);
-		$opacBaseURL = $conf['opacBaseURL'] . 'XML=1/';
+		$opacBaseURL = $conf['opacBaseURL'] . 'XML=1/XMLSAVE=N/';
 		$baseDir = PATH_site . 'fileadmin/gok/';
 
 		t3lib_div::mkdir_deep(PATH_site, 'fileadmin/gok/xml');
