@@ -37,7 +37,7 @@ $TCA['tx_nkwgok_data'] = array(
 		'cruser_id' => 'cruser_id',
 		'default_sortby' => 'ORDER BY crdate',
 		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'tca.php',
-		'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'icon_tx_nkwgok_data.gif',
+		'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'ext_icon.gif',
 		'searchFields' => 'descr, descr_en, gok'
 	),
 );
