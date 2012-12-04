@@ -6,39 +6,39 @@
 	</meta>
 	<data type="array">
 		<languageKey index="en" type="array">
-			<label index="tx_nkwgok_data">GOK</label>
-			<label index="tx_nkwgok_data.gok">GOK</label>
-			<label index="tx_nkwgok_data.search">Search Term (URL escaped)</label>
-			<label index="tx_nkwgok_data.ppn">PPN</label>
-			<label index="tx_nkwgok_data.descr">Title (German)</label>
-			<label index="tx_nkwgok_data.descr_en">Title (English)</label>
-			<label index="tx_nkwgok_data.hitcount">Number of hits in Opac</label>
+			<label index="tx_nkwgok_data">Subject</label>
+			<label index="tx_nkwgok_data.gok">Notation</label>
+			<label index="tx_nkwgok_data.ppn">ID (PPN)</label>
+			<label index="tx_nkwgok_data.search">Search Query (CCL)</label>
+			<label index="tx_nkwgok_data.descr">Subject Name(German)</label>
+			<label index="tx_nkwgok_data.descr_en">Subject Name (English)</label>
+			<label index="tx_nkwgok_data.tags">Tags (comma separated)</label>
+			<label index="tx_nkwgok_data.parent">ID of parent element</label>
+			<label index="tx_nkwgok_data.hierarchy">Subject hierarchy level</label>
+			<label index="tx_nkwgok_data.childcount">Number of child elements</label>
+			<label index="tx_nkwgok_data.hitcount">Number of hits for this Notation in Opac</label>
 			<label index="tx_nkwgok_data.totalhitcount">Number of hits in Opac, including child-topics</label>
-			<label index="tx_nkwgok_data.parent">PPN of parent element</label>
-			<label index="tx_nkwgok_data.hierarchy">GOK hierarchy Level</label>
-			<label index="tx_nkwgok_data.tags">Tags</label>
 			<label index="tx_nkwgok_data.type">Record Type</label>
-			<label index="tt_content.list_type_pi1">GOK</label>
-			<label index="flexform.gok">GOK</label>
-			<label index="flexform.url">URL</label>
+
+			<label index="tt_content.list_type_pi1">Subject</label>
 		</languageKey>
 		
 		<languageKey index="de" type="array">
 			<label index="tx_nkwgok_data">GOK</label>
-			<label index="tx_nkwgok_data.search">Suchabfrage (URL escaped)</label>
-			<label index="tx_nkwgok_data.gok">GOK</label>
-			<label index="tx_nkwgok_data.ppn">PPN</label>
-			<label index="tx_nkwgok_data.descr">Titel (Deutsch)</label>
-			<label index="tx_nkwgok_data.descr_en">Titel (Englisch)</label>
-			<label index="tx_nkwgok_data.hitcount">Anzahl der Treffer zum Thema im Opac</label>
-			<label index="tx_nkwgok_data.totalhitcount">Anzahl der Treffer zum Thema im Opac, einschließlich aller untergeordneten Themen</label>
-			<label index="tx_nkwgok_data.parent">PPN des Elternelements</label>
-			<label index="tx_nkwgok_data.hierarchy">Stufe in der GOK Hierarchie</label>
-			<label index="tx_nkwgok_data.tags">Tags</label>
-			<label index="tx_nkwgok_data.fromopac">Art des Datensatzes</label>
-			<label index="tt_content.list_type_pi1">GOK</label>
-			<label index="flexform.gok">GOK</label>
-			<label index="flexform.url">URL</label>
+			<label index="tx_nkwgok_data.gok">Notation</label>
+			<label index="tx_nkwgok_data.search">Suchabfrage (CCL)</label>
+			<label index="tx_nkwgok_data.ppn">ID (PPN)</label>
+			<label index="tx_nkwgok_data.descr">Name (Deutsch)</label>
+			<label index="tx_nkwgok_data.descr_en">Name (Englisch)</label>
+			<label index="tx_nkwgok_data.tags">Tags (kommagetrennt)</label>
+			<label index="tx_nkwgok_data.parent">ID des Elternelements</label>
+			<label index="tx_nkwgok_data.hierarchy">Ebene in der Fachierarchie</label>
+			<label index="tx_nkwgok_data.childcount">Anzahl der Kindelemente</label>
+			<label index="tx_nkwgok_data.hitcount">Anzahl der Treffer mit dieser Notation im Opac</label>
+			<label index="tx_nkwgok_data.totalhitcount">Anzahl der Treffer zu dieser Notation im Opac, einschließlich aller untergeordneten Notationen</label>
+			<label index="tx_nkwgok_data.type">Art des Datensatzes</label>
+
+			<label index="tt_content.list_type_pi1">Fachgebiet</label>
 		</languageKey>
 	</data>
 </T3locallang>

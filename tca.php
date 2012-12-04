@@ -31,6 +31,15 @@ $TCA['tx_nkwgok_data'] = array(
 	),
 	'feInterface' => $TCA['tx_nkwgok_data']['feInterface'],
 	'columns' => array(
+		'ppn' => array(
+			'exclude' => 0,
+			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.ppn',
+			'config' => array(
+				'type' => 'input',
+				'size' => '30',
+				'eval' => 'trim',
+			)
+		),
 		'gok' => array(
 			'exclude' => 0, 
 			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.gok', 
@@ -46,15 +55,6 @@ $TCA['tx_nkwgok_data'] = array(
 			'config' => array(
 				'type' => 'input',
 				'size' => '30',
-				'eval' => 'trim',
-			)
-		),
-		'ppn' => array(
-			'exclude' => 0, 
-			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.ppn', 
-			'config' => array( 
-				'type' => 'input', 
-				'size' => '30', 
 				'eval' => 'trim',
 			)
 		),
@@ -90,12 +90,12 @@ $TCA['tx_nkwgok_data'] = array(
 			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.hierarchy', 
 			'config' => array(
 				'type'     => 'input', 
-				'size'     => '4', 
+				'size'     => '10',
 				'max'      => '4', 
 				'eval'     => 'int', 
 				'checkbox' => '0', 
 				'range'    => array(
-					'upper' => '20',
+					'upper' => '31',
 					'lower' => '0'
 				), 
 				'default' => 0
@@ -106,7 +106,7 @@ $TCA['tx_nkwgok_data'] = array(
 			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.childcount',
 			'config' => array(
 				'type'     => 'input',
-				'size'     => '4',
+				'size'     => '10',
 				'max'      => '4',
 				'eval'     => 'int',
 				'checkbox' => '0',
@@ -162,14 +162,14 @@ $TCA['tx_nkwgok_data'] = array(
 			'exclude' => 0,
 			'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.type',
 			'config' => array(
-				'type' => 'text',
-				'cols' => '30',
-				'rows' => '1'
+				'type' => 'input',
+				'size' => '30',
+				'eval' => 'trim',
 			)
 		),
 	),
 	'types' => array(
-		'0' => array('showitem' => 'gok;;;;1-1-1, search, ppn, descr, descr_en, parent, hierarchy, hitcount, tags, type')
+		'0' => array('showitem' => 'ppn, gok, search, descr, descr_en, parent, hierarchy, childcount, hitcount, totalhitcount, tags, type')
 	),
 	'palettes' => array(
 		'1' => array('showitem' => '')
