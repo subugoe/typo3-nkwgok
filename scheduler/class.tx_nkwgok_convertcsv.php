@@ -148,7 +148,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * 2:	parent PPN -> 045C $9
 	 * 3:	GOK name (German) -> 045A $j
 	 * 4:	search query -> str $a
-	 * 5:	GOK name (English) -> 044F $a [optional]
+	 * 5:	GOK name (English) -> 044F $a with $S d [optional]
 	 * 6:	Tags (comma-separated list of strings) -> tags $a [optional]
 	 *
 	 * @param string $CSVPath path to CSV file whose name should end in .csv and contain no other dots
@@ -198,12 +198,12 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 					// 003@ is the Pica record ID, PPN.
 					$this->appendFieldForDataTo('003@', '0', $PPN, $record, $doc);
 					// 045A contains the subject notation in $a and subject name in $j.
-					$d045 = $this->appendFieldForDataTo('045A', 'a', $PPN, $record, $doc);
+					$d045A = $this->appendFieldForDataTo('045A', 'a', $PPN, $record, $doc);
 					if (trim($fields[2]) !== NULL) {
-						$subfield = $doc->createElement('subfield');
-						$subfield->setAttribute('code', 'j');
-						$d045->appendChild($subfield);
-						$subfield->appendChild($doc->createTextNode(trim($fields[2])));
+						$subfieldJ = $doc->createElement('subfield');
+						$subfieldJ->setAttribute('code', 'j');
+						$subfieldJ->appendChild($doc->createTextNode(trim($fields[2])));
+						$d045A->appendChild($subfieldJ);
 					}
 					// 045C $9 is the parent record’s PPN.
 					$parentPPN = trim($fields[1]);
@@ -214,8 +214,12 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 						$this->appendFieldForDataTo('str', 'a', trim($fields[3]), $record, $doc);
 
 						if (count($fields) > 4) {
-							// 044F $a contains the subject name’s English translation.
-							$this->appendFieldForDataTo('044F', 'a', trim($fields[4]), $record, $doc);
+							// 044F $a contains the subject name’s English translation and a subfield $S d.
+							$d044F = $this->appendFieldForDataTo('044F', 'a', trim($fields[4]), $record, $doc);
+							$subfieldS = $doc->createElement('subfield');
+							$subfieldS->setAttribute('code', 'S');
+							$subfieldS->appendChild($doc->createTextNode('d'));
+							$d044F->appendChild($subfieldS);
 
 							if (count($fields > 5)) {
 								// Use made-up field tags $a for tags string.
