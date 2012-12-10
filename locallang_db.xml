@@ -20,7 +20,7 @@
 			<label index="tx_nkwgok_data.totalhitcount">Number of hits in Opac, including child-topics</label>
 			<label index="tx_nkwgok_data.type">Record Type</label>
 
-			<label index="tt_content.list_type_pi1">Subject</label>
+			<label index="tt_content.list_type_pi1">Subject Hierarchy</label>
 		</languageKey>
 		
 		<languageKey index="de" type="array">
@@ -38,7 +38,7 @@
 			<label index="tx_nkwgok_data.totalhitcount">Anzahl der Treffer zu dieser Notation im Opac, einschließlich aller untergeordneten Notationen</label>
 			<label index="tx_nkwgok_data.type">Art des Datensatzes</label>
 
-			<label index="tt_content.list_type_pi1">Fachgebiet</label>
+			<label index="tt_content.list_type_pi1">Fachgebiete</label>
 		</languageKey>
 	</data>
 </T3locallang>
