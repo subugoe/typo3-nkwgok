@@ -108,7 +108,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 		}
 
 		if ($success) {
-			t3lib_div::devLog('loadFromOpac Scheduler Task: LKL download succeeded', tx_nkwgok_utility::extKey, 1);
+			t3lib_div::devLog('loadFromOpac Scheduler Task: LKL download for ' . $fileBaseName - ' succeeded', tx_nkwgok_utility::extKey, 1);
 		}
 
 		return $success;

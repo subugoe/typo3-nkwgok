@@ -1,12 +1,15 @@
-2012-11-? 3.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+2012-12-? 3.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Add support for BRK authority records (Pica type »Tov«)
 		* download the records and their corresponding hit counts
 	* change naming scheme for downloaded XML files
 	* default to tree style if no style is set in the FlexForm
 	* refactoring to reduce memory footprint in database import scheduler task
-	* introduce constant for repeatedly used strings
+	* introduce constants for repeatedly used strings
 	* table change to store the record type instead of the »fromOpac« flag
 	* support hit counts for MSC matches from CSV files
+	* take into account the $4 subfield when determining a record’s parent
+	* avoid a few warning log messages coming from array functions
+	* improve strings used in the backend interface
 
 2012-09-19 2.2.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Generalise hitcount analysis to enable recursive hitcounts for MSC and other classification systems

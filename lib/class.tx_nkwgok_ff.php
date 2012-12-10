@@ -23,7 +23,7 @@
 ***************************************************************/
 
 
-require_once t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok_utility.php';
+require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok_utility.php');
 
 /**
  * Description 
