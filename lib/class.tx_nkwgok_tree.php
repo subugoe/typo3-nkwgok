@@ -67,7 +67,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$useShallowLinks = ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowSearch'] == 1);
 		if ($this->arguments['omitXXX']) {
 			$useShallowLinks = TRUE;
-			t3lib_div::sysLog('Configured to use deep links together with omitXXX. This will not work as the totalhitcount is incorrect when we arbitrarily leave out child elements. Using shallow links instead.' , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_WARNING);
+			t3lib_div::devLog('Configured to use deep links together with omitXXX. This will not work as the totalhitcount is incorrect when we arbitrarily leave out child elements. Using shallow links instead.' , tx_nkwgok_utility::extKey, 2);
 		}
 		if ($useShallowLinks)  {
 			$containerClasses[] = 'shallowLinks';

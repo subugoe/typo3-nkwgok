@@ -26,13 +26,13 @@ class tx_nkwgok_checkNewCSV extends tx_scheduler_Task {
 			$convertCSVTask = t3lib_div::makeInstance('tx_nkwgok_convertCSV');
 			$success = $convertCSVTask->execute($this->nkwgokStartPageId);
 			if (!$success) {
-				t3lib_div::sysLog('checkNewCSV Scheduler Task: Problem during conversion of CSV files. Stopping.' , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_FATAL);
+				t3lib_div::devLog('checkNewCSV Scheduler Task: Problem during conversion of CSV files. Stopping.' , tx_nkwgok_utility::extKey, 3);
 			}
 			else {
 				$loadxmlTask = t3lib_div::makeInstance('tx_nkwgok_loadxml');
 				$success = $loadxmlTask->execute();
 				if (!$success) {
-					t3lib_div::sysLog('checkNewCSV Scheduler Task: could not import XML to TYPO3 database.' , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_FATAL);
+					t3lib_div::devLog('checkNewCSV Scheduler Task: could not import XML to TYPO3 database.' , tx_nkwgok_utility::extKey, 3);
 				}
 			}
 		}
@@ -54,12 +54,12 @@ class tx_nkwgok_checkNewCSV extends tx_scheduler_Task {
 			$CSVPathInfo = pathinfo($CSVPath);
 			$XMLPath = PATH_site . 'fileadmin/gok/xml/' . $CSVPathInfo['filename'] . '-0.xml';
 			if (!file_exists($XMLPath)) {
-				t3lib_div::sysLog('Need to convert CSV files because ' . $XMLPath . ' is missing.' , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_INFO);
+				t3lib_div::devLog('Need to convert CSV files because ' . $XMLPath . ' is missing.' , tx_nkwgok_utility::extKey, 1);
 				$needsUpdate = True;
 				break;
 			}
 			else if (filemtime($XMLPath) < filemtime($CSVPath)) {
-				t3lib_div::sysLog('Need to convert CSV files because ' . $CSVPath . ' is newer than the corresponding XML file.' , tx_nkwgok_utility::extKey, t3lib_div::SYSLOG_SEVERITY_INFO);
+				t3lib_div::devLog('Need to convert CSV files because ' . $CSVPath . ' is newer than the corresponding XML file.' , tx_nkwgok_utility::extKey, 1);
 				$needsUpdate = True;
 				break;
 			}
