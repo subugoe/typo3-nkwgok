@@ -145,7 +145,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 *
 	 * Columns in the file are:
 	 * 1:	PPN -> 003@ $0
-	 * 2:	parent PPN -> 045C $9
+	 * 2:	parent PPN -> 045C $9 with $4 nueb
 	 * 3:	GOK name (German) -> 045A $j
 	 * 4:	search query -> str $a
 	 * 5:	GOK name (English) -> 044F $a with $S d [optional]
@@ -205,9 +205,14 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 						$subfieldJ->appendChild($doc->createTextNode(trim($fields[2])));
 						$d045A->appendChild($subfieldJ);
 					}
-					// 045C $9 is the parent record’s PPN.
+					// 045C $9 is the parent record’s PPN, $4 nueb indicates it is a parent record.
 					$parentPPN = trim($fields[1]);
-					$this->appendFieldForDataTo('045C', '9', $parentPPN, $record, $doc);
+					$d045C = $this->appendFieldForDataTo('045C', '9', $parentPPN, $record, $doc);
+					$subfield4 = $doc->createElement('subfield');
+					$subfield4->setAttribute('code', '4');
+					$subfield4->appendChild($doc->createTextNode('nueb'));
+					$d045C->appendChild($subfield4);
+
 					if (count($fields) > 3) {
 						// Search query
 						// Write custom search query in the made-up field str $a.
