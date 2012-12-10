@@ -393,7 +393,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				$recordType = $this->typeOfRecord($record);
 				$tree[$PPN]['type'] = $recordType;
 
-				$myParentPPNs = $record->xpath('datafield[@tag="045C"]/subfield[@code="9"]');
+				$myParentPPNs = $record->xpath('datafield[@tag="045C" and subfield[@code="4"] = "nueb"]/subfield[@code="9"]');
 				if ($myParentPPNs && count($myParentPPNs) > 0) {
 					// Child record: store its PPN in the list of its parent’s children…
 					$parentPPN = (string)($myParentPPNs[0]);
