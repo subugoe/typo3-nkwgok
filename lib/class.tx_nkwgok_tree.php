@@ -353,6 +353,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				$queryComponents['no_cache'] = 1;
 
 				if ((array_key_exists('expand', $this->arguments)
+							&& is_array($this->arguments['expand'])
 							&& in_array($PPN, $this->arguments['expand']))
 						|| $GOK['childcount'] <= $autoExpandLevel) {
 					$itemClass = 'close';
