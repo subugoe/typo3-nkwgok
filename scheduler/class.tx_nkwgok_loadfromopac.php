@@ -92,6 +92,10 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 				$targetFilePath = $folderPath . $fileBaseName . '-' . $firstRecord . '.xml';
 				$targetFile = fopen($targetFilePath, 'w');
 				if ($targetFile) {
+					// As of 2012-11 the Pica OPAC XML output erroneously double escapes
+					// &, <, > and ", giving &amp;#38; instead of &#38; etc. Undo that.
+					$opacDownload = str_replace('&amp;#', '&#', $opacDownload);
+
 					fwrite($targetFile, $opacDownload);
 					fclose($targetFile);
 					$firstRecord += NKWGOKImportChunkSize;
