@@ -190,11 +190,11 @@ abstract class tx_nkwgok {
 
 
 	/**
-	 * Return GOK name for display.
+	 * Return subject name for display.
 	 *
 	 * Use English if the language code is 'en' and German otherwise.
 	 *
-	 * Some GOK names end with a super-subject indicator enclosed in { }.
+	 * Some subject names end with a super-subject indicator enclosed in { }.
 	 * This is helpful when viewing the subject name on its own but is redundant
 	 * when viewed inside the subject hierarchy. The parameter $simplify = True
 	 * removes that indicator.
@@ -227,11 +227,12 @@ abstract class tx_nkwgok {
 
 
 	/**
-	 * Returns GOK records for the children of a given PPN, ordered by GOK.
+	 * Returns subject records for the children of a given identifier (PPN)
+	 * ordered by their notation.
 	 *
 	 * @param string $parentPPN
 	 * @param Boolean $includeParent if True, the parent item is included
-	 * @return Array of GOK records of the $parentPPN’s children
+	 * @return Array of subject records of the $parentPPN’s children
 	 */
 	protected function getChildren($parentPPN, $includeParent = False) {
 		$parentEscaped = $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, tx_nkwgok_utility::dataTable);

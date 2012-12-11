@@ -140,7 +140,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 									 && $GOK['045A']['a']) {
 
 								if ($GOK['type'] === tx_nkwgok_utility::recordTypeGOK || $GOK['type'] === tx_nkwgok_utility::recordTypeBRK) {
-									// GOK or BRK Opac search, using the corresponding index.
+									// GOK or BRK OPAC search, using the corresponding index.
 									$indexName = $this->typeToIndexName($GOK['type']);
 								}
 								else {
@@ -251,7 +251,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 						$rows[] = Array($PPN, $hierarchy, $GOKString, $parentID, $descr, $search, $descr_en, $tags, $childCount, $GOK['type'], $hitCount, $totalHitCount, time(), time(), 1);
 					}
-				} // end of loop over GOKs
+				} // end of loop over subjects
 				$keyNames = Array('ppn', 'hierarchy', 'gok', 'parent', 'descr', 'search', 'descr_en', 'tags', 'childcount', 'type', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
 				$result = $GLOBALS['TYPO3_DB']->exec_INSERTmultipleRows(tx_nkwgok_utility::dataTable, $keyNames, $rows);
 
@@ -467,7 +467,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 	/**
 	 * Load hitcounts from fileadmin/gok/hitcounts/*.xml.
-	 * These files are downloaded from the Opac by the loadFromOpac Scheduler task.
+	 * These files are downloaded from the OPAC by the loadFromOpac Scheduler task.
 	 *
 	 * @author Sven-S. Porst
 	 *

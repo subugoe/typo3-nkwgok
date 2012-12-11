@@ -53,17 +53,17 @@ class tx_nkwgok_ff {
 
 
 	/**
-	 * Queries the database for all records having the $parentGOK parameter as their parent element
-	 *  and returns the query result.
+	 * Queries the database for all records having the $parentID parameter as
+	 * their parent element and returns the query result.
 	 *
-	 * @param string $parentGOK
+	 * @param string $parentID
 	 * @return array
 	 */
-	private function queryForChildrenOf ($parentGOK) {
+	private function queryForChildrenOf ($parentID) {
 		$queryResults = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 			'*',
 			tx_nkwgok_utility::dataTable,
-			"parent = '" . $parentGOK . "'",
+			"parent = '" . $parentID . "'",
 			'',
 			'gok ASC',
 			'');

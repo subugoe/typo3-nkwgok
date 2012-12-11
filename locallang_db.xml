@@ -16,15 +16,15 @@
 			<label index="tx_nkwgok_data.parent">ID of parent element</label>
 			<label index="tx_nkwgok_data.hierarchy">Subject hierarchy level</label>
 			<label index="tx_nkwgok_data.childcount">Number of child elements</label>
-			<label index="tx_nkwgok_data.hitcount">Number of hits for this Notation in Opac</label>
-			<label index="tx_nkwgok_data.totalhitcount">Number of hits in Opac, including child-topics</label>
+			<label index="tx_nkwgok_data.hitcount">Number of hits for this Notation in OPAC</label>
+			<label index="tx_nkwgok_data.totalhitcount">Number of hits in OPAC, including child-topics</label>
 			<label index="tx_nkwgok_data.type">Record Type</label>
 
 			<label index="tt_content.list_type_pi1">Subject Hierarchy</label>
 		</languageKey>
 		
 		<languageKey index="de" type="array">
-			<label index="tx_nkwgok_data">GOK</label>
+			<label index="tx_nkwgok_data">Fach</label>
 			<label index="tx_nkwgok_data.gok">Notation</label>
 			<label index="tx_nkwgok_data.search">Suchabfrage (CCL)</label>
 			<label index="tx_nkwgok_data.ppn">ID (PPN)</label>
@@ -34,8 +34,8 @@
 			<label index="tx_nkwgok_data.parent">ID des Elternelements</label>
 			<label index="tx_nkwgok_data.hierarchy">Ebene in der Fachierarchie</label>
 			<label index="tx_nkwgok_data.childcount">Anzahl der Kindelemente</label>
-			<label index="tx_nkwgok_data.hitcount">Anzahl der Treffer mit dieser Notation im Opac</label>
-			<label index="tx_nkwgok_data.totalhitcount">Anzahl der Treffer zu dieser Notation im Opac, einschließlich aller untergeordneten Notationen</label>
+			<label index="tx_nkwgok_data.hitcount">Anzahl der Treffer mit dieser Notation im OPAC</label>
+			<label index="tx_nkwgok_data.totalhitcount">Anzahl der Treffer zu dieser Notation im OPAC, einschließlich aller untergeordneten Notationen</label>
 			<label index="tx_nkwgok_data.type">Art des Datensatzes</label>
 
 			<label index="tt_content.list_type_pi1">Fachgebiete</label>

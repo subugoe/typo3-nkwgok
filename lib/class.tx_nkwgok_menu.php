@@ -36,7 +36,7 @@
 class tx_nkwgok_menu extends tx_nkwgok {
 
 	/**
-	 * Returns markup for GOK menus based on the configuration in $this->arguments.
+	 * Returns markup for subject menus based on the configuration in $this->arguments.
 	 *
 	 * @return DOMElement containing the markup for a menu
 	 */
@@ -91,7 +91,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 
 
 	/**
-	 * Returns markup for GOK menus based on the configuration in $this->arguments.
+	 * Returns markup for subject menus based on the configuration in $this->arguments.
 	 * 
 	 * @return DOMDocument
 	 */
@@ -108,7 +108,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 
 
 	/**
-	 * Helper function to insert JavaScript for the GOK Menu into the passed
+	 * Helper function to insert JavaScript for the subject menu into the passed
 	 * $container element.
 	 *
 	 * @param DOMElement $container the <script> tag is inserted into
@@ -232,8 +232,8 @@ class tx_nkwgok_menu extends tx_nkwgok {
 					/* Add general menu item(s).
 					 * A menu item searching for all subjects beneath the selected one in the
 					 * hierarchy and one searching for records matching exactly the subject selected.
-					 * The latter case is only expected to happen for subjects coming from Opac GOK
-					 * records.
+					 * The latter case is only expected to happen for subjects coming from OPAC
+					 * subject authority records.
 					 */
 					$option = $this->doc->createElement('option');
 					$select->appendChild($option);

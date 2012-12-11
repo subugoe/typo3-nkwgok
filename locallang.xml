@@ -6,8 +6,8 @@
 	</meta>
 	<data type="array">
 		<languageKey index="en" type="array">
-			<label index="scheduler.loadFromOpac.name">1: Load subject authority data from Opac</label>
-			<label index="scheduler.loadFromOpac.description">Loads Pica-XML subject authority records from Opac to fileadmin/gok/xml/ and result counts to fileadmin/gok/hitcounts/.</label>
+			<label index="scheduler.loadFromOpac.name">1: Load subject authority data from OPAC</label>
+			<label index="scheduler.loadFromOpac.description">Loads Pica-XML subject authority records from OPAC to fileadmin/gok/xml/ and result counts to fileadmin/gok/hitcounts/.</label>
 
 			<label index="scheduler.convertCSV.name">2: Convert CSV-files to XML</label>
 			<label index="scheduler.convertCSV.description">Converts CSV files in fileadmin/gok/csv/ with subject tree information to Pica-XML which can be imported to the database.</label>
@@ -22,14 +22,14 @@
 			<label index="scheduler.updateCSV.description">Converts CSV files in fileadmin/gok/csv/ with subject tree information to Pica-XML and re-imports all XML files in fileadmin/gok/xml/ to the TYPO3 database.</label>
 
 			<label index="scheduler.importAll.name">1+2+3: Download, convert and import subject information</label>
-			<label index="scheduler.importAll.description">Downloads Pica-XML subject authority records from Opac, converts CSV files in fileadmin/gok/csv/ with subject tree information information to Pica-XML and then imports all of them into the TYPO3 database.</label>
+			<label index="scheduler.importAll.description">Downloads Pica-XML subject authority records from OPAC, converts CSV files in fileadmin/gok/csv/ with subject tree information information to Pica-XML and then imports all of them into the TYPO3 database.</label>
 
 			<label index="scheduler.convertCSV.startPageId">Page ID where your root TypoScript is inserted (usually 1)</label>
 		</languageKey>
 		
 		<languageKey index="de" type="array">
-			<label index="scheduler.loadFromOpac.name">1: Normdatensätze für Themengebiete aus Opac laden</label>
-			<label index="scheduler.loadFromOpac.description">Lädt Pica-XML Normdatensätze aus dem Opac nach fileadmin/gok/xml/ und die Trefferzahlen nach fileadmin/gok/hitcounts/.</label>
+			<label index="scheduler.loadFromOpac.name">1: Normdatensätze für Themengebiete aus OPAC laden</label>
+			<label index="scheduler.loadFromOpac.description">Lädt Pica-XML Normdatensätze aus dem OPAC nach fileadmin/gok/xml/ und die Trefferzahlen nach fileadmin/gok/hitcounts/.</label>
 			
 			<label index="scheduler.convertCSV.name">2: CSV Dateien zu XML konvertieren</label>
 			<label index="scheduler.convertCSV.description">Konvertiert CSV Dateien mit Fachhierarchieinformationen in fileadmin/gok/csv/ zu Pica-XML Dateien in fileadmin/gok/xml, die in die Datenbank importiert werden können.</label>

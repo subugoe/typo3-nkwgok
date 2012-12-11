@@ -1,6 +1,6 @@
 <?php
 /**
- * TYPO3 Scheduler task to download the Opac data we need and store them in
+ * TYPO3 Scheduler task to download the OPAC data we need and store them in
  * fileadmin/gok/...
  *
  * Unifies the features provided by class.tx_nkwgok_loadxml.php and
@@ -71,7 +71,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 
 
 	/**
-	 * Downloads batches of local authority records from Opac as
+	 * Downloads batches of local authority records from OPAC as
 	 * Pica XML records and writes them into our fileadmin folder.
 	 *
 	 * @param string $opacBaseURL

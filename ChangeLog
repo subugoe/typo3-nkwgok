@@ -5,7 +5,7 @@
 	* default to tree style if no style is set in the FlexForm
 	* refactoring to reduce memory footprint in database import scheduler task
 	* introduce constants for repeatedly used strings
-	* table change to store the record type instead of the »fromOpac« flag
+	* table change to store the record type instead of the »fromopac« flag
 	* support hit counts for MSC matches from CSV files
 	* take into account the $4 subfield when determining a record’s parent
 	* avoid a few warning log messages coming from array functions
@@ -41,17 +41,17 @@
 	* Split XML files generated from CSV files into chunks of 500 records (to
 		avoid hitting the 128MB RAM limit for PHP)
 	* CHANGE CSV DATA FORMAT: remove columns 2 and 3
-	* Fix links to Opac (enclose search terms in quotation marks)
+	* Fix links to OPAC (enclose search terms in quotation marks)
 
 2012-01-23 1.4.0 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
 	* add nofollow attribute to tree expansion/collapsing links to reduce overzealous spidering
 
 2011-12-13 1.3.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
-	* improve usage of deep Opac links (introduce a 'General' element for the records associated to parent nodes)
+	* improve usage of deep OPAC links (introduce a 'General' element for the records associated to parent nodes)
 	* fix bug with importing introduced in 1.2.1
 
 2011-11-25 1.2.1 Sven-S. Porst <porst@sub.uni-goettingen.de>
-	* switch default Opac URL to https
+	* switch default OPAC URL to https
 	* only retrieve records with statusID = 0 in database queries to avoid duplicates
 	* use quotation marks in term used for index scans
 	* deal with differing data structure returned by TYPO3 4.6’s t3lib_div::readLLXMLfile()
@@ -64,7 +64,7 @@
 	* add searchFields to ext_tables.php
 
 2011-11-11 1.1.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
-	* adapt hitcount usage to current Opac indexing
+	* adapt hitcount usage to current OPAC indexing
 	* remove support for old-school subject tree style
 	* more generic tree item creation, allowing links for the root node
 	* improve default look of multiline items and GOK ID display
@@ -73,7 +73,7 @@
 	* final tweaks, we’ll start using this
 
 2011-08-23 0.9.13 Sven-S. Porst <porst@sub.uni-goettingen.de>
-	* compute total hit counts for Opac LKLs
+	* compute total hit counts for OPAC LKLs
 	* add total hitcounts to database
 	* add link to full subject hierarchy to tree output
 	* add plugin.tx_nkwgok_pi1.shallowSearch setting to toggle between deep and shallow searches
@@ -92,15 +92,15 @@
 
 2011-05-19 0.9.8 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* add field fromopac to database to reliably spot records originating
-		from the Opac
-	* use lowercase 'lkl' search key instead of 'LKL' for Opac GOK records
+		from the OPAC
+	* use lowercase 'lkl' search key instead of 'LKL' for OPAC GOK records
 
 2011-05-15 0.9.7 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
 	* Added TCA definition for the new Tag field
 
 2011-05-05 0.9.6 Sven-S. Porst <porst@sub.uni-goettigen.de>
 	* Change the query format in the search column of the data table from
-		URL-escaped Pica Opac queries to non-escaped CCL-queries
+		URL-escaped Pica OPAC queries to non-escaped CCL-queries
 
 2011-05-02 0.9.5 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* rename 'Convert history' scheduler task to 'Convert CSV'
@@ -115,7 +115,7 @@
 		GOK-displays on the same web page
 
 2011-03-24 0.9 Sven-S. Porst <porst@sub.uni-goettingen.de>
-	* Add loading of Opac data as a scheduler job
+	* Add loading of OPAC data as a scheduler job
 	* Add conversion of History CSV data as a scheduler job
 	* Add a scheduler job to perform all data fetching/conversion/import in one go
 	* improve documentation
@@ -130,7 +130,7 @@
 
 2011-02-28 - 0.7 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* provide a display style using menus
-	* download hit counts from Opac
+	* download hit counts from OPAC
 	* display hit counts in tree style
 
 2011-02-23 Sven-S. Porst <porst@sub.uni-goettingen.de>
@@ -138,8 +138,8 @@
 
 2011-02-23 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* major code cleanup
-	* single code path for Ajax and non Ajax case
-	* correct order of display in non Ajax case
+	* single code path for AJAX and non AJAX case
+	* correct order of display in non AJAX case
 
 2011-02-11 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
 	* Removed Ajax spinner Icon and loading-message

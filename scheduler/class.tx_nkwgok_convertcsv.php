@@ -138,7 +138,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 
 	/**
-	 * Loads CSV file at the given path and processes it to Opac XML format
+	 * Loads CSV file at the given path and processes it to OPAC XML format
 	 * with Pica Tev fields for the corresponding Normdatensatz.
 	 *
 	 * The file’s text encoding is expected to be UTF-8 or ISO/Windows Latin-1.
@@ -146,9 +146,9 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * Columns in the file are:
 	 * 1:	PPN -> 003@ $0
 	 * 2:	parent PPN -> 045C $9 with $4 nueb
-	 * 3:	GOK name (German) -> 045A $j
+	 * 3:	subject name (German) -> 045A $j
 	 * 4:	search query -> str $a
-	 * 5:	GOK name (English) -> 044F $a with $S d [optional]
+	 * 5:	subject name (English) -> 044F $a with $S d [optional]
 	 * 6:	Tags (comma-separated list of strings) -> tags $a [optional]
 	 *
 	 * @param string $CSVPath path to CSV file whose name should end in .csv and contain no other dots
@@ -183,7 +183,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 			// Use data from CSV to build Pica-style data fields in XML.
 			if (count($fields) >= 3 && trim(implode('', $fields)) !== '') {
-				// GOK name is in field 5, so ignore lines with less fields
+				// subject name is in field 5, so ignore lines with fewer fields
 				// as well as those with only empty fields.
 				$PPN = trim($fields[0]);
 

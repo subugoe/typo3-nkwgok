@@ -36,17 +36,17 @@
 class tx_nkwgok_tree extends tx_nkwgok {
 
 	/**
-	 * Returns markup for GOK tree based on the configuration in $this->arguments.
+	 * Returns markup for subject tree based on the configuration in $this->arguments.
 	 *
 	 * The $this->arguments array needs to contain:
 	 * - a string element 'gok' which can either be 'all' (to display the
-	 *		complete GOK tree) or a GOK string of the node to be used as the
+	 *		complete subject tree) or the notation of the node to be used as the
 	 *		root of the tree
-	 * - a string element 'style' which may take tha values 'tree' or 'column'
+	 * - a string element 'style' which may take the values 'tree' or 'column'
 	 * - an array element 'expand' listing the IDs of subjects to be expanded
 	 *
 	 * Further array elements can be:
-	 * - 'showGOKID', determining whether the subject’s ID is displayed along
+	 * - 'showGOKID', determining whether the subject’s notation is displayed along
 	 *		with its name
 	 *
 	 * @author Sven-S. Porst
@@ -117,7 +117,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 
 	/**
-	 * Returns markup for GOK menus based on the configuration in $this->arguments.
+	 * Returns markup for subject menus based on the configuration in $this->arguments.
 	 *
 	 * @author Sven-S. Porst
 	 * @return DOMDocument
@@ -133,7 +133,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 
 	/**
-	 * Helper function to insert JavaScript for the GOK Tree into the passed
+	 * Helper function to insert JavaScript for the subject tree into the passed
 	 * $container element.
 	 *
 	 * @author Sven-S. Porst
@@ -277,7 +277,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 
 	/**
-	 * Appends a single GOK item child element of type $elementName
+	 * Appends a single subject item child element of type $elementName
 	 * to the element $container inside $this->doc and returns it.
 	 *
 	 * @author Sven-S. Porst
@@ -333,7 +333,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$openLink->appendChild($this->doc->createTextNode(' '));
 		$openLink->appendChild($GOKNameSpan);
 
-		// Add Opac links when not in column mode.
+		// Add OPAC links when not in column mode.
 		if ($this->arguments['style'] !== 'column') {
 			$this->appendOpacLinksTo($GOK, $item);
 		}
@@ -411,11 +411,11 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 
 	/**
-	 * Appends two Opac search links to $container, one for shallow search and
+	 * Appends two OPAC search links to $container, one for shallow search and
 	 * one for deep search. One of them will be hidden by CSS.
 	 *
 	 * @author Sven-S. Porst
-	 * @param Array $GOK GOK record
+	 * @param Array $GOK subject record
 	 * @param DOMElement $container the link elements are appended to
 	 */
 	private function appendOpacLinksTo ($GOK, $container) {
@@ -439,7 +439,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * The link text indicates the number of results if it is known.
 	 *
 	 * @author Sven-S. Porst
-	 * @param Array $GOKData GOK record
+	 * @param Array $GOKData subject record
 	 * @param Boolean $deepSearch
 	 * @return DOMElement
 	 */
@@ -485,14 +485,14 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 
 	/**
-	 * Returns URL string for an Opac Search.
+	 * Returns URL string for an OPAC Search.
 	 * If $deepSearch is false, the search query stored in $GOKData is used.
 	 * If $deepSearch is true, a deep hierarchical search for records related
-	 * to the GOK Normsatz PPN is used
-	 * If the record did not originate from Opac, Null is returned.
+	 * to the ID (PPN) of the subject’s authority  record is used.
+	 * If the record did not originate from OPAC, Null is returned.
 	 *
 	 * @author Sven-S. Porst
-	 * @param Array $GOKData GOK record
+	 * @param Array $GOKData subject record
 	 * @param Boolean $deepSearch
 	 * @return string|Null URL
 	 */
@@ -511,7 +511,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			$GOKSearchURL .= '/EPD?PPN=' . $GOKData['ppn'] . '&FRM=';
 		}
 		else if ($GOKData['search']) {
-			// Convert CCL string to Opac-style search string and escape.
+			// Convert CCL string to OPAC-style search string and escape.
 			$searchString = urlencode(str_replace('=', ' ', $GOKData['search']));
 			$GOKSearchURL .= '/REC=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=' . $searchString;
 		}

@@ -26,14 +26,14 @@ if (!defined ('TYPO3_MODE')) {
 }
 t3lib_extMgm::addPItoST43($_EXTKEY, 'pi1/class.tx_nkwgok_pi1.php', '_pi1', 'list_type', 1);
 
-// Scheduler task for downloading LKL data from Opac.
+// Scheduler task for downloading LKL data from OPAC.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadFromOpac'] = array(
 	'extension'        => $_EXTKEY,
 	'title'            => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadFromOpac.name',
 	'description'      => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadFromOpac.description',
 );
 
-// Scheduler task for downloading LKL data from Opac.
+// Scheduler task for downloading LKL data from OPAC.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_convertCSV'] = array(
 	'extension'        => $_EXTKEY,
 	'title'            => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.convertCSV.name',
@@ -41,7 +41,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_conve
 	'additionalFields' => 'tx_nkwgok_scheduler_convertcsvadditionalparameters'
 );
 
-// Scheduler task for importing GOK XML files into TYPO3 database.
+// Scheduler task for importing Pica authority record XML files into TYPO3 database.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadxml'] = array(
 	'extension'        => $_EXTKEY,
 	'title'            => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadxml.name',

@@ -5,7 +5,7 @@ plugin.tx_nkwgok_pi1{
 		# link2 = http://www.sub.uni-goettingen.de/download/geography.csv
 	}
 
-	# Do Opac links in the tree perform a deep or shallow search?
+	# Do OPAC links in the tree perform a deep or shallow search?
 	shallowSearch = 0
 
 	# When using menus expand the hierarchy in-place when there are <= child elements

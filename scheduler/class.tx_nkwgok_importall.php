@@ -2,7 +2,7 @@
 /**
  * TYPO3 Scheduler task to automatically run our three scheduler tasks
  * in the correct order:
- * 1. Load LKL data from Opac
+ * 1. Load LKL data from OPAC
  * 2. Convert History CSV Data to XML
  * 3. Import all the XML to the TYPO3 Database
  *
@@ -27,7 +27,7 @@ class tx_nkwgok_importAll extends tx_scheduler_Task {
 		$loadFromOpacTask = t3lib_div::makeInstance('tx_nkwgok_loadFromOpac');
 		$success = $loadFromOpacTask->execute();
 		if (!$success) {
-			t3lib_div::devLog('importALL Scheduler Task: could not load Opac data. Stopping.' , tx_nkwgok_utility::extKey, 3);
+			t3lib_div::devLog('importALL Scheduler Task: could not load OPAC data. Stopping.' , tx_nkwgok_utility::extKey, 3);
 		}
 		else {
 			$convertCSVTask = t3lib_div::makeInstance('tx_nkwgok_convertCSV');

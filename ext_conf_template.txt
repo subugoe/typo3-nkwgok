@@ -1,4 +1,4 @@
-# cat=basic//130; type=text; label=Opac Base URL with trailing /
+# cat=basic//130; type=text; label=OPAC Base URL with trailing /
 opacBaseURL = https://opac.sub.uni-goettingen.de/DB=1/
 
 # cat=basic//130; type=text; label=replace included CSS with path
