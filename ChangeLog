@@ -1,4 +1,7 @@
-2012-12-11 3.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+2012-12-12 3.0.1 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* Fix spelling of Band-Realkatalog label
+
+2012-12-11 3.0.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Add support for BRK authority records (Pica type »Tov«)
 		* download the records and their corresponding hit counts
 	* change naming scheme for downloaded XML files

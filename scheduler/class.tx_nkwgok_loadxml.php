@@ -293,15 +293,15 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		);
 		$GLOBALS['TYPO3_DB']->exec_INSERTquery(tx_nkwgok_utility::dataTable, $GOKRootRow);
 
-		// Add the Bandrealkatalog root node.
+		// Add the Band-Realkatalog root node.
 		$BRKRootRow = array(
 			'ppn' => tx_nkwgok_utility::BRKRootNode,
 			'hierarchy' => 0,
 			'gok' => tx_nkwgok_utility::BRKRootNode,
 			'parent' => tx_nkwgok_utility::rootNode,
-			'descr' => 'Göttinger Bandrealkatalog',
+			'descr' => 'Göttinger Band-Realkatalog',
 			'search' => '',
-			'descr_en' => 'Göttingen Bandrealkatalog',
+			'descr_en' => 'Göttingen Band-Realkatalog',
 			'tags' => '',
 			'childcount' => count($this->tree[tx_nkwgok_utility::BRKRootNode]),
 			'type' => tx_nkwgok_utility::recordTypeBRK,
