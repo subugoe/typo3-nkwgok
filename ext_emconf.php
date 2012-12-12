@@ -30,7 +30,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'clearCacheOnLoad' => 0,
 	'lockType' => '',
 	'author_company' => 'Göttingen State and University Library, Germany http://www.sub.uni-goettingen.de',
-	'version' => '3.0.0',
+	'version' => '3.0.1',
 	'constraints' => array(
 		'depends' => array(
 			'php' => '5.3.8-0.0.0',
@@ -42,7 +42,7 @@ $EM_CONF[$_EXTKEY] = array(
 		'suggests' => array(
 		),
 	),
-	'_md5_values_when_last_written' => 'a:30:{s:9:"ChangeLog";s:4:"b9b7";s:16:"ext_autoload.php";s:4:"4c19";s:21:"ext_conf_template.txt";s:4:"1bd6";s:12:"ext_icon.gif";s:4:"614f";s:17:"ext_localconf.php";s:4:"ed37";s:14:"ext_tables.php";s:4:"fca6";s:14:"ext_tables.sql";s:4:"8dbe";s:13:"locallang.xml";s:4:"4581";s:16:"locallang_db.xml";s:4:"60cd";s:15:"README.markdown";s:4:"6ea1";s:12:"t3jquery.txt";s:4:"1bfe";s:7:"tca.php";s:4:"8619";s:23:"lib/class.tx_nkwgok.php";s:4:"6dbd";s:26:"lib/class.tx_nkwgok_ff.php";s:4:"9906";s:28:"lib/class.tx_nkwgok_menu.php";s:4:"87f9";s:28:"lib/class.tx_nkwgok_tree.php";s:4:"8fde";s:31:"lib/class.tx_nkwgok_utility.php";s:4:"840f";s:11:"lib/get.php";s:4:"9156";s:27:"pi1/class.tx_nkwgok_pi1.php";s:4:"517b";s:16:"pi1/flexform.xml";s:4:"20e9";s:17:"pi1/locallang.xml";s:4:"2bca";s:14:"res/nkwgok.css";s:4:"13c6";s:41:"scheduler/class.tx_nkwgok_checknewcsv.php";s:4:"e81e";s:40:"scheduler/class.tx_nkwgok_convertcsv.php";s:4:"5f5b";s:39:"scheduler/class.tx_nkwgok_importall.php";s:4:"e058";s:42:"scheduler/class.tx_nkwgok_loadfromopac.php";s:4:"b39f";s:37:"scheduler/class.tx_nkwgok_loadxml.php";s:4:"e4e7";s:70:"scheduler/class.tx_nkwgok_scheduler_convertcsvadditionalparameters.php";s:4:"20e6";s:39:"scheduler/class.tx_nkwgok_updatecsv.php";s:4:"a4ce";s:16:"static/setup.txt";s:4:"e2aa";}',
+	'_md5_values_when_last_written' => 'a:30:{s:9:"ChangeLog";s:4:"c78b";s:16:"ext_autoload.php";s:4:"4c19";s:21:"ext_conf_template.txt";s:4:"1bd6";s:12:"ext_icon.gif";s:4:"614f";s:17:"ext_localconf.php";s:4:"ed37";s:14:"ext_tables.php";s:4:"fca6";s:14:"ext_tables.sql";s:4:"8dbe";s:13:"locallang.xml";s:4:"4581";s:16:"locallang_db.xml";s:4:"60cd";s:15:"README.markdown";s:4:"6ea1";s:12:"t3jquery.txt";s:4:"1bfe";s:7:"tca.php";s:4:"8619";s:23:"lib/class.tx_nkwgok.php";s:4:"6dbd";s:26:"lib/class.tx_nkwgok_ff.php";s:4:"9906";s:28:"lib/class.tx_nkwgok_menu.php";s:4:"87f9";s:28:"lib/class.tx_nkwgok_tree.php";s:4:"8fde";s:31:"lib/class.tx_nkwgok_utility.php";s:4:"840f";s:11:"lib/get.php";s:4:"9156";s:27:"pi1/class.tx_nkwgok_pi1.php";s:4:"517b";s:16:"pi1/flexform.xml";s:4:"20e9";s:17:"pi1/locallang.xml";s:4:"2bca";s:14:"res/nkwgok.css";s:4:"13c6";s:41:"scheduler/class.tx_nkwgok_checknewcsv.php";s:4:"e81e";s:40:"scheduler/class.tx_nkwgok_convertcsv.php";s:4:"5f5b";s:39:"scheduler/class.tx_nkwgok_importall.php";s:4:"e058";s:42:"scheduler/class.tx_nkwgok_loadfromopac.php";s:4:"b39f";s:37:"scheduler/class.tx_nkwgok_loadxml.php";s:4:"f2e5";s:70:"scheduler/class.tx_nkwgok_scheduler_convertcsvadditionalparameters.php";s:4:"20e6";s:39:"scheduler/class.tx_nkwgok_updatecsv.php";s:4:"a4ce";s:16:"static/setup.txt";s:4:"e2aa";}',
 );
 
 ?>
