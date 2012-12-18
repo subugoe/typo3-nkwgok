@@ -4,6 +4,7 @@
 		* displayed in the tree elements’ tooltips
 		* filled with strings from Pica 044F when $S is g
 	* use XPath for parsing tag 044F (the previous method failed on repeated tags)
+	* switch all XML parsing to XPath, drop the previously used custom function
 
 2012-12-12 3.0.1 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Fix spelling of Band-Realkatalog label

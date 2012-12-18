@@ -114,42 +114,51 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 				$xml = simplexml_load_file($xmlPath);
 				foreach ($xml->xpath('/RESULT/SET/SHORTTITLE/record') as $recordElement) {
-					$GOK = $this->picaXMLToArray($recordElement);
+					$recordType = $this->typeOfRecord($recordElement);
 
 					// Build complete record and insert into database.
 					// Discard records without a PPN.
-					$PPN = trim($GOK['003@']['0']);
+					$PPNs = $recordElement->xpath('datafield[@tag="003@"]/subfield[@code="0"]');
+					$PPN = trim($PPNs[0]);
+
+					$notations = $recordElement->xpath('datafield[@tag="045A"]/subfield[@code="a"]');
+					$notation = '';
+					if (count($notations) > 0) {
+						$notation = trim($notations[0]);
+					}
+
+					$mscs = $recordElement->xpath('datafield[@tag="044H" and subfield[@code="2"]="msc"]/subfield[@code="a"]');
+					$csvSearches = $recordElement->xpath('datafield[@tag="str"]/subfield[@code="a"]');
+
 					if ($PPN !== '' && array_key_exists($PPN, $subjectTree)) {
 						$search = '';
-						if ($GOK['type'] === tx_nkwgok_utility::recordTypeCSV) {
+						if ($recordType === tx_nkwgok_utility::recordTypeCSV) {
 							// Subject coming from CSV file with a CCL search query in the 'str/a' field.
-							if (array_key_exists('str', $GOK) && array_key_exists('a', $GOK['str']) && $GOK['str']['a']) {
-								$search = $GOK['str']['a'];
+							if (count($csvSearches) > 0) {
+								$csvSearch = trim($csvSearches[0]);
+								$search = $csvSearch;
 							}
 						}
 						else {
 							// Subject coming from a Pica authority record.
-							if (array_key_exists('044H', $GOK)
-								&& array_key_exists('2', $GOK['044H'])
-								&& strtolower($GOK['044H']['2']) === 'msc') {
+							if (count($mscs) > 0) {
 								// Maths type GOK with an MSC type search term.
-								$search = 'msc="' . $GOK['044H']['a'] . '"';
+								$msc = trim($mscs[0]);
+								$search = 'msc="' . $msc . '"';
 							}
-							else if (array_key_exists('045A', $GOK)
-									 && array_key_exists ('a', $GOK['045A'])
-									 && $GOK['045A']['a']) {
-
-								if ($GOK['type'] === tx_nkwgok_utility::recordTypeGOK || $GOK['type'] === tx_nkwgok_utility::recordTypeBRK) {
+							else if (count($notations) > 0) {
+								if ($recordType === tx_nkwgok_utility::recordTypeGOK
+									|| $recordType === tx_nkwgok_utility::recordTypeBRK) {
 									// GOK or BRK OPAC search, using the corresponding index.
-									$indexName = $this->typeToIndexName($GOK['type']);
+									$indexName = $this->typeToIndexName($recordType);
+									// Requires quotation marks around the search term as notations can begin
+									// with three character strings that could be mistaken for index names.
+									$search = $indexName . '="' . $notation . '"';
 								}
 								else {
-									t3lib_div::devLog('loadXML Scheduler Task: Unknown record type »' . $GOK['type'] . '« in record PPN ' . $PPN . '. Skipping.', tx_nkwgok_utility::extKey, 3, $GOK);
+									t3lib_div::devLog('loadXML Scheduler Task: Unknown record type »' . $recordType . '« in record PPN ' . $PPN . '. Skipping.', tx_nkwgok_utility::extKey, 3, $recordElement);
 									continue;
 								}
-								// Requires quotation marks around the search term as notations can begin
-								// with three character strings that could be mistaken for index names.
-								$search = $indexName . '="' . $GOK['045A']['a'] . '"';
 							}
 						}
 
@@ -157,8 +166,9 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						$parentID = $treeElement['parent'];
 
 						// Use stored subject tree to determine hierarchy level.
-						// The hierarchy typically is no deeper than 12 levels:
-						// cut off at 32 to prevent an infinite loop.
+						// The hierarchy should be no deeper than 12 levels
+						// (for GOK) and 25 levels (for BRK).
+						// Cut off at 32 to prevent an infinite loop.
 						$hierarchy = 0;
 						$nextParent = $parentID;
 						while ($nextParent !== Null && $nextParent !== tx_nkwgok_utility::rootNode) {
@@ -167,70 +177,75 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 								$nextParent = $subjectTree[$nextParent]['parent'];
 							}
 							else {
-								t3lib_div::devLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN ' . $nextParent . ' for record PPN ' . $PPN . '. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', tx_nkwgok_utility::extKey, 3, $GOK);
+								t3lib_div::devLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN ' . $nextParent . ' for record PPN ' . $PPN . '. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', tx_nkwgok_utility::extKey, 3, $recordElement);
 								$hierarchy = -1;
 								break;
 							}
 							if ($hierarchy > NKWGOKMaxHierarchy) {
-								t3lib_div::devLog('loadXML Scheduler Task: Hierarchy level for PPN ' . $PPN . ' exceeds the maximum limit of ' . NKWGOKMaxHierarchy . ' levels. This needs to be fixed, the subject tree may contain an infinite loop.', tx_nkwgok_utility::extKey, 3, $GOK);
+								t3lib_div::devLog('loadXML Scheduler Task: Hierarchy level for PPN ' . $PPN . ' exceeds the maximum limit of ' . NKWGOKMaxHierarchy . ' levels. This needs to be fixed, the subject tree may contain an infinite loop.', tx_nkwgok_utility::extKey, 3, $recordElement);
 								$hierarchy = -1;
 								break;
 							}
 						}
 
-						$GOKString = trim($GOK['045A']['a']);
-						$GOKLower = strtolower($GOKString);
-						$descr = trim($GOK['045A']['j']);
-						$search = trim($search);
-						$tags = $GOK['tags']['a'];
-						$hitCount = -1;
-						$totalHitCount = -1;
+						// Main subject name from field 045A $j.
+						$descr = '';
+						$descrs = $recordElement->xpath('datafield[@tag="045A"]/subfield[@code="j"]');
+						if (count($descrs) > 0) {
+							$descr = trim($descrs[0]);
+						}
 
-						// English translation of the subject’s name is in field 044F $a if $S is »d«.
+						// English translation of the subject’s name from field 044F $a if $S is »d«.
 						$descr_en = '';
 						$d044FSdsa = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="d"]/subfield[@code="a"]');
 						if (count($d044FSdsa) > 0) {
 							$descr_en = trim($d044FSdsa[0]);
 						}
 
-						// Alternate/additional description of the subject.
+						// Alternate/additional description of the subject from field 044F $a if $S is »g«.
 						$descr_alternate = '';
 						$d044FSgsa = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="g"]/subfield[@code="a"]');
 						if (count($d044FSgsa) > 0) {
 							$descr_alternate = trim($d044FSgsa[0]);
 						}
 						
-						// Hit keys are lowercase.
+						// Tags from the field tags artificially inserted by our CSV converter.
+						$tags = '';
+						$tagss = $recordElement->xpath('datafield[@tag="tags"]/subfield[@code="a"]');
+						if (count($tagss) > 0) {
+							$descr = trim($tagss[0]);
+						}
+
+						// Hitcount keys are lowercase.
 						// Set result count information:
 						// * for GOK, BRK, and MSC-type records: try to use hitcount
 						// * for CSV-type records: if only one LKL query, try to use hitcount, else use -1
 						// * otherwise: use 0
-						if (array_key_exists('044H', $GOK)
-							&& array_key_exists('2', $GOK['044H'])
-							&& array_key_exists('a', $GOK['044H'])
-							&& in_array(strtolower($GOK['044H']['2']), Array('msc'))) {
-							$type = strtolower($GOK['044H']['2']);
-							$notation = strtolower($GOK['044H']['a']);
-							if (array_key_exists($type, $this->hitCounts)
-									&& array_key_exists($notation, $this->hitCounts[$type])) {
-								$hitCount = $this->hitCounts[$type][$notation];
+						$hitCount = -1;
+						if (count($mscs) > 0) {
+							$msc = trim($mscs[0]);
+							if (array_key_exists('msc', $this->hitCounts)
+									&& array_key_exists($msc, $this->hitCounts['msc'])) {
+								$hitCount = $this->hitCounts['msc'][$msc];
 							}
 						}
-						else if (($GOK['type'] === tx_nkwgok_utility::recordTypeGOK
-									|| $GOK['type'] === tx_nkwgok_utility::recordTypeBRK)
-								 && array_key_exists($GOKLower, $this->hitCounts[$GOK['type']])) {
-							$hitCount = $this->hitCounts[$GOK['type']][$GOKLower];
+						else if (($recordType === tx_nkwgok_utility::recordTypeGOK
+									|| $recordType === tx_nkwgok_utility::recordTypeBRK)
+								 && array_key_exists(strtolower($notation), $this->hitCounts[$recordType])) {
+							$hitCount = $this->hitCounts[$recordType][strtolower($notation)];
 						}
-						else if ($GOK['str']['a']) {
+						else if ($recordType === tx_nkwgok_utility::recordTypeCSV && count($csvSearches) > 0) {
 							// Try to detect simple GOK and MSC queries from CSV files so hit counts can be displayed for them.
+							$csvSearch = trim($csvSearches[0]);
+
 							$foundGOKs = Array();
 							$GOKPattern = '/^lkl=([a-zA-Z]*\s?[.X0-9]*)$/';
-							preg_match($GOKPattern, $GOK['str']['a'], $foundGOKs);
+							preg_match($GOKPattern, $csvSearch, $foundGOKs);
 							$foundGOK = strtolower($foundGOKs[1]);
 
 							$foundMSCs = Array();
 							$MSCPattern = '/^msc=([0-9Xx][0-9Xx][A-Z-]*[0-9Xx]*)/';
-							preg_match($MSCPattern, $GOK['str']['a'], $foundMSCs);
+							preg_match($MSCPattern, $csvSearch, $foundMSCs);
 							$foundMSC = strtolower($foundMSCs[1]);
 
 							if (count($foundGOKs) > 1 && $foundGOK
@@ -240,7 +255,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							else if (count($foundMSCs) > 1 && $foundMSC
 								&& array_key_exists($foundMSC, $this->hitCounts[tx_nkwgok_utility::recordTypeMSC])) {
 								$hitCount = $this->hitCounts[tx_nkwgok_utility::recordTypeMSC][$foundMSC];
-								$GOK['type'] = tx_nkwgok_utility::recordTypeMSC;
+								$recordType = tx_nkwgok_utility::recordTypeMSC;
 							}
 						}
 						else {
@@ -248,13 +263,14 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						}
 
 						// Add total hit count information if it exists.
+						$totalHitCount = -1;
 						if (array_key_exists($PPN, $totalHitCounts)) {
 							$totalHitCount = $totalHitCounts[$PPN];
 						}
 
 						$childCount = count($treeElement['children']);
 
-						$rows[] = Array($PPN, $hierarchy, $GOKString, $parentID, $descr, $descr_en, $descr_alternate, $search, $tags, $childCount, $GOK['type'], $hitCount, $totalHitCount, time(), time(), 1);
+						$rows[] = Array($PPN, $hierarchy, $notation, $parentID, $descr, $descr_en, $descr_alternate, $search, $tags, $childCount, $recordType, $hitCount, $totalHitCount, time(), time(), 1);
 					}
 				} // end of loop over subjects
 				$keyNames = Array('ppn', 'hierarchy', 'gok', 'parent', 'descr', 'descr_en', 'descr_alternate', 'search', 'tags', 'childcount', 'type', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
@@ -319,41 +335,6 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			'statusID' => 1
 		);
 		$GLOBALS['TYPO3_DB']->exec_INSERTquery(tx_nkwgok_utility::dataTable, $BRKRootRow);
-	}
-
-
-
-	/**
-	 * Go through the record XML element and turn it into a PHP array.
-	 * The array uses Pica field names as keys with arrays as values. The
-	 * inner arrays use Pica subfield names as keys and their values as values.
-	 * 
-	 * If fields or subfields are repeated, their last occurrence is used.
-	 * 
-	 * @param DOMElement $recordElement
-	 * @return Array
-	 */
-	private function picaXMLToArray ($recordElement) {
-		$record = Array();
-		$record['type'] = $this->typeOfRecord($recordElement);
-
-		foreach ($recordElement->xpath('datafield') as $field) {
-			$fieldName = trim((string) $field->attributes());
-
-			// Process just the fields we need.
-			$wantedFieldNames = Array('003@', '044F', '044H', '045A', '045C', 'str', 'tags');
-			if (in_array($fieldName, $wantedFieldNames)) {
-				foreach ($field->xpath('subfield') as $subfield) {
-					$subfieldName = (string)$subfield['code'];
-					$subfieldContent = trim((string)$subfield);
-					if ($subfieldContent !== Null) {
-						$record[$fieldName][$subfieldName] = $subfieldContent;
-					}
-				}
-			}
-		}
-
-		return $record;
 	}
 
 
