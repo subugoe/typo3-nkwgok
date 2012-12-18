@@ -1,3 +1,10 @@
+2012-12-?? 3.1.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* Add field descr_alternate
+		* for an additional description
+		* displayed in the tree elements’ tooltips
+		* filled with strings from Pica 044F when $S is g
+	* use XPath for parsing tag 044F (the previous method failed on repeated tags)
+
 2012-12-12 3.0.1 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Fix spelling of Band-Realkatalog label
 

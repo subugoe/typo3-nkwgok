@@ -182,19 +182,24 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						$GOKLower = strtolower($GOKString);
 						$descr = trim($GOK['045A']['j']);
 						$search = trim($search);
-						$descr_en = '';
 						$tags = $GOK['tags']['a'];
 						$hitCount = -1;
 						$totalHitCount = -1;
 
 						// English translation of the subject’s name is in field 044F $a if $S is »d«.
-						if (array_key_exists('044F', $GOK)
-							&& array_key_exists('a', $GOK['044F'])
-							&& array_key_exists('S', $GOK['044F'])
-							&& $GOK['044F']['S'] === 'd') {
-							$descr_en = trim($GOK['044F']['a']);
+						$descr_en = '';
+						$d044FSdsa = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="d"]/subfield[@code="a"]');
+						if (count($d044FSdsa) > 0) {
+							$descr_en = trim($d044FSdsa[0]);
 						}
 
+						// Alternate/additional description of the subject.
+						$descr_alternate = '';
+						$d044FSgsa = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="g"]/subfield[@code="a"]');
+						if (count($d044FSgsa) > 0) {
+							$descr_alternate = trim($d044FSgsa[0]);
+						}
+						
 						// Hit keys are lowercase.
 						// Set result count information:
 						// * for GOK, BRK, and MSC-type records: try to use hitcount
@@ -249,10 +254,10 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 						$childCount = count($treeElement['children']);
 
-						$rows[] = Array($PPN, $hierarchy, $GOKString, $parentID, $descr, $search, $descr_en, $tags, $childCount, $GOK['type'], $hitCount, $totalHitCount, time(), time(), 1);
+						$rows[] = Array($PPN, $hierarchy, $GOKString, $parentID, $descr, $descr_en, $descr_alternate, $search, $tags, $childCount, $GOK['type'], $hitCount, $totalHitCount, time(), time(), 1);
 					}
 				} // end of loop over subjects
-				$keyNames = Array('ppn', 'hierarchy', 'gok', 'parent', 'descr', 'search', 'descr_en', 'tags', 'childcount', 'type', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
+				$keyNames = Array('ppn', 'hierarchy', 'gok', 'parent', 'descr', 'descr_en', 'descr_alternate', 'search', 'tags', 'childcount', 'type', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
 				$result = $GLOBALS['TYPO3_DB']->exec_INSERTmultipleRows(tx_nkwgok_utility::dataTable, $keyNames, $rows);
 
 			} // end of loop over files
@@ -280,8 +285,9 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			'gok' => tx_nkwgok_utility::GOKRootNode,
 			'parent' => tx_nkwgok_utility::rootNode,
 			'descr' => 'Göttinger Online Klassifikation (GOK)',
-			'search' => '',
 			'descr_en' => 'Göttingen Online Classification (GOK)',
+			'descr_alternate' => '',
+			'search' => '',
 			'tags' => '',
 			'childcount' => count($this->tree[tx_nkwgok_utility::GOKRootNode]),
 			'type' => tx_nkwgok_utility::recordTypeGOK,
@@ -300,8 +306,9 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			'gok' => tx_nkwgok_utility::BRKRootNode,
 			'parent' => tx_nkwgok_utility::rootNode,
 			'descr' => 'Göttinger Band-Realkatalog',
-			'search' => '',
 			'descr_en' => 'Göttingen Band-Realkatalog',
+			'descr_alternate' => '',
+			'search' => '',
 			'tags' => '',
 			'childcount' => count($this->tree[tx_nkwgok_utility::BRKRootNode]),
 			'type' => tx_nkwgok_utility::recordTypeBRK,

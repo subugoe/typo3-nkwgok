@@ -346,6 +346,11 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				$noscriptLink = '#';
 				$mainTitle = sprintf($this->localise('%s Unterkategorien anzeigen'), $GOK['childcount']);
 				$alternativeTitle = $this->localise('Unterkategorien ausblenden');
+				// If we have an alternative title, add it to the tooltips.
+				if (strlen($GOK['descr_alternate']) > 0) {
+					$mainTitle .= ': ' . $GOK['descr_alternate'];
+					$alternativeTitle .= ': ' . $GOK['descr_alternate'];
+				}
 				$urlComponents = parse_url(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'));
 				$baseURL = $urlComponents['scheme'] .  '://' . $urlComponents['host'] . $urlComponents['path'];
 				$queryComponents = Array();
