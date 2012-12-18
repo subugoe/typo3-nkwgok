@@ -206,7 +206,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						$descr_alternate = '';
 						$d044FSgsa = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="g"]/subfield[@code="a"]');
 						if (count($d044FSgsa) > 0) {
-							$descr_alternate = trim($d044FSgsa[0]);
+							$descr_alternate = trim(implode('; ', $d044FSgsa));
 						}
 						
 						// Tags from the field tags artificially inserted by our CSV converter.
