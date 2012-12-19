@@ -195,20 +195,27 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							$descr = trim($descrs[0]);
 						}
 
-						// English translation of the subject’s name from field 044F $a if $S is »d«.
+						// English version of the subject’s name from field 044F $a if $S is »d«.
 						$descr_en = '';
-						$d044FSdsa = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="d"]/subfield[@code="a"]');
-						if (count($d044FSdsa) > 0) {
-							$descr_en = trim($d044FSdsa[0]);
+						$descr_ens = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="d"]/subfield[@code="a"]');
+						if (count($descr_ens) > 0) {
+							$descr_en = trim($descr_ens[0]);
 						}
 
-						// Alternate/additional description of the subject from field 044F $a if $S is »g«.
+						// Alternate/additional description of the subject from field 044F $a if $S is »g« and $L is not »eng«
 						$descr_alternate = '';
-						$d044FSgsa = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="g"]/subfield[@code="a"]');
-						if (count($d044FSgsa) > 0) {
-							$descr_alternate = trim(implode('; ', $d044FSgsa));
+						$descr_alternates = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="g" and not(subfield[@code="L"]="eng")]/subfield[@code="a"]');
+						if (count($descr_alternates) > 0) {
+							$descr_alternate = trim(implode('; ', $descr_alternates));
 						}
 						
+						// English version of alternate/additional description of the subject from field 044F $a if $S is »g« and $L is  »eng«
+						$descr_alternate_en = '';
+						$descr_alternate_ens = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="g" and subfield[@code="L"]="eng"]/subfield[@code="a"]');
+						if (count($descr_alternate_ens) > 0) {
+							$descr_alternate_en = trim(implode('; ', $descr_alternate_ens));
+						}
+
 						// Tags from the field tags artificially inserted by our CSV converter.
 						$tags = '';
 						$tagss = $recordElement->xpath('datafield[@tag="tags"]/subfield[@code="a"]');
@@ -270,10 +277,10 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 						$childCount = count($treeElement['children']);
 
-						$rows[] = Array($PPN, $hierarchy, $notation, $parentID, $descr, $descr_en, $descr_alternate, $search, $tags, $childCount, $recordType, $hitCount, $totalHitCount, time(), time(), 1);
+						$rows[] = Array($PPN, $hierarchy, $notation, $parentID, $descr, $descr_en, $descr_alternate, $descr_alternate_en, $search, $tags, $childCount, $recordType, $hitCount, $totalHitCount, time(), time(), 1);
 					}
 				} // end of loop over subjects
-				$keyNames = Array('ppn', 'hierarchy', 'gok', 'parent', 'descr', 'descr_en', 'descr_alternate', 'search', 'tags', 'childcount', 'type', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
+				$keyNames = Array('ppn', 'hierarchy', 'gok', 'parent', 'descr', 'descr_en', 'descr_alternate', 'descr_alternate_en', 'search', 'tags', 'childcount', 'type', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
 				$result = $GLOBALS['TYPO3_DB']->exec_INSERTmultipleRows(tx_nkwgok_utility::dataTable, $keyNames, $rows);
 
 			} // end of loop over files
@@ -303,6 +310,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			'descr' => 'Göttinger Online Klassifikation (GOK)',
 			'descr_en' => 'Göttingen Online Classification (GOK)',
 			'descr_alternate' => '',
+			'descr_alternate_en' => '',
 			'search' => '',
 			'tags' => '',
 			'childcount' => count($this->tree[tx_nkwgok_utility::GOKRootNode]),
@@ -324,6 +332,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			'descr' => 'Göttinger Band-Realkatalog',
 			'descr_en' => 'Göttingen Band-Realkatalog',
 			'descr_alternate' => '',
+			'descr_alternate_en' => '',
 			'search' => '',
 			'tags' => '',
 			'childcount' => count($this->tree[tx_nkwgok_utility::BRKRootNode]),

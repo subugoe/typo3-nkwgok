@@ -29,7 +29,7 @@
  */
 
 
-define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, descr_alternate, parent, hierarchy, childcount, hitcount, totalhitcount, type');
+define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, descr_alternate, descr_alternate_en, parent, hierarchy, childcount, hitcount, totalhitcount, type');
 
 /**
  * Class tx_nkwgok: provides output for the nkwgok extension.

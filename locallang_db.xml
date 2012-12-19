@@ -10,14 +10,15 @@
 			<label index="tx_nkwgok_data.gok">Notation</label>
 			<label index="tx_nkwgok_data.ppn">ID (PPN)</label>
 			<label index="tx_nkwgok_data.search">Search Query (CCL)</label>
-			<label index="tx_nkwgok_data.descr">Subject Name(German)</label>
+			<label index="tx_nkwgok_data.descr">Subject Name (German)</label>
 			<label index="tx_nkwgok_data.descr_en">Subject Name (English)</label>
 			<label index="tx_nkwgok_data.descr_alternate">Alternative Description</label>
+			<label index="tx_nkwgok_data.descr_alternate_en">Alternative Description (English)</label>
 			<label index="tx_nkwgok_data.tags">Tags (comma separated)</label>
 			<label index="tx_nkwgok_data.parent">ID of parent element</label>
 			<label index="tx_nkwgok_data.hierarchy">Subject hierarchy level</label>
 			<label index="tx_nkwgok_data.childcount">Number of child elements</label>
-			<label index="tx_nkwgok_data.hitcount">Number of hits for this Notation in OPAC</label>
+			<label index="tx_nkwgok_data.hitcount">Number of hits for this notation in OPAC</label>
 			<label index="tx_nkwgok_data.totalhitcount">Number of hits in OPAC, including child-topics</label>
 			<label index="tx_nkwgok_data.type">Record Type</label>
 
@@ -32,6 +33,7 @@
 			<label index="tx_nkwgok_data.descr">Name (Deutsch)</label>
 			<label index="tx_nkwgok_data.descr_en">Name (Englisch)</label>
 			<label index="tx_nkwgok_data.descr_alternate">Alternative Beschreibung</label>
+			<label index="tx_nkwgok_data.descr_alternate_en">Alternative Beschreibung (Englisch)</label>
 			<label index="tx_nkwgok_data.tags">Tags (kommagetrennt)</label>
 			<label index="tx_nkwgok_data.parent">ID des Elternelements</label>
 			<label index="tx_nkwgok_data.hierarchy">Ebene in der Fachierarchie</label>

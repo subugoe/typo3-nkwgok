@@ -342,6 +342,15 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$JSCommand = '';
 		$itemClass = 'nochildren';
 		if ($isInteractive === True) {
+			// Set up addition to title, if it exists.
+			$titleAddition = '';
+			if ($this->language === 'en' && $GOK['descr_alternate_en'] !== '') {
+				$titleAddition = $GOK['descr_alternate_en'];
+			}
+			else if ($GOK['descr_alternate'] !== '') {
+				$titleAddition = $GOK['descr_alternate'];
+			}
+
 			if ($GOK['childcount'] > 0) {
 				$noscriptLink = '#';
 				$mainTitle = sprintf($this->localise('%s Unterkategorien anzeigen'), $GOK['childcount']);
@@ -386,11 +395,12 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				$openLink->setAttribute('href', $noscriptLink);
 				$openLink->setAttribute('rel', 'nofollow');
 
-				// If we have an alternative title, add it to the tooltips.
-				if (strlen($GOK['descr_alternate']) > 0) {
-					$mainTitle .= ': ' . $GOK['descr_alternate'];
-					$alternativeTitle .= ': ' . $GOK['descr_alternate'];
+				// Add extra note to title if it exists.
+				if ($titleAddition !== '') {
+					$mainTitle .= ': ' . $titleAddition;
+					$alternativeTitle .= ': ' . $titleAddition;
 				}
+				// Set up title attribute and its alternate.
 				$openLink->setAttribute('title', $mainTitle);
 				$openLink->setAttribute('alttitle', $alternativeTitle);
 			}
@@ -401,8 +411,8 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			}
 			else {
 				// Tree style: add tooltip to the surrounding anchor tag if an alternative title exists.
-				if (strlen($GOK['descr_alternate']) > 0) {
-					$openLink->setAttribute('title', $GOK['descr_alternate']);
+				if ($titleAddition !== '') {
+					$openLink->setAttribute('title', $titleAddition);
 				}
 			}
 		}

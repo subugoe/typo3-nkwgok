@@ -17,6 +17,7 @@ CREATE TABLE tx_nkwgok_data (
 	descr text,
 	descr_en text,
 	descr_alternate text,
+	descr_alternate_en text,
 	tags text,
 	type varchar(255) DEFAULT '' NOT NULL,
 	parent varchar(255) DEFAULT '' NOT NULL,
