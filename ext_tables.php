@@ -31,7 +31,7 @@ t3lib_extMgm::addStaticFile($_EXTKEY, 'static/', 'GOK');
 $TCA['tx_nkwgok_data'] = array(
 	'ctrl' => array(
 		'title' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data',
-		'label' => 'gok',
+		'label' => 'notation',
 		'label_alt' => 'descr',
         'label_alt_force' => 1,
 		'tstamp' => 'tstamp',
@@ -40,7 +40,7 @@ $TCA['tx_nkwgok_data'] = array(
 		'default_sortby' => 'ORDER BY crdate',
 		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'tca.php',
 		'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'ext_icon.gif',
-		'searchFields' => 'descr, descr_en, gok'
+		'searchFields' => 'descr, descr_en, notation'
 	),
 );
 t3lib_div::loadTCA('tt_content');

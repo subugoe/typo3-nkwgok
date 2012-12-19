@@ -29,7 +29,7 @@
  */
 
 
-define('NKWGOKQueryFields', 'ppn, gok, search, descr, descr_en, descr_alternate, descr_alternate_en, parent, hierarchy, childcount, hitcount, totalhitcount, type');
+define('NKWGOKQueryFields', 'ppn, notation, search, descr, descr_en, descr_alternate, descr_alternate_en, parent, hierarchy, childcount, hitcount, totalhitcount, type');
 
 /**
  * Class tx_nkwgok: provides output for the nkwgok extension.
@@ -238,7 +238,7 @@ abstract class tx_nkwgok {
 		$parentEscaped = $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, tx_nkwgok_utility::dataTable);
 		$whereClause = 'parent = ' . $parentEscaped;
 		if ($this->arguments['omitXXX']) {
-			$whereClause .= ' AND NOT gok LIKE "%XXX"';
+			$whereClause .= ' AND NOT notation LIKE "%XXX"';
 		}
 		$whereClause = '(' . $whereClause . ')';
 		if ($includeParent) {
@@ -250,7 +250,7 @@ abstract class tx_nkwgok {
 					tx_nkwgok_utility::dataTable,
 					$whereClause,
 					'',
-					'hierarchy,gok ASC',
+					'hierarchy,notation ASC',
 					'');
 
 		$children = Array();

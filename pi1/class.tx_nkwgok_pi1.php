@@ -58,11 +58,11 @@ class tx_nkwgok_pi1 extends tslib_pibase {
 		$arguments = t3lib_div::_GET('tx_nkwgok');
 		
 		// get flexform
-		$arguments['gok'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'source', 'sDEF');
+		$arguments['notation'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'source', 'sDEF');
 		$altSource = trim($this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'altSource', 'sDEF'));
 		// alternative source overrides first definition
 		if ($altSource) {
-			$arguments['gok'] = $altSource;
+			$arguments['notation'] = $altSource;
 		}
 
 		// unique expand array

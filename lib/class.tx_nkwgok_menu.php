@@ -60,19 +60,19 @@ class tx_nkwgok_menu extends tx_nkwgok {
 		$pageID->setAttribute('name', 'no_cache');
 		$pageID->setAttribute('value', 1); //$GLOBALS['TSFE']->id);
 
-		$startNodes = explode(',', $this->arguments['gok']);
+		$startNodes = explode(',', $this->arguments['notation']);
 		if (count($startNodes) > 1) {
-			t3lib_div::devLog('several start nodes given (' . $this->arguments['gok'] . ') but only the first is used in menu mode' , tx_nkwgok_utility::extKey, 2);
+			t3lib_div::devLog('several start nodes given (' . $this->arguments['notation'] . ') but only the first is used in menu mode' , tx_nkwgok_utility::extKey, 2);
 		}
 		$startNodeGOK = trim($startNodes[0]);
-		$firstNodeCondition = "gok LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK, tx_nkwgok_utility::dataTable) . ' AND statusID = 0';
+		$firstNodeCondition = "notation LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK, tx_nkwgok_utility::dataTable) . ' AND statusID = 0';
 		// run query and collect result
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 					NKWGOKQueryFields,
 					tx_nkwgok_utility::dataTable,
 					$firstNodeCondition,
 					'',
-					'gok ASC',
+					'notation ASC',
 					'');
 
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {

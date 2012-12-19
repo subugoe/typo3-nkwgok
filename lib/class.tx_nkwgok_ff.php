@@ -34,14 +34,14 @@ class tx_nkwgok_ff {
 
 		$options = array();
 		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($rootNodes)) {
-			$optionTitle = '[' . $row['gok'] . '] ' . $row['descr'];
-			$optionValue = $row['gok'];
+			$optionTitle = '[' . $row['notation'] . '] ' . $row['descr'];
+			$optionValue = $row['notation'];
 			$options[] = array($optionTitle , $optionValue);
 
 			$childNodes = $this->queryForChildrenOf($optionValue);
 			while($childRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($childNodes)) {
-				$childOptionTitle = '—[' . $childRow['gok'] . '] ' . $childRow['descr'];
-				$childOptionValue = $childRow['gok'];
+				$childOptionTitle = '—[' . $childRow['notation'] . '] ' . $childRow['descr'];
+				$childOptionValue = $childRow['notation'];
 				$options[] = array($childOptionTitle , $childOptionValue);
 			}
 		}
@@ -65,7 +65,7 @@ class tx_nkwgok_ff {
 			tx_nkwgok_utility::dataTable,
 			"parent = '" . $parentID . "'",
 			'',
-			'gok ASC',
+			'notation ASC',
 			'');
 
 		return $queryResults;

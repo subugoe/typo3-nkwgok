@@ -280,7 +280,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						$rows[] = Array($PPN, $hierarchy, $notation, $parentID, $descr, $descr_en, $descr_alternate, $descr_alternate_en, $search, $tags, $childCount, $recordType, $hitCount, $totalHitCount, time(), time(), 1);
 					}
 				} // end of loop over subjects
-				$keyNames = Array('ppn', 'hierarchy', 'gok', 'parent', 'descr', 'descr_en', 'descr_alternate', 'descr_alternate_en', 'search', 'tags', 'childcount', 'type', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
+				$keyNames = Array('ppn', 'hierarchy', 'notation', 'parent', 'descr', 'descr_en', 'descr_alternate', 'descr_alternate_en', 'search', 'tags', 'childcount', 'type', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
 				$result = $GLOBALS['TYPO3_DB']->exec_INSERTmultipleRows(tx_nkwgok_utility::dataTable, $keyNames, $rows);
 
 			} // end of loop over files
@@ -305,7 +305,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		$GOKRootRow = array(
 			'ppn' => tx_nkwgok_utility::GOKRootNode,
 			'hierarchy' => 0,
-			'gok' => tx_nkwgok_utility::GOKRootNode,
+			'notation' => tx_nkwgok_utility::GOKRootNode,
 			'parent' => tx_nkwgok_utility::rootNode,
 			'descr' => 'Göttinger Online Klassifikation (GOK)',
 			'descr_en' => 'Göttingen Online Classification (GOK)',
@@ -327,7 +327,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		$BRKRootRow = array(
 			'ppn' => tx_nkwgok_utility::BRKRootNode,
 			'hierarchy' => 0,
-			'gok' => tx_nkwgok_utility::BRKRootNode,
+			'notation' => tx_nkwgok_utility::BRKRootNode,
 			'parent' => tx_nkwgok_utility::rootNode,
 			'descr' => 'Göttinger Band-Realkatalog',
 			'descr_en' => 'Göttingen Band-Realkatalog',

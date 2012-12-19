@@ -7,7 +7,7 @@
 	<data type="array">
 		<languageKey index="en" type="array">
 			<label index="tx_nkwgok_data">Subject</label>
-			<label index="tx_nkwgok_data.gok">Notation</label>
+			<label index="tx_nkwgok_data.notation">Notation</label>
 			<label index="tx_nkwgok_data.ppn">ID (PPN)</label>
 			<label index="tx_nkwgok_data.search">Search Query (CCL)</label>
 			<label index="tx_nkwgok_data.descr">Subject Name (German)</label>
@@ -27,7 +27,7 @@
 		
 		<languageKey index="de" type="array">
 			<label index="tx_nkwgok_data">Fach</label>
-			<label index="tx_nkwgok_data.gok">Notation</label>
+			<label index="tx_nkwgok_data.notation">Notation</label>
 			<label index="tx_nkwgok_data.search">Suchabfrage (CCL)</label>
 			<label index="tx_nkwgok_data.ppn">ID (PPN)</label>
 			<label index="tx_nkwgok_data.descr">Name (Deutsch)</label>

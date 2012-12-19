@@ -39,7 +39,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * Returns markup for subject tree based on the configuration in $this->arguments.
 	 *
 	 * The $this->arguments array needs to contain:
-	 * - a string element 'gok' which can either be 'all' (to display the
+	 * - a string element 'notation' which can either be 'all' (to display the
 	 *		complete subject tree) or the notation of the node to be used as the
 	 *		root of the tree
 	 * - a string element 'style' which may take the values 'tree' or 'column'
@@ -77,10 +77,10 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$container->setAttribute('id', 'tx_nkwgok-' . $this->objectID);
 
 		// Get and insert start nodes.
-		$startNodes = explode(',', $this->arguments['gok']);
+		$startNodes = explode(',', $this->arguments['notation']);
 		$queryParts = Array();
 		foreach ($startNodes as $startNodeGOK) {
-			$queryParts[] = 'gok = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr(trim($startNodeGOK), tx_nkwgok_utility::dataTable);
+			$queryParts[] = 'notation = ' . $GLOBALS['TYPO3_DB']->fullQuoteStr(trim($startNodeGOK), tx_nkwgok_utility::dataTable);
 		}
 		$query = implode(' OR ', $queryParts) . ' AND statusID = 0';
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
@@ -88,7 +88,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 					tx_nkwgok_utility::dataTable,
 					$query,
 					'',
-					'gok ASC',
+					'notation ASC',
 					'');
 
 		$resultCount = $GLOBALS['TYPO3_DB']->sql_num_rows($queryResult);
@@ -322,7 +322,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 		$GOKIDSpan = $this->doc->createElement('span');
 		$GOKIDSpan->setAttribute('class', 'GOKID');
-		$GOKIDSpan->appendChild($this->doc->createTextNode($GOK['gok']));
+		$GOKIDSpan->appendChild($this->doc->createTextNode($GOK['notation']));
 
 		$GOKNameSpan = $this->doc->createElement('span');
 		$GOKNameSpan->setAttribute('class', 'GOKName');

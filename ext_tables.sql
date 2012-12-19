@@ -11,7 +11,7 @@ CREATE TABLE tx_nkwgok_data (
 	l18n_parent int(11) DEFAULT '0' NOT NULL,
 	l18n_diffsource mediumblob NOT NULL,
 
-	gok varchar(255) DEFAULT '' NOT NULL,
+	notation varchar(255) DEFAULT '' NOT NULL,
 	ppn varchar(255) DEFAULT '' NOT NULL,
 	search text,
 	descr text,
