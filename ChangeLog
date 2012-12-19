@@ -1,10 +1,11 @@
-2012-12-?? 3.1.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
-	* Add field descr_alternate
-		* for an additional description
+2012-12-19 3.1.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* Add ability to handle additional/alternate description for a subject name
 		* displayed in the tree elements’ tooltips
 		* filled with strings from Pica 044F when $S is g
+		* in both German (default) and English (when $L eng)
 	* use XPath for parsing tag 044F (the previous method failed on repeated tags)
-	* switch all XML parsing to XPath, drop the previously used custom function
+	* switch XML parsing on database import to XPath, drop the previously used custom function
+	* change field name for the notation from »gok« to »notation«
 
 2012-12-12 3.0.1 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Fix spelling of Band-Realkatalog label
