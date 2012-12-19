@@ -231,9 +231,9 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						$hitCount = -1;
 						if (count($mscs) > 0) {
 							$msc = trim($mscs[0]);
-							if (array_key_exists('msc', $this->hitCounts)
-									&& array_key_exists($msc, $this->hitCounts['msc'])) {
-								$hitCount = $this->hitCounts['msc'][$msc];
+							if (array_key_exists(tx_nkwgok_utility::recordTypeMSC, $this->hitCounts)
+									&& array_key_exists($msc, $this->hitCounts[tx_nkwgok_utility::recordTypeMSC])) {
+								$hitCount = $this->hitCounts[tx_nkwgok_utility::recordTypeMSC][$msc];
 							}
 						}
 						else if (($recordType === tx_nkwgok_utility::recordTypeGOK
