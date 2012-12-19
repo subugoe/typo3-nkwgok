@@ -100,7 +100,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		$XMLFolder = PATH_site . 'fileadmin/gok/xml/';
 		$fileList = $this->fileListAtPathForType ($XMLFolder, $type);
 
-		if (count($fileList) > 0) {
+		if (is_array($fileList) && count($fileList) > 0) {
 			// Parse XML files to extract just the tree structure.
 			$subjectTree = $this->loadSubjectTree($fileList);
 
@@ -475,35 +475,37 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		$fileList = $this->fileListAtPathForType($hitCountFolder, 'all');
 
 		$hitCounts = Array();
-		foreach ($fileList as $xmlPath) {
-			$xml = simplexml_load_file($xmlPath);
-			if ($xml) {
-				$scanlines = $xml->xpath('/RESULT/SCANLIST/SCANLINE');
-				foreach ($scanlines as $scanline) {
-					$hits = Null;
-					$description = Null;
-					$hitCountType = Null;
-					foreach($scanline->attributes() as $name => $value) {
-						if ($name === 'hits') {
-							$hits = (int)$value;
+		if (is_array($fileList)) {
+			foreach ($fileList as $xmlPath) {
+				$xml = simplexml_load_file($xmlPath);
+				if ($xml) {
+					$scanlines = $xml->xpath('/RESULT/SCANLIST/SCANLINE');
+					foreach ($scanlines as $scanline) {
+						$hits = Null;
+						$description = Null;
+						$hitCountType = Null;
+						foreach($scanline->attributes() as $name => $value) {
+							if ($name === 'hits') {
+								$hits = (int)$value;
+							}
+							else if ($name === 'description') {
+								$description = (string)$value;
+							}
+							else if ($name === 'mnemonic') {
+								$hitCountType = tx_nkwgok_utility::indexNameToType(strtolower((string)$value));
+							}
 						}
-						else if ($name === 'description') {
-							$description = (string)$value;
+						if ($hits !== Null && $description !== Null && $hitCountType !== Null) {
+							if (!array_key_exists($hitCountType, $hitCounts)) {
+								$hitCounts[$hitCountType] = Array();
+							}
+							$hitCounts[$hitCountType][$description] = $hits;
 						}
-						else if ($name === 'mnemonic') {
-							$hitCountType = tx_nkwgok_utility::indexNameToType(strtolower((string)$value));
-						}
-					}
-					if ($hits !== Null && $description !== Null && $hitCountType !== Null) {
-						if (!array_key_exists($hitCountType, $hitCounts)) {
-							$hitCounts[$hitCountType] = Array();
-						}
-						$hitCounts[$hitCountType][$description] = $hits;
 					}
 				}
-			}
-			else {
-				t3lib_div::devLog('loadXML Scheduler Task: could not load/parse XML from ' . $xmlPath, tx_nkwgok_utility::extKey, 3);
+				else {
+					t3lib_div::devLog('loadXML Scheduler Task: could not load/parse XML from ' . $xmlPath, tx_nkwgok_utility::extKey, 3);
+				}
 			}
 		} // end foreach
 
@@ -591,10 +593,15 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 			$fileList = glob($basePath . $type . '-*.xml');
 		}
 		else {
-			$allFiles = glob($basePath . '*.xml');
+			$fileList = glob($basePath . '*.xml');
 			$gokFiles = glob($basePath . tx_nkwgok_utility::recordTypeGOK . '-*.xml');
+			if (is_array($gokFiles)) {
+				$fileList = array_diff($fileList, $gokFiles);
+			}
 			$brkFiles = glob($basePath . tx_nkwgok_utility::recordTypeBRK . '-*.xml');
-			$fileList = array_diff($allFiles, $gokFiles, $brkFiles);
+			if (is_array($brkFiles)) {
+				$fileList = array_diff($fileList, $brkFiles);
+			}
 		}
 
 		return $fileList;
