@@ -187,7 +187,7 @@ $TCA['tx_nkwgok_data'] = array(
 		),
 	),
 	'types' => array(
-		'0' => array('showitem' => 'ppn, notation, search, descr, descr_en, parent, hierarchy, childcount, hitcount, totalhitcount, tags, type')
+		'0' => array('showitem' => 'ppn, notation, search, descr, descr_en, descr_alternate, descr_alternate_en, parent, hierarchy, childcount, hitcount, totalhitcount, tags, type')
 	),
 	'palettes' => array(
 		'1' => array('showitem' => '')
