@@ -1,3 +1,6 @@
+2012-12-19 3.1.1 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* fix bug that lost the German subject name when importing from CSV
+
 2012-12-19 3.1.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Add ability to handle additional/alternate description for a subject name
 		* displayed in the tree elements’ tooltips

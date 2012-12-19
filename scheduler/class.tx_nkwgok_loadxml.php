@@ -220,7 +220,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 						$tags = '';
 						$tagss = $recordElement->xpath('datafield[@tag="tags"]/subfield[@code="a"]');
 						if (count($tagss) > 0) {
-							$descr = trim($tagss[0]);
+							$tags = trim($tagss[0]);
 						}
 
 						// Hitcount keys are lowercase.
