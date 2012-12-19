@@ -150,7 +150,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 								if ($recordType === tx_nkwgok_utility::recordTypeGOK
 									|| $recordType === tx_nkwgok_utility::recordTypeBRK) {
 									// GOK or BRK OPAC search, using the corresponding index.
-									$indexName = $this->typeToIndexName($recordType);
+									$indexName = tx_nkwgok_utility::typeToIndexName($recordType);
 									// Requires quotation marks around the search term as notations can begin
 									// with three character strings that could be mistaken for index names.
 									$search = $indexName . '="' . $notation . '"';
@@ -491,7 +491,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							$description = (string)$value;
 						}
 						else if ($name === 'mnemonic') {
-							$hitCountType = $this->indexNameToType(strtolower((string)$value));
+							$hitCountType = tx_nkwgok_utility::indexNameToType(strtolower((string)$value));
 						}
 					}
 					if ($hits !== Null && $description !== Null && $hitCountType !== Null) {
@@ -642,47 +642,6 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 		return $recordType;
 	}
-
-
-	
-	/**
-	 * Returns the internal type name for the given index name.
-	 * * lkl -> gok
-	 * * pass others through unchanged
-	 * 
-	 * @param String $indexName
-	 * @return String
-	 */
-	private function indexNameToType ($indexName) {
-		$type = $indexName;
-
-		if ($indexName === 'lkl') {
-			$type = 'gok';
-		}
-
-		return $type;
-	}
-
-
-
-	/**
-	 * Returns the internal type name for the given index name.
-	 * * gok -> lkl
-	 * * pass others through unchanged
-	 *
-	 * @param String $type
-	 * @return String
-	 */
-	private function typeToIndexName ($type) {
-		$indexName = $type;
-
-		if ($type === 'gok') {
-			$indexName = 'lkl';
-		}
-
-		return $indexName;
-	}
-
 
 }
 

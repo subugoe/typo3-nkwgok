@@ -44,12 +44,10 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 		}
 
 		$opacLKLURL = $opacBaseURL . 'CMD?ACT=SRCHA/IKT=8600/TRM=tev+not+LKL+p%3F/REC=2/PRS=XML/NORND=1';
-		$GOKFileBaseName = 'gok';
-		$success = $this->downloadAuthorityDataFromOpacToFolder($opacLKLURL, $XMLDir, $GOKFileBaseName);
+		$success = $this->downloadAuthorityDataFromOpacToFolder($opacLKLURL, $XMLDir, tx_nkwgok_utility::recordTypeGOK);
 
 		$opacBRKURL = $opacBaseURL . 'CMD?ACT=SRCHA/IKT=8600/TRM=tov/REC=2/PRS=XML/NORND=1';
-		$BRKFileBaseName = 'brk';
-		$success &= $this->downloadAuthorityDataFromOpacToFolder($opacBRKURL, $XMLDir, $BRKFileBaseName);
+		$success &= $this->downloadAuthorityDataFromOpacToFolder($opacBRKURL, $XMLDir, tx_nkwgok_utility::recordTypeBRK);
 
 
 		// Create the hitcounts folder if necessary and delete all files inside it if it exists.
@@ -61,9 +59,9 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 		}
 
 		$opacHitCountURL = $opacBaseURL . 'CMD?ACT=BRWS&SCNST=' . NKWGOKImportChunkSize;
-		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, 'lkl', $hitCountDir);
-		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, 'msc', $hitCountDir);
-		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, 'brk', $hitCountDir);
+		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, tx_nkwgok_utility::typeToIndexName(tx_nkwgok_utility::recordTypeGOK), $hitCountDir);
+		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, tx_nkwgok_utility::typeToIndexName(tx_nkwgok_utility::recordTypeBRK), $hitCountDir);
+		$success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, tx_nkwgok_utility::typeToIndexName(tx_nkwgok_utility::recordTypeMSC), $hitCountDir);
 
 		return $success;
 	}
