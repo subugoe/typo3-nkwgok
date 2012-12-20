@@ -1,3 +1,8 @@
+2012-12-20 3.3.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* re-implement configuration for loading remote CSV files
+		* do not use TypoScript which is attached to a page
+		* store URLs globally in extension configuration
+
 2012-12-20 3.2.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* fix bug that prevented the correct import of subject information from CSV files only on some systems
 	* ensure tree style is chosen when no display mode is selected in the FlexForm

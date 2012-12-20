@@ -29,22 +29,11 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	/**
 	 * Function executed from the Scheduler.
 	 *
-	 * @param int $startPageID - ID of page where TypoScript with the URLs to download is set up
 	 * @return boolean TRUE if success, otherwise FALSE
 	 */
-	public function execute($startPageID = Null) {
-		$myPageID = $startPageID;
-		if ($myPageID === Null) {
-			$myPageID = $this->nkwgokStartPageId;
-		}
-
-		$URLList = $this->getNkwgokDownloadURLs($myPageID);
-		if ($URLList) {
-			$this->downloadURLs($URLList);
-		}
-		else {
-			t3lib_div::devLog('convertCSV Scheduler Task: no URLs for downloading CSV files set up in the Scheduler task', tx_nkwgok_utility::extKey, 1);
-		}
+	public function execute() {
+		$URLList = $this->getCSVDownloadURLs();
+		$this->downloadURLs($URLList);
 
 		$success = true;
 		$fileList = glob(PATH_site . 'fileadmin/gok/csv/*.csv');
@@ -63,41 +52,22 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * The ID of the page storing the TypoScript needs to be set up in extension
 	 * manager.
 	 *
-	 * @param int $pageUid
 	 * @return array of URLs to download
 	 */
-	protected function getNkwgokDownloadURLs($pageUid = 1) {
-		$downloadURLs = Null;
-		
-		// begin
-		if (!is_object($GLOBALS['TT'])) {
-			$GLOBALS['TT'] = t3lib_div::makeInstance('t3lib_timeTrack');
-			$GLOBALS['TT']->start();
-		}
+	protected function getCSVDownloadURLs() {
+		$downloadURLs = Array();
 
-		if ((!is_object($GLOBALS['TSFE'])) && is_int($pageUid)) {
-			// builds TSFE object
-			$GLOBALS['TSFE'] = t3lib_div::makeInstance('tslib_fe', $GLOBALS['TYPO3_CONF_VARS'], $pageUid, $type=0, $no_cache=0, $cHash='', $jumpurl='', $MP='', $RDCT='');
+		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][tx_nkwgok_utility::extKey]);
+		$URLsString = $conf['CSVURLs'];
 
-			// builds rootline
-			$GLOBALS['TSFE']->sys_page = t3lib_div::makeInstance('t3lib_pageSelect');
-			$rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($pageUid);
-
-			// init template
-			$GLOBALS['TSFE']->tmpl = t3lib_div::makeInstance('t3lib_tsparser_ext');
-			// Do not log time-performance information
-			$GLOBALS['TSFE']->tmpl->tt_track = 0;
-			$GLOBALS['TSFE']->tmpl->init();
-
-			// this generates the constants/config + hierarchy info for the template.
-			$GLOBALS['TSFE']->tmpl->runThroughTemplates($rootLine, $start_template_uid = 0);
-			$GLOBALS['TSFE']->tmpl->generateConfig();
-			$GLOBALS['TSFE']->tmpl->loaded = 1;
-
-			// get config array and other init from pagegen
-			$GLOBALS['TSFE']->getConfigArray();
-
-			$downloadURLs = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['downloadUrl.'];
+		if ($URLsString) {
+			$URLStrings = explode(' ', trim($URLsString));
+			foreach ($URLStrings as $URL) {
+				$URL = trim($URL);
+				if ($URL !== '') {
+					$downloadURLs[] = $URL;
+				}
+			}
 		}
 
 		return $downloadURLs;

@@ -11,10 +11,12 @@ Es gibt Scheduler Tasks, um die benötigten Daten automatisch neu zu importieren
 Im TYPO3 Extension-Manager gibt es zwei Grundeinstellungen für die Extension:
 
 1. OPAC Base URL with trailing /: Aus dieser URL werden die Links in den OPAC
-gebaut. [Standardwert: https://opac.sub.uni-goettingen.de/DB=1/]
+	gebaut. [Standardwert: https://opac.sub.uni-goettingen.de/DB=1/]
 2. replace included CSS with path: Pfad einer eigenen CSS-Datei für die Baum-
-und Menüdarstellung [Standardwert: leer, die CSS-Datei der Extension wird genutzt]
-
+	und Menüdarstellung [Standardwert: leer, die CSS-Datei der Extension wird genutzt]
+3. URLs of CSV files to download: Liste von URLs, von denen CSV Dateien geladen
+	werden. Einträge der Liste sind durch Leerzeichen getrennt. Die einzelnen
+	zu ladenden Dateien müssen unterschiedliche Namen haben. [Standardwer: leer]
 
 ## Einstellungen für das Content Element
 Jedes Content-Element mit dem  Plug-In hat drei Einstellungsmöglichkeiten:
@@ -120,25 +122,14 @@ Solche CSV-Dateien liegen momentan vor für:
 
 Eingabedateien kommen aus zwei Quellen:
 
-1. können CSV Dateien heruntergeladen werden. Hierzu muß:
-	1. im Setup der Root-Seite der Site ein Array der zu ladenden Dateien in der
-		TypoScript Einstellung `plugin.tx_nkwgok_pi1.downloadUrl` hinterlegt werden.
-
-		Beispiel:
-
-			plugin.tx_nkwgok_pi1.downloadUrl {
-				Neuerwerbungen = http://aac.sub.uni-goettingen.de/fileadmin/gok/csv/AACNeuerwerbungen.csv
-				NeuerwerbungenHist = http://aac.sub.uni-goettingen.de/fileadmin/gok/csv/AACNeuerwerbungenHistory.csv
-				NeuerwerbungenLit = http://aac.sub.uni-goettingen.de/fileadmin/gok/csv/AACNeuerwerbungenLiterature.csv
-			}
-	2. in den Optionen des verwandten Scheduler-Tasks die ID der Root-Seite
-		eingetragen sein
+1. Es können CSV Dateien im Ordner fileadmin/gok/csv hinterlegt werden. Ihre Dateinamen
+	sollten sich nicht mit denen aus Schritt 1 überschneiden.
+2. Es können CSV Dateien heruntergeladen werden. Hierzu muß in der Konfiguration
+	der Extension eine leerzeichenseparierte Liste von URLs hinterlegt werden.
 
 	Mit diesen Einstellungen werden die Dateien an den hinterlegten URLs beim
 		Ausführen des Scheduler Tasks in den Ordner fileadmin/gok/csv geladen
 		und ersetzen dabei ältere Dateien mit denselben Namen.
-2. können CSV Dateien im Ordner fileadmin/gok/csv hinterlegt werden. Ihre Dateinamen
-	sollten sich nicht mit denen aus Schritt 1 überschneiden.
 
 Dateiformat: Als Spaltentrenner wird ein Semikolon (;) erwartet, Spalteninhalte
 können von Anführungszeichen (") umschlossen sein.

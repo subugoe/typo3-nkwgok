@@ -24,7 +24,7 @@ class tx_nkwgok_checkNewCSV extends tx_scheduler_Task {
 		$success = True;
 		if ($this->needsUpdate()) {
 			$convertCSVTask = t3lib_div::makeInstance('tx_nkwgok_convertCSV');
-			$success = $convertCSVTask->execute($this->nkwgokStartPageId);
+			$success = $convertCSVTask->execute();
 			if (!$success) {
 				t3lib_div::devLog('checkNewCSV Scheduler Task: Problem during conversion of CSV files. Stopping.' , tx_nkwgok_utility::extKey, 3);
 			}

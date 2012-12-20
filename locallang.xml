@@ -24,8 +24,8 @@
 			<label index="scheduler.importAll.name">1+2+3: Download, convert and import subject information</label>
 			<label index="scheduler.importAll.description">Downloads Pica-XML subject authority records from OPAC, converts CSV files in fileadmin/gok/csv/ with subject tree information information to Pica-XML and then imports all of them into the TYPO3 database.</label>
 
-			<label index="scheduler.convertCSV.startPageId">Page ID where your root TypoScript is inserted (usually 1)</label>
 		</languageKey>
+
 		
 		<languageKey index="de" type="array">
 			<label index="scheduler.loadFromOpac.name">1: Normdatensätze für Themengebiete aus OPAC laden</label>
@@ -46,7 +46,6 @@
 			<label index="scheduler.importAll.name">1+2+3: Fachhierarchiedaten laden, konvertieren und importieren</label>
 			<label index="scheduler.importAll.description">Lädt und konvertiert alle Daten zu Fachhierarchieen und importiert sie in die TYPO3-Datenbank.</label>
 
-			<label index="scheduler.convertCSV.startPageId">Seiten ID, in der das Haupt-TypoScript eingebunden ist (meistens 1)</label>
 		</languageKey>
 		
 	</data>
