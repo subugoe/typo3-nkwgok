@@ -255,11 +255,15 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 							preg_match($MSCPattern, $csvSearch, $foundMSCs);
 							$foundMSC = strtolower($foundMSCs[1]);
 
-							if (count($foundGOKs) > 1 && $foundGOK
+							if (count($foundGOKs) > 1
+								&& $foundGOK
+								&& array_key_exists(tx_nkwgok_utility::recordTypeGOK, $this->hitCounts)
 								&& array_key_exists($foundGOK, $this->hitCounts[tx_nkwgok_utility::recordTypeGOK])) {
 								$hitCount = $this->hitCounts[tx_nkwgok_utility::recordTypeGOK][$foundGOK];
 							}
-							else if (count($foundMSCs) > 1 && $foundMSC
+							else if (count($foundMSCs) > 1
+								&& $foundMSC
+								&& array_key_exists(tx_nkwgok_utility::recordTypeMSC, $this->hitCounts)
 								&& array_key_exists($foundMSC, $this->hitCounts[tx_nkwgok_utility::recordTypeMSC])) {
 								$hitCount = $this->hitCounts[tx_nkwgok_utility::recordTypeMSC][$foundMSC];
 								$recordType = tx_nkwgok_utility::recordTypeMSC;
