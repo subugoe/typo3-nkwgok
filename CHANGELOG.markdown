@@ -1,3 +1,9 @@
+2012-12-20 3.2.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* fix bug that prevented the correct import of subject information from CSV files only on some systems
+	* ensure tree style is chosen when no display mode is selected in the FlexForm
+	* Rename ChangeLog file
+	* add fake Star Office documentation
+
 2012-12-19 3.1.1 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* fix bug that lost the German subject name when importing from CSV
 
