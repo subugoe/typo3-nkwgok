@@ -91,7 +91,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 				$localData = file_get_contents($localPath);
 				if ($localData != $remoteData) {
 					// Only overwrite local file if the file contents have changed.
-					if (file_put_contents($localPath, $remoteData)) {
+					if (file_put_contents($localPath, $remoteData) !== FALSE) {
 						t3lib_div::devLog('convertCSV Scheduler Task: replaced file ' . $localPath . '.', tx_nkwgok_utility::extKey, 1);
 					}
 					else {
