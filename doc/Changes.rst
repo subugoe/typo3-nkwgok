@@ -1,7 +1,15 @@
+Version History
+===============
+
+2013-02-?? 3.4.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* Remove explicit coding for GOK and BRK root nodes; they are represented by authority records now
+	* Convert Readme and Changes files from Markdown to reST
+
 2012-12-20 3.3.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* re-implement configuration for loading remote CSV files
-		* do not use TypoScript which is attached to a page
-		* store URLs globally in extension configuration
+
+	  * do not use TypoScript which is attached to a page
+	  * store URLs globally in extension configuration
 
 2012-12-20 3.2.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* fix bug that prevented the correct import of subject information from CSV files only on some systems
@@ -14,9 +22,11 @@
 
 2012-12-19 3.1.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Add ability to handle additional/alternate description for a subject name
-		* displayed in the tree elements’ tooltips
-		* filled with strings from Pica 044F when $S is g
-		* in both German (default) and English (when $L eng)
+
+	  * displayed in the tree elements’ tooltips
+	  * filled with strings from Pica 044F when $S is g
+	  * in both German (default) and English (when $L eng)
+
 	* use XPath for parsing tag 044F (the previous method failed on repeated tags)
 	* switch XML parsing on database import to XPath, drop the previously used custom function
 	* change field name for the notation from »gok« to »notation«
@@ -26,7 +36,9 @@
 
 2012-12-11 3.0.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Add support for BRK authority records (Pica type »Tov«)
-		* download the records and their corresponding hit counts
+
+	  * download the records and their corresponding hit counts
+
 	* change naming scheme for downloaded XML files
 	* default to tree style if no style is set in the FlexForm
 	* refactoring to reduce memory footprint in database import scheduler task
@@ -60,12 +72,9 @@
 	* Make number of inline menu child elements configurable through the `menuInlineThreshold` TypoScript setting.
 
 2012-01-27 1.5.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
-	* Ignore hierarchy level in Pica field 009B $a and compute the value ourselves.
-		We depend on this data being correct and it may be incorrect, causing an
-		infinite loop.
+	* Ignore hierarchy level in Pica field 009B $a and compute the value ourselves. We depend on this data being correct and it may be incorrect, causing an infinite loop.
 	* Refactor functions and variables.
-	* Split XML files generated from CSV files into chunks of 500 records (to
-		avoid hitting the 128MB RAM limit for PHP)
+	* Split XML files generated from CSV files into chunks of 500 records (to avoid hitting the 128MB RAM limit for PHP)
 	* CHANGE CSV DATA FORMAT: remove columns 2 and 3
 	* Fix links to OPAC (enclose search terms in quotation marks)
 
@@ -117,28 +126,24 @@
 	* Added configuration for Scheduler Tasks in TypoScript
 
 2011-05-19 0.9.8 Sven-S. Porst <porst@sub.uni-goettingen.de>
-	* add field fromopac to database to reliably spot records originating
-		from the OPAC
+	* add field fromopac to database to reliably spot records originating from the OPAC
 	* use lowercase 'lkl' search key instead of 'LKL' for OPAC GOK records
 
 2011-05-15 0.9.7 Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>
 	* Added TCA definition for the new Tag field
 
 2011-05-05 0.9.6 Sven-S. Porst <porst@sub.uni-goettigen.de>
-	* Change the query format in the search column of the data table from
-		URL-escaped Pica OPAC queries to non-escaped CCL-queries
+	* Change the query format in the search column of the data table from URL-escaped Pica OPAC queries to non-escaped CCL-queries
 
 2011-05-02 0.9.5 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* rename 'Convert history' scheduler task to 'Convert CSV'
 	* store XML files in 'xml' subfolder of fileadmin/gok instead of 'lkl' subfolder
-	* change data tree, so we can have other trees besides the main GOK tree (e.g. for
-		special Neuerwerbungen or Guide subject lists
+	* change data tree, so we can have other trees besides the main GOK tree (e.g. for special Neuerwerbungen or Guide subject lists
 	* add backend configuration for hiding GOK-IDs in tree view
 	* add 'tags' field from column 8 in CSV files
 
 2011-03-30 Sven-S. Porst <porst@sub.uni-goettingen.de>
-	* Add ID of containing TYPO3 object to DOM IDs, so we can use several
-		GOK-displays on the same web page
+	* Add ID of containing TYPO3 object to DOM IDs, so we can use several GOK-displays on the same web page
 
 2011-03-24 0.9 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* Add loading of OPAC data as a scheduler job
