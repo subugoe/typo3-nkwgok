@@ -22,6 +22,11 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
+/**
+ * Changes 2011-2013 by Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * See the Changelog or git repository for details.
+ */
+
 
 require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok_utility.php');
 
@@ -38,7 +43,7 @@ class tx_nkwgok_ff {
 			$optionValue = $row['notation'];
 			$options[] = array($optionTitle , $optionValue);
 
-			$childNodes = $this->queryForChildrenOf($optionValue);
+			$childNodes = $this->queryForChildrenOf($row['ppn']);
 			while($childRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($childNodes)) {
 				$childOptionTitle = '—[' . $childRow['notation'] . '] ' . $childRow['descr'];
 				$childOptionValue = $childRow['notation'];
