@@ -1,13 +1,17 @@
 <?php
 
+/**
+ * Class providing helper functions and constants.
+ *
+ * @author Sven-S. Porst <porst@sub.uni-goettingen.de>
+ */
+
 class tx_nkwgok_utility {
 
 	const extKey = 'nkwgok';
 	const dataTable = 'tx_nkwgok_data';
 
 	const rootNode = 'Root';
-	const GOKRootNode = 'GOK-Root';
-	const BRKRootNode = 'BRK-Root';
 
 	const recordTypeGOK = 'gok';
 	const recordTypeBRK = 'brk';

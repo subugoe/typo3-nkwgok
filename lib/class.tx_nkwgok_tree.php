@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2010 by Nils K. Windisch, SUB Göttingen
  * <windisch@sub.uni-goettingen.de
- * Copyright (C) 2011-2012 by Sven-S. Porst, SUB Göttingen
+ * Copyright (C) 2011-2013 by Sven-S. Porst, SUB Göttingen
  * <porst@sub.uni-goettingen.de>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -527,8 +527,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$GOKSearchURL = $conf['opacBaseURL'] . 'LNG=' . $picaLanguageCode;
 
 		if ($deepSearch === True
-			&& ($GOKData['type'] === tx_nkwgok_utility::recordTypeGOK || $GOKData['type'] === tx_nkwgok_utility::recordTypeBRK)
-			&& $GOKData['ppn'] !== tx_nkwgok_utility::GOKRootNode && $GOKData['ppn'] !== tx_nkwgok_utility::BRKRootNode) {
+			&& ($GOKData['type'] === tx_nkwgok_utility::recordTypeGOK || $GOKData['type'] === tx_nkwgok_utility::recordTypeBRK)) {
 			// Use special command to do the hierarchical search for records related
 			// to the Normsatz PPN.
 			$GOKSearchURL .= '/EPD?PPN=' . $GOKData['ppn'] . '&FRM=';

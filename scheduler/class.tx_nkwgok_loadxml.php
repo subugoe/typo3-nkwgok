@@ -25,8 +25,8 @@
 
 
 /**
- * Changes 2011-2012 by Sven-S. Porst <porst@sub.uni-goettingen.de>
- * See the ChangeLog or git repository for details.
+ * Changes 2011-2013 by Sven-S. Porst <porst@sub.uni-goettingen.de>
+ * See the Changelog or git repository for details.
  */
 
 
@@ -75,8 +75,6 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 		$result = $this->loadXMLForType(tx_nkwgok_utility::recordTypeCSV);
 		$result &= $this->loadXMLForType(tx_nkwgok_utility::recordTypeGOK);
 		$result &= $this->loadXMLForType(tx_nkwgok_utility::recordTypeBRK);
-
-		$this->addRootNodes();
 
 		// Delete all old records with statusID 1, then switch all new records to statusID 0.
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery(tx_nkwgok_utility::dataTable, 'statusID = 0');
@@ -302,57 +300,6 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 
 
 	/**
-	 * Helper function, adding the GOK and BRK root nodes to the database.
-	 */
-	private function addRootNodes () {
-		// Add the GOK root node.
-		$GOKRootRow = array(
-			'ppn' => tx_nkwgok_utility::GOKRootNode,
-			'hierarchy' => 0,
-			'notation' => tx_nkwgok_utility::GOKRootNode,
-			'parent' => tx_nkwgok_utility::rootNode,
-			'descr' => 'Göttinger Online Klassifikation (GOK)',
-			'descr_en' => 'Göttingen Online Classification (GOK)',
-			'descr_alternate' => '',
-			'descr_alternate_en' => '',
-			'search' => '',
-			'tags' => '',
-			'childcount' => count($this->tree[tx_nkwgok_utility::GOKRootNode]),
-			'type' => tx_nkwgok_utility::recordTypeGOK,
-			'hitcount' => -1,
-			'totalhitcount' => -1,
-			'crdate' => time(),
-			'tstamp' => time(),
-			'statusID' => 1
-		);
-		$GLOBALS['TYPO3_DB']->exec_INSERTquery(tx_nkwgok_utility::dataTable, $GOKRootRow);
-
-		// Add the Band-Realkatalog root node.
-		$BRKRootRow = array(
-			'ppn' => tx_nkwgok_utility::BRKRootNode,
-			'hierarchy' => 0,
-			'notation' => tx_nkwgok_utility::BRKRootNode,
-			'parent' => tx_nkwgok_utility::rootNode,
-			'descr' => 'Göttinger Band-Realkatalog',
-			'descr_en' => 'Göttingen Band-Realkatalog',
-			'descr_alternate' => '',
-			'descr_alternate_en' => '',
-			'search' => '',
-			'tags' => '',
-			'childcount' => count($this->tree[tx_nkwgok_utility::BRKRootNode]),
-			'type' => tx_nkwgok_utility::recordTypeBRK,
-			'hitcount' => -1,
-			'totalhitcount' => -1,
-			'crdate' => time(),
-			'tstamp' => time(),
-			'statusID' => 1
-		);
-		$GLOBALS['TYPO3_DB']->exec_INSERTquery(tx_nkwgok_utility::dataTable, $BRKRootRow);
-	}
-
-
-
-	/**
 	 * Goes through data files and creates information of the subject tree’s
 	 * structure from that.
 	 *
@@ -372,9 +319,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 	 */
 	private function loadSubjectTree ($fileList) {
 		$tree = Array();
-		$tree[tx_nkwgok_utility::GOKRootNode] = Array('children' => Array(), 'parent' => tx_nkwgok_utility::rootNode, 'type' => tx_nkwgok_utility::recordTypeGOK);
-		$tree[tx_nkwgok_utility::BRKRootNode] = Array('children' => Array(), 'parent' => tx_nkwgok_utility::rootNode, 'type' => tx_nkwgok_utility::recordTypeBRK);
-		$tree[tx_nkwgok_utility::rootNode] = Array('children' => Array(tx_nkwgok_utility::GOKRootNode, tx_nkwgok_utility::BRKRootNode));
+		$tree[tx_nkwgok_utility::rootNode] = Array('children' => Array());
 
 		// Run through all files once to gather information about the
 		// structure of the data we process.
@@ -408,19 +353,7 @@ class tx_nkwgok_loadxml extends tx_scheduler_Task {
 				}
 				else {
 					// has no parent record
-					if ($recordType === tx_nkwgok_utility::recordTypeGOK) {
-						// GOK subject authority record.
-						$parentPPN = tx_nkwgok_utility::GOKRootNode;
-					}
-					else if ($recordType === tx_nkwgok_utility::recordTypeBRK) {
-						// BRK subject authoriy record.
-						$parentPPN = tx_nkwgok_utility::BRKRootNode;
-					}
-					else {
-						// Other record: goes in at top level.
-						$parentPPN = tx_nkwgok_utility::rootNode;
-					}
-
+					$parentPPN = tx_nkwgok_utility::rootNode;
 					$tree[$parentPPN]['children'][] = $PPN;
 					$tree[$PPN]['parent'] = $parentPPN;
 				}
