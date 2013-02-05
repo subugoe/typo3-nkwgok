@@ -1,9 +1,10 @@
 Version History
 ===============
 
-2013-02-?? 3.4.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
-	* Remove explicit coding for GOK and BRK root nodes; they are represented by authority records now
-	* Convert Readme and Changes files from Markdown to reST
+2013-02-05 3.4.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* remove explicit coding for GOK and BRK root nodes; they are represented by authority records now
+	* build subtrees in FlexForm using PPN, not notation
+	* convert Readme and Changes files from Markdown to reST
 
 2012-12-20 3.3.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* re-implement configuration for loading remote CSV files
