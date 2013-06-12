@@ -150,11 +150,12 @@ class tx_nkwgok_menu extends tx_nkwgok {
 			var newSelect = document.createElement('select');
 			var jNewSelect = jQuery(newSelect);
 			newSelect.setAttribute('level', level);
-			if (!jQuery.browser.msie) {
+			var isIE = (navigator.appVersion.indexOf('MSIE ') !== -1);
+			if (!isIE) {
 				jNewSelect.hide();
 			}
 			option.form.appendChild(newSelect);
-			if (!jQuery.browser.msie) {
+			if (!isIE) {
 				jNewSelect.slideDown('fast');
 			}
 			var loadingOption = document.createElement('option');
