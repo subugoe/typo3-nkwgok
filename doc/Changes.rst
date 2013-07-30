@@ -1,6 +1,9 @@
 Version History
 ===============
 
+2013-07-30 3.4.1 Sven-S. Porst <porst@sub.uni-goettingen.de>
+	* compatible with jQuery ≥1.9
+
 2013-02-05 3.4.0 Sven-S. Porst <porst@sub.uni-goettingen.de>
 	* remove explicit coding for GOK and BRK root nodes; they are represented by authority records now
 	* build subtrees in FlexForm using PPN, not notation
