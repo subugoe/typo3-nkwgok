@@ -33,8 +33,8 @@
  * @package TYPO3
  * @subpackage tx_nkwgok
  */
-class tx_nkwgok_pi1 extends tslib_pibase {
-	
+class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
+
 	/**
 	 * Main method of the PlugIn
 	 *
@@ -42,7 +42,7 @@ class tx_nkwgok_pi1 extends tslib_pibase {
 	 * @author	Sven-S. Porst <porst@sub.uni-goettingen.de>
 	 * @param	string		$content: The PlugIn content
 	 * @param	array		$conf: The PlugIn configuration
-	 * @return	The content that is displayed on the website
+	 * @return	string The content that is displayed on the website
 	 */
 	function main($content, $conf) {
 		// basic
@@ -55,8 +55,8 @@ class tx_nkwgok_pi1 extends tslib_pibase {
 		$this->addStylesheet();
 
 		// get getvars
-		$arguments = t3lib_div::_GET('tx_nkwgok');
-		
+		$arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GET('tx_nkwgok');
+
 		// get flexform
 		$arguments['notation'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'source', 'sDEF');
 		$altSource = trim($this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'altSource', 'sDEF'));
@@ -78,13 +78,11 @@ class tx_nkwgok_pi1 extends tslib_pibase {
 		$arguments['language'] = $GLOBALS['TSFE']->lang;
 
 		$nkwgok = tx_nkwgok::instantiateSubclassFor($arguments);
-		$doc = $nkwgok->getMarkup();		
+		$doc = $nkwgok->getMarkup();
 		$content .= $doc->saveHTML();
-		
+
 		return $content;
 	}
-
-
 
 	/**
 	 * Helper function to add our default stylesheet or the one at the path
@@ -97,7 +95,7 @@ class tx_nkwgok_pi1 extends tslib_pibase {
 		$nkwgokGlobalConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][tx_nkwgok_utility::extKey]);
 		$cssPath = $nkwgokGlobalConf['CSSPath'];
 		if (!$cssPath) {
-			$cssPath = 'EXT:nkwgok/res/nkwgok.css';
+			$cssPath = 'EXT:nkwgok/Resources/Public/Css/nkwgok.css';
 		}
 
 		$GLOBALS['TSFE']->pSetup['includeCSS.'][tx_nkwgok_utility::extKey] = $cssPath;
@@ -105,9 +103,6 @@ class tx_nkwgok_pi1 extends tslib_pibase {
 
 }
 
-
-
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/pi1/class.tx_nkwgok_pi1.php']) {
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/pi1/class.tx_nkwgok_pi1.php']);
 }
-?>

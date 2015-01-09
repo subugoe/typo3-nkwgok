@@ -46,19 +46,15 @@ class tx_nkwgok_eid {
 	 * @author Sven-S. Porst <porst@sub.uni-goettingen.de>
 	 * */
 	function eid_main() {
-		// initialize DB functions
-		tslib_eidtools::connectDB();
 
-		$arguments = t3lib_div::_GET('tx_nkwgok');
+		$arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GET('tx_nkwgok');
 		$nkwgok = tx_nkwgok::instantiateSubclassFor($arguments);
 		$output = $nkwgok->getAJAXMarkup();
-	
+
 		echo $output->saveHTML();
 	}
 
 }
 
-$nkwgok_eid = t3lib_div::makeInstance('tx_nkwgok_eid');
+$nkwgok_eid = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_eid');
 $nkwgok_eid->eid_main();
-
-?>

@@ -67,12 +67,12 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$useShallowLinks = ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowSearch'] == 1);
 		if ($this->arguments['omitXXX']) {
 			$useShallowLinks = TRUE;
-			t3lib_div::devLog('Configured to use deep links together with omitXXX. This will not work as the totalhitcount is incorrect when we arbitrarily leave out child elements. Using shallow links instead.' , tx_nkwgok_utility::extKey, 2);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('Configured to use deep links together with omitXXX. This will not work as the totalhitcount is incorrect when we arbitrarily leave out child elements. Using shallow links instead.' , tx_nkwgok_utility::extKey, 2);
 		}
 		if ($useShallowLinks)  {
 			$containerClasses[] = 'shallowLinks';
 		}
-		
+
 		$container->setAttribute('class', implode(' ', $containerClasses));
 		$container->setAttribute('id', 'tx_nkwgok-' . $this->objectID);
 
@@ -114,8 +114,6 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		return $this->doc;
 	}
 
-
-
 	/**
 	 * Returns markup for subject menus based on the configuration in $this->arguments.
 	 *
@@ -129,8 +127,6 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 		return $this->doc;
 	}
-
-
 
 	/**
 	 * Helper function to insert JavaScript for the subject tree into the passed
@@ -175,7 +171,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			var functionText = 'hideGOK" . $this->objectID . "(\"' + id + '\");return false;';
 			link[0].onclick = new Function(functionText);
 			jQuery.get("
-				. "'" . t3lib_div::getIndpEnv('TYPO3_SITE_URL') . "index.php',
+				. "'" . \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . "index.php',
 				{'eID': '" . tx_nkwgok_utility::extKey . "', "
 				. "'tx_" . tx_nkwgok_utility::extKey . "[language]': '" . $this->language . "', "
 				. "'tx_" . tx_nkwgok_utility::extKey . "[expand][0]': id, "
@@ -248,7 +244,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @return void
 	 * */
 	private function appendGOKTreeChildren($parentPPN, $container, $expandMarker, $autoExpandLevel) {
-		$GOKs = $this->getChildren($parentPPN, True);
+		$GOKs = $this->getChildren($parentPPN, TRUE);
 		if (sizeof($GOKs) > 1) {
 			$ul = $this->doc->createElement('ul');
 			$container->appendChild($ul);
@@ -259,7 +255,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			$ul->setAttribute('class', 'level-' . $firstGOK['hierarchy']);
 			if ($firstGOK['hitcount'] > 0) {
 				$firstGOK['descr'] = $this->localise('Allgemeines');
-				$this->appendGOKTreeItem($ul, 'li', $firstGOK, $expandMarker, $autoExpandLevel, False, 'general-items-node');
+				$this->appendGOKTreeItem($ul, 'li', $firstGOK, $expandMarker, $autoExpandLevel, FALSE, 'general-items-node');
 			}
 
 			foreach ($GOKs as $GOK) {
@@ -326,7 +322,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 		$GOKNameSpan = $this->doc->createElement('span');
 		$GOKNameSpan->setAttribute('class', 'GOKName');
-		$GOKNameSpan->appendChild($this->doc->createTextNode($this->GOKName($GOK, True)));
+		$GOKNameSpan->appendChild($this->doc->createTextNode($this->GOKName($GOK, TRUE)));
 
 		$openLink->appendChild($this->doc->createTextNode(' '));
 		$openLink->appendChild($GOKIDSpan);
@@ -341,7 +337,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$buttonText = '   ';
 		$JSCommand = '';
 		$itemClass = 'nochildren';
-		if ($isInteractive === True) {
+		if ($isInteractive === TRUE) {
 			// Set up addition to title, if it exists.
 			$titleAddition = '';
 			if ($this->language === 'en' && $GOK['descr_alternate_en'] !== '') {
@@ -355,7 +351,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				$noscriptLink = '#';
 				$mainTitle = sprintf($this->localise('%s Unterkategorien anzeigen'), $GOK['childcount']);
 				$alternativeTitle = $this->localise('Unterkategorien ausblenden');
-				$urlComponents = parse_url(t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'));
+				$urlComponents = parse_url(\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
 				$baseURL = $urlComponents['scheme'] .  '://' . $urlComponents['host'] . $urlComponents['path'];
 				$queryComponents = Array();
 				parse_str($urlComponents['query'], $queryComponents);
@@ -372,7 +368,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 					$mainTitle = $alternativeTitle;
 					$alternativeTitle = $tmpTitle;
 					$queryComponents['tx_nkwgok']['expand'] = $expandMarker;
-					$noscriptLink = t3lib_div::linkThisUrl($baseURL, $queryComponents);
+					$noscriptLink = \TYPO3\CMS\Core\Utility\GeneralUtility::linkThisUrl($baseURL, $queryComponents);
 
 					// Recursively add opened subject list.
 					// Add it into the current item for the default tree style.
@@ -388,7 +384,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 					$JSCommand = 'expandGOK' . $this->objectID;
 					$buttonText = '[+]';
 					$queryComponents['tx_nkwgok']['expand'] = $expand;
-					$noscriptLink = t3lib_div::linkThisUrl($baseURL, $queryComponents)
+					$noscriptLink = \TYPO3\CMS\Core\Utility\GeneralUtility::linkThisUrl($baseURL, $queryComponents)
 						. '#c' . $this->objectID . '-' .  $PPN;
 				}
 
@@ -463,7 +459,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 *
 	 * @author Sven-S. Porst
 	 * @param Array $GOKData subject record
-	 * @param Boolean $deepSearch
+	 * @param bool $deepSearch
 	 * @return DOMElement
 	 */
 	private function OPACLinkElement ($GOKData, $deepSearch) {
@@ -545,5 +541,3 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	}
 
 }
-
-?>

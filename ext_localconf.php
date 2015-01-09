@@ -24,7 +24,7 @@
 if (!defined ('TYPO3_MODE')) {
 	die ('Access denied.');
 }
-t3lib_extMgm::addPItoST43($_EXTKEY, 'pi1/class.tx_nkwgok_pi1.php', '_pi1', 'list_type', 1);
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPItoST43($_EXTKEY, 'pi1/class.tx_nkwgok_pi1.php', '_pi1', 'list_type', 1);
 
 // Scheduler task for downloading LKL data from OPAC.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadFromOpac'] = array(
@@ -74,4 +74,3 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_impor
 );
 
 $TYPO3_CONF_VARS['FE']['eID_include']['nkwgok'] = 'EXT:nkwgok/lib/get.php';
-?>

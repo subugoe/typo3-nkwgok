@@ -26,7 +26,7 @@ if (!defined('TYPO3_MODE')) {
 	die('Access denied.');
 }
 // Add TypoScript to Configuration
-t3lib_extMgm::addStaticFile($_EXTKEY, 'static/', 'GOK');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($_EXTKEY, 'Configuration/TypoScript/', 'GOK');
 
 $TCA['tx_nkwgok_data'] = array(
 	'ctrl' => array(
@@ -38,24 +38,22 @@ $TCA['tx_nkwgok_data'] = array(
 		'crdate' => 'crdate',
 		'cruser_id' => 'cruser_id',
 		'default_sortby' => 'ORDER BY crdate',
-		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'tca.php',
-		'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'ext_icon.gif',
+		'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY) . 'Configuration/TCA/Data.php',
+		'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath($_EXTKEY) . 'Resources/Public/Images/ext_icon.gif',
 		'searchFields' => 'descr, descr_en, notation'
 	),
 );
-t3lib_div::loadTCA('tt_content');
 $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY . '_pi1'] = 'layout,select_key,pages';
 $TCA['tt_content']['types']['list']['subtypes_addlist'][$_EXTKEY . '_pi1'] = 'pi_flexform';
-t3lib_extMgm::addPiFlexFormValue($_EXTKEY . '_pi1', 'FILE:EXT:nkwgok/pi1/flexform.xml');
-t3lib_extMgm::addPlugin(
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue($_EXTKEY . '_pi1', 'FILE:EXT:nkwgok/pi1/flexform.xml');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin(
 				array(
 					'LLL:EXT:nkwgok/locallang_db.xml:tt_content.list_type_pi1',
 					$_EXTKEY . '_pi1',
-					t3lib_extMgm::extRelPath($_EXTKEY) . 'ext_icon.gif'),
+					\TYPO3\CMS\About\Domain\Model\Extension::extRelPath($_EXTKEY) . 'Resources/Public/Images/ext_icon.gif'),
 				'list_type');
 if (TYPO3_MODE == 'BE') {
-	t3lib_extMgm::addLLrefForTCAdescr('xMOD_tx_nkwgok', 'EXT:' . $_EXTKEY . '/locallang_csh.xml');
+	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('xMOD_tx_nkwgok', 'EXT:' . $_EXTKEY . '/locallang_csh.xml');
 }
 // class for dynamic FF
-include_once(t3lib_extMgm::extPath($_EXTKEY) . '/lib/class.tx_nkwgok_ff.php');
-?>
+include_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY) . '/lib/class.tx_nkwgok_ff.php');

@@ -15,7 +15,7 @@
  * @package		TYPO3
  * @subpackage	tx_nkwgok
  */
-class tx_nkwgok_convertCSV extends tx_scheduler_Task {
+class tx_nkwgok_convertCSV extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 
 	/**
 	 * List of all PPNs processed so far.
@@ -23,8 +23,6 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 * @var array
 	 */
 	protected $PPNList = Array();
-
-
 
 	/**
 	 * Function executed from the Scheduler.
@@ -44,8 +42,6 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 		return $success;
 	}
 
-	
-	
 	/**
 	 * Retrieves setup information with an array of URLs pointing to CSV files
 	 * that need to be downloaded from TypoScript.
@@ -73,8 +69,6 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 		return $downloadURLs;
 	}
 
-	
-
 	/**
 	 * Downloads files from URLs in the passed array to fileadmin/gok/csv.
 	 * Potentially overwrites previously existing files.
@@ -92,20 +86,18 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 				if ($localData != $remoteData) {
 					// Only overwrite local file if the file contents have changed.
 					if (file_put_contents($localPath, $remoteData) !== FALSE) {
-						t3lib_div::devLog('convertCSV Scheduler Task: replaced file ' . $localPath . '.', tx_nkwgok_utility::extKey, 1);
+						\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('convertCSV Scheduler Task: replaced file ' . $localPath . '.', tx_nkwgok_utility::extKey, 1);
 					}
 					else {
-						t3lib_div::devLog('convertCSV Scheduler Task: failed to write downloaded file to ' . $localPath . '.', tx_nkwgok_utility::extKey, 2, Array($localData, $remoteData));
+						\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('convertCSV Scheduler Task: failed to write downloaded file to ' . $localPath . '.', tx_nkwgok_utility::extKey, 2, Array($localData, $remoteData));
 					}
 				}
 			}
 			else {
-				t3lib_div::devLog('convertCSV Scheduler Task: failed to download ' . $URL . '.', tx_nkwgok_utility::extKey, 2);
+				\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('convertCSV Scheduler Task: failed to download ' . $URL . '.', tx_nkwgok_utility::extKey, 2);
 			}
 		}
 	}
-
-
 
 	/**
 	 * Loads CSV file at the given path and processes it to OPAC XML format
@@ -141,7 +133,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 		foreach ($CSVLines as $lineNumber => $line) {
 			// Set up document.
 			if ($doc === Null) {
-				$doc = DOMImplementation::createDocument();
+				$doc = \DOMImplementation::createDocument();
 				$result = $doc->createElement('RESULT');
 				$doc->appendChild($result);
 				$set = $doc->createElement('SET');
@@ -204,18 +196,18 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 					}
 
 					if ($this->PPNList[$PPN]) {
-						t3lib_div::devLog('convertCSV Scheduler Task: Duplicate PPN "' . $PPN. '" in file ' . $CSVPath, tx_nkwgok_utility::extKey, 2);
+						\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('convertCSV Scheduler Task: Duplicate PPN "' . $PPN. '" in file ' . $CSVPath, tx_nkwgok_utility::extKey, 2);
 					}
 
 					// Add current PPN to PPN list.
 					$this->PPNList[$PPN] = True;
 				}
 				else {
-					t3lib_div::devLog('convertCSV Scheduler Task: Blank PPN  in line: "' . implode(';', $fields) .'" of file ' . $CSVPath, tx_nkwgok_utility::extKey, 2);
+					\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('convertCSV Scheduler Task: Blank PPN  in line: "' . implode(';', $fields) .'" of file ' . $CSVPath, tx_nkwgok_utility::extKey, 2);
 				} // if ($PPN != '')
 			}
 			else if (count($fields) > 1 && trim(implode('', $fields)) !== '') {
-				t3lib_div::devLog('convertCSV Scheduler Task: Line "' . implode(';', $fields) . '" of file ' . $CSVPath . ' contains less than 3 fields.', tx_nkwgok_utility::extKey, 2);
+				\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('convertCSV Scheduler Task: Line "' . implode(';', $fields) . '" of file ' . $CSVPath . ' contains less than 3 fields.', tx_nkwgok_utility::extKey, 2);
 			} // (count($fields) >= 3)
 
 
@@ -228,7 +220,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 				$resultPath = PATH_site. 'fileadmin/gok/xml/' . $XMLFileName;
 
 				if ($doc->save($resultPath) === False) {
-					t3lib_div::devLog('convertCSV Scheduler Task: Failed to write XML file' . $resultPath , tx_nkwgok_utility::extKey, 3);
+					\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('convertCSV Scheduler Task: Failed to write XML file' . $resultPath , tx_nkwgok_utility::extKey, 3);
 					break;
 				}
 				else {
@@ -241,8 +233,6 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 
 		return $success;
 	}
-
-
 
 	/**
 	 * Wraps the field content in a datafield/subfield structure with the
@@ -257,7 +247,7 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 	 */
 	private function appendFieldForDataTo ($fieldName, $subfieldName, $content, $container, $doc) {
 		$datafield = Null;
-		
+
 		if ($fieldName !== Null && $subfieldName !== Null
 				&& $content !== Null && $container !== Null && $doc !== Null) {
 			$datafield = $doc->createElement('datafield');
@@ -271,9 +261,9 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 			$subfield->appendChild($doc->createTextNode($content));
 		}
 		else {
-			t3lib_div::devLog('convertCSV Scheduler Task: Some parameter was Null in appendFieldForDataTo' , tx_nkwgok_utility::extKey, 3);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('convertCSV Scheduler Task: Some parameter was Null in appendFieldForDataTo' , tx_nkwgok_utility::extKey, 3);
 		}
-		
+
 		return $datafield;
 	}
 
@@ -281,9 +271,6 @@ class tx_nkwgok_convertCSV extends tx_scheduler_Task {
 }
 
 
-
-if (defined('TYPO3_MODE')
-		&& $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_convertcsv.php']) {
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_convertcsv.php']) {
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_convertcsv.php']);
 }
-?>

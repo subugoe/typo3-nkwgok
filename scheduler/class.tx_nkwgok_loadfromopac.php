@@ -20,7 +20,7 @@ define('NKWGOKImportChunkSize', 500);
  * @package		TYPO3
  * @subpackage	tx_nkwgok
  */
-class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
+class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 
 	/**
 	 * Function executed from the Scheduler.
@@ -33,7 +33,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 		$opacBaseURL = $conf['opacBaseURL'] . 'XML=1/XMLSAVE=N/';
 		$baseDir = PATH_site . 'fileadmin/gok/';
 
-		t3lib_div::mkdir_deep(PATH_site, 'fileadmin/gok/xml');
+		\TYPO3\CMS\Core\Utility\GeneralUtility::mkdir_deep(PATH_site, 'fileadmin/gok/xml');
 		// Create lkl folder if necessary and remove all files whose names begin with a digit.
 		// (This is a simple heuristic to delete all the files we downloaded and keep
 		// the CSV files whose names begin with a letter.)
@@ -51,7 +51,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 
 
 		// Create the hitcounts folder if necessary and delete all files inside it if it exists.
-		t3lib_div::mkdir(PATH_site, 'fileadmin/gok/hitcounts');
+		\TYPO3\CMS\Core\Utility\GeneralUtility::mkdir(PATH_site, 'fileadmin/gok/hitcounts');
 		$hitCountDir = $baseDir . 'hitcounts/';
 		$hitCountFileList = glob($hitCountDir . '*');
 		foreach ($hitCountFileList as $file) {
@@ -65,8 +65,6 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 
 		return $success;
 	}
-
-
 
 	/**
 	 * Downloads batches of local authority records from OPAC as
@@ -99,24 +97,22 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 					$firstRecord += NKWGOKImportChunkSize;
 				}
 				else {
-					t3lib_div::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , tx_nkwgok_utility::extKey, 3);
+					\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , tx_nkwgok_utility::extKey, 3);
 					$success = False;
 				}
 			}
 			else {
-				t3lib_div::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, tx_nkwgok_utility::extKey, 3);
+				\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, tx_nkwgok_utility::extKey, 3);
 				$success = False;
 			}
 		}
 
 		if ($success) {
-			t3lib_div::devLog('loadFromOpac Scheduler Task: LKL download for ' . $fileBaseName - ' succeeded', tx_nkwgok_utility::extKey, 1);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: LKL download for ' . $fileBaseName - ' succeeded', tx_nkwgok_utility::extKey, 1);
 		}
 
 		return $success;
 	}
-
-
 
 	/**
 	 * Downloads hit counts for all entries of the $indexName index by browsing.
@@ -152,7 +148,7 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 					fclose($targetFile);
 				}
 				else {
-					t3lib_div::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , tx_nkwgok_utility::extKey, 3);
+					\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , tx_nkwgok_utility::extKey, 3);
 					$success = False;
 				}
 
@@ -160,25 +156,20 @@ class tx_nkwgok_loadFromOpac extends tx_scheduler_Task {
 				$scanNext = $termAttribute[0];
 			}
 			else {
-				t3lib_div::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, tx_nkwgok_utility::extKey, 3);
+				\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, tx_nkwgok_utility::extKey, 3);
 				$success = False;
 			}
 		}
 
 		if ($success) {
-			t3lib_div::devLog('loadFromOpac Scheduler Task: hitcount download for index ' . $indexName . ' succeeded', tx_nkwgok_utility::extKey, 1);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: hitcount download for index ' . $indexName . ' succeeded', tx_nkwgok_utility::extKey, 1);
 		}
 
 		return $success;
 	}
 
-
 }
 
-
-
-if (defined('TYPO3_MODE')
-		&& $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_loadfromopac.php']) {
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_loadfromopac.php']) {
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_loadfromopac.php']);
 }
-?>

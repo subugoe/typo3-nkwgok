@@ -62,7 +62,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 
 		$startNodes = explode(',', $this->arguments['notation']);
 		if (count($startNodes) > 1) {
-			t3lib_div::devLog('several start nodes given (' . $this->arguments['notation'] . ') but only the first is used in menu mode' , tx_nkwgok_utility::extKey, 2);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('several start nodes given (' . $this->arguments['notation'] . ') but only the first is used in menu mode' , tx_nkwgok_utility::extKey, 2);
 		}
 		$startNodeGOK = trim($startNodes[0]);
 		$firstNodeCondition = "notation LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK, tx_nkwgok_utility::dataTable) . ' AND statusID = 0';
@@ -88,11 +88,9 @@ class tx_nkwgok_menu extends tx_nkwgok {
 		return $this->doc;
 	}
 
-
-
 	/**
 	 * Returns markup for subject menus based on the configuration in $this->arguments.
-	 * 
+	 *
 	 * @return DOMDocument
 	 */
 	public function getAJAXMarkup () {
@@ -104,8 +102,6 @@ class tx_nkwgok_menu extends tx_nkwgok {
 
 		return $this->doc;
 	}
-
-
 
 	/**
 	 * Helper function to insert JavaScript for the subject menu into the passed
@@ -181,8 +177,6 @@ class tx_nkwgok_menu extends tx_nkwgok {
 ";
 		$scriptElement->appendChild($this->doc->createTextNode($js));
 	}
-
-
 
 	/**
 	 * Looks up child elements for the given $parentPPN, creates DOM elements
@@ -289,5 +283,3 @@ class tx_nkwgok_menu extends tx_nkwgok {
 	}
 
 }
-
-?>

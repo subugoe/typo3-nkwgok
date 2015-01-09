@@ -28,10 +28,10 @@
  */
 
 
-require_once(t3lib_extMgm::extPath('nkwgok') . 'lib/class.tx_nkwgok_utility.php');
+require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('nkwgok') . 'lib/class.tx_nkwgok_utility.php');
 
 /**
- * Description 
+ * Description
  */
 class tx_nkwgok_ff {
 	function addFields($config) {
@@ -77,4 +77,3 @@ class tx_nkwgok_ff {
 	}
 
 }
-?>

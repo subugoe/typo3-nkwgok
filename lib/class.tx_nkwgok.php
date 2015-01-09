@@ -57,20 +57,16 @@ abstract class tx_nkwgok {
 
 	/**
 	 * Language code to use for the localisation.
-	 * @var string ISO 639-1 language code 
+	 * @var string ISO 639-1 language code
 	 */
 	protected $language;
 
-
-	
 	/**
 	 * TYPO3 content object ID for our content element. This variable
 	 * is initialised by the instantiateSubclassFor() method.
 	 * @var string
 	 */
 	protected $objectID;
-
-
 
 	/**
 	 * DOMDocument used by subclasses to create their content. This variable
@@ -79,29 +75,23 @@ abstract class tx_nkwgok {
 	 */
 	protected $doc;
 
-
-
 	/**
 	 * Implemented by subclasses.
 	 * Returns a DOMDocument with markup for the subject hierarchy based on the
 	 * settings passed to instantiateSubclassFor.
-	 * 
+	 *
 	 * @return DOMDocument
 	 */
 	abstract function getMarkup ();
 
-	
-	
 	/**
 	 * Implemented by subclasses.
 	 * Returns a DOMDocument with markup for the partial subject hierarchy based
 	 * on the settings passed to instantiateSubclassFor.
-	 * 
+	 *
 	 * @return DOMDocument
 	 */
 	abstract function getAJAXMarkup ();
-
-
 
 	/**
 	 * Uses the 'style' field of the $arguments array to determine which subclass
@@ -114,11 +104,11 @@ abstract class tx_nkwgok {
 		$subclass = NULL;
 
 		if ($arguments['style'] === 'menu') {
-			$subclass = t3lib_div::makeInstance('tx_nkwgok_menu');
+			$subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_menu');
 		}
 		else {
 			// Default to displaying the tree. Expected for styles 'tree' and 'column'.
-			$subclass = t3lib_div::makeInstance('tx_nkwgok_tree');
+			$subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_tree');
 			if (!array_key_exists('style', $arguments) || !$arguments['style']) {
 				// Default to tree style if style is not set.
 				$arguments['style'] = 'tree';
@@ -128,15 +118,13 @@ abstract class tx_nkwgok {
 		if ($subclass) {
 			// Configure the newly created instance.
 			$subclass->arguments = $arguments;
-			$subclass->doc = DOMImplementation::createDocument();
+			$subclass->doc = \DOMImplementation::createDocument();
 			$subclass->objectID = $arguments['objectID'];
 			$subclass->language = $arguments['language'];
 		}
 
 		return $subclass;
 	}
-
-
 
 	/**
 	 * @var Array
@@ -153,8 +141,8 @@ abstract class tx_nkwgok {
 	 */
 	protected function localise ($key) {
 		$result = '';
-		
-		$filePath = t3lib_div::getFileAbsFileName('EXT:' . tx_nkwgok_utility::extKey . '/pi1/locallang.xml');
+
+		$filePath = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName('EXT:' . tx_nkwgok_utility::extKey . '/pi1/locallang.xml');
 		if (!$this->localisation) {
 			/**
 			 * The returned $localisation seems to have the following structure:
@@ -162,7 +150,7 @@ abstract class tx_nkwgok {
 			 * Only the requested languageKey seems to be present and the innermost
 			 * array can also contain a 'source' key.
 			 */
-			$parser = t3lib_div::makeInstance('t3lib_l10n_parser_Llxml');
+			$parser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_l10n_parser_Llxml');
 			$this->localisation = $parser->getParsedData($filePath, $this->language);
 		}
 
@@ -170,7 +158,7 @@ abstract class tx_nkwgok {
 		if (!array_key_exists($this->language, $this->localisation)) {
 			$myLanguage = 'default';
 		}
-		
+
 		if (array_key_exists($key, $this->localisation[$myLanguage])) {
 			$result = $this->localisation[$myLanguage][$key];
 		}
@@ -186,8 +174,6 @@ abstract class tx_nkwgok {
 
 		return $result;
 	}
-
-
 
 	/**
 	 * Return subject name for display.
@@ -223,8 +209,6 @@ abstract class tx_nkwgok {
 		}
 		return trim($displayName);
 	}
-
-
 
 	/**
 	 * Returns subject records for the children of a given identifier (PPN)
@@ -262,5 +246,3 @@ abstract class tx_nkwgok {
 	}
 
 }
-
-?>

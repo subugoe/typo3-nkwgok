@@ -17,29 +17,29 @@
  * @package		TYPO3
  * @subpackage	tx_nkwgok
  */
-class tx_nkwgok_importAll extends tx_scheduler_Task {
+class tx_nkwgok_importAll extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 
 	/**
 	 * Function executed by the Scheduler.
 	 * @return	boolean	TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
-		$loadFromOpacTask = t3lib_div::makeInstance('tx_nkwgok_loadFromOpac');
+		$loadFromOpacTask = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_loadFromOpac');
 		$success = $loadFromOpacTask->execute();
 		if (!$success) {
-			t3lib_div::devLog('importALL Scheduler Task: could not load OPAC data. Stopping.' , tx_nkwgok_utility::extKey, 3);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('importALL Scheduler Task: could not load OPAC data. Stopping.' , tx_nkwgok_utility::extKey, 3);
 		}
 		else {
-			$convertCSVTask = t3lib_div::makeInstance('tx_nkwgok_convertCSV');
+			$convertCSVTask = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_convertCSV');
 			$success = $convertCSVTask->execute();
 			if (!$success) {
-				t3lib_div::devLog('importAll Scheduler Task: Problem during conversion of CSV files. Stopping.' , tx_nkwgok_utility::extKey, 3);
+				\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('importAll Scheduler Task: Problem during conversion of CSV files. Stopping.' , tx_nkwgok_utility::extKey, 3);
 			}
 			else {
-				$loadxmlTask = t3lib_div::makeInstance('tx_nkwgok_loadxml');
+				$loadxmlTask = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_loadxml');
 				$success = $loadxmlTask->execute();
 				if (!$success) {
-					t3lib_div::devLog('importAll Scheduler Task: could not import XML to TYPO3 database.' , tx_nkwgok_utility::extKey, 3);
+					\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('importAll Scheduler Task: could not import XML to TYPO3 database.' , tx_nkwgok_utility::extKey, 3);
 				}
 			}
 		}
@@ -50,9 +50,6 @@ class tx_nkwgok_importAll extends tx_scheduler_Task {
 }
 
 
-
-if (defined('TYPO3_MODE')
-		&& $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_importall.php']) {
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_importall.php']) {
 	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_importall.php']);
 }
-?>

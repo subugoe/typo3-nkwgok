@@ -60,5 +60,3 @@ class tx_nkwgok_utility {
 	}
 
 }
-
-?>
