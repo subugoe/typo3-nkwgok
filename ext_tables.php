@@ -50,7 +50,7 @@ $TCA['tt_content']['types']['list']['subtypes_addlist'][$_EXTKEY . '_pi1'] = 'pi
 				array(
 					'LLL:EXT:nkwgok/locallang_db.xml:tt_content.list_type_pi1',
 					$_EXTKEY . '_pi1',
-					\TYPO3\CMS\About\Domain\Model\Extension::extRelPath($_EXTKEY) . 'Resources/Public/Images/ext_icon.gif'),
+					\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath($_EXTKEY) . 'Resources/Public/Images/ext_icon.gif'),
 				'list_type');
 if (TYPO3_MODE == 'BE') {
 	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('xMOD_tx_nkwgok', 'EXT:' . $_EXTKEY . '/locallang_csh.xml');
