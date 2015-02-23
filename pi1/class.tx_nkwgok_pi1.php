@@ -38,11 +38,11 @@ class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 	/**
 	 * Main method of the PlugIn
 	 *
-	 * @author	Nils K. Windisch <windisch@sub.uni-goettingen.de>
-	 * @author	Sven-S. Porst <porst@sub.uni-goettingen.de>
-	 * @param	string		$content: The PlugIn content
-	 * @param	array		$conf: The PlugIn configuration
-	 * @return	string The content that is displayed on the website
+	 * @author    Nils K. Windisch <windisch@sub.uni-goettingen.de>
+	 * @author    Sven-S. Porst <porst@sub.uni-goettingen.de>
+	 * @param    string $content : The PlugIn content
+	 * @param    array $conf : The PlugIn configuration
+	 * @return    string The content that is displayed on the website
 	 */
 	function main($content, $conf) {
 		// basic
@@ -91,7 +91,7 @@ class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 	 * @author Sven-S. Porst
 	 * @return void
 	 */
-	protected function addStylesheet () {
+	protected function addStylesheet() {
 		$nkwgokGlobalConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][tx_nkwgok_utility::extKey]);
 		$cssPath = $nkwgokGlobalConf['CSSPath'];
 		if (!$cssPath) {

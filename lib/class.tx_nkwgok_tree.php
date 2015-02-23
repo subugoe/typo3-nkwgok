@@ -27,7 +27,6 @@
  ******************************************************************************/
 
 
-
 /**
  * class.tx_nkwgok_tree.php
  *
@@ -40,19 +39,19 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 *
 	 * The $this->arguments array needs to contain:
 	 * - a string element 'notation' which can either be 'all' (to display the
-	 *		complete subject tree) or the notation of the node to be used as the
-	 *		root of the tree
+	 *        complete subject tree) or the notation of the node to be used as the
+	 *        root of the tree
 	 * - a string element 'style' which may take the values 'tree' or 'column'
 	 * - an array element 'expand' listing the IDs of subjects to be expanded
 	 *
 	 * Further array elements can be:
 	 * - 'showGOKID', determining whether the subject’s notation is displayed along
-	 *		with its name
+	 *        with its name
 	 *
 	 * @author Sven-S. Porst
 	 * @return DOMDocument
 	 */
-	public function getMarkup () {
+	public function getMarkup() {
 		$this->addGOKTreeJSToElement($this->doc);
 
 		// Create container.
@@ -67,9 +66,9 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$useShallowLinks = ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowSearch'] == 1);
 		if ($this->arguments['omitXXX']) {
 			$useShallowLinks = TRUE;
-			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('Configured to use deep links together with omitXXX. This will not work as the totalhitcount is incorrect when we arbitrarily leave out child elements. Using shallow links instead.' , tx_nkwgok_utility::extKey, 2);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('Configured to use deep links together with omitXXX. This will not work as the totalhitcount is incorrect when we arbitrarily leave out child elements. Using shallow links instead.', tx_nkwgok_utility::extKey, 2);
 		}
-		if ($useShallowLinks)  {
+		if ($useShallowLinks) {
 			$containerClasses[] = 'shallowLinks';
 		}
 
@@ -84,12 +83,12 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		}
 		$query = implode(' OR ', $queryParts) . ' AND statusID = 0';
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-					NKWGOKQueryFields,
-					tx_nkwgok_utility::dataTable,
-					$query,
-					'',
-					'notation ASC',
-					'');
+				NKWGOKQueryFields,
+				tx_nkwgok_utility::dataTable,
+				$query,
+				'',
+				'notation ASC',
+				'');
 
 		$resultCount = $GLOBALS['TYPO3_DB']->sql_num_rows($queryResult);
 		$topElementType = 'span';
@@ -120,7 +119,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @author Sven-S. Porst
 	 * @return DOMDocument
 	 */
-	public function getAJAXMarkup () {
+	public function getAJAXMarkup() {
 		$parentPPN = $this->arguments['expand'][0];
 
 		$this->appendGOKTreeChildren($parentPPN, $this->doc, Array($parentPPN), 1);
@@ -136,7 +135,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @param DOMElement $container the <script> tag is inserted into
 	 * @return void
 	 */
-	private function addGOKTreeJSToElement ($container) {
+	private function addGOKTreeJSToElement($container) {
 		$scriptElement = $this->doc->createElement('script');
 		$container->appendChild($scriptElement);
 		$scriptElement->setAttribute('type', 'text/javascript');
@@ -151,7 +150,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 		$HTMLInsertionTarget = 'jContainerLI';
 		if ($this->arguments['style'] === 'column') {
-			$HTMLInsertionTarget = 'jQuery("#tx_nkwgok-' . $this->objectID .'")';
+			$HTMLInsertionTarget = 'jQuery("#tx_nkwgok-' . $this->objectID . '")';
 		}
 
 		$js .= "
@@ -159,7 +158,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			var jContainerLI = jQuery('#c" . $this->objectID . "-' + id);
 			selectGOK" . $this->objectID . "(id);
 			jContainerLI.removeClass('open').addClass('close');
-			var link = jQuery('#openCloseLink-" . $this->objectID ."-' + id);";
+			var link = jQuery('#openCloseLink-" . $this->objectID . "-' + id);";
 		if ($this->arguments['style'] === 'column') {
 			$js .= "
 			jContainerLI.parent().nextAll('ul').remove();";
@@ -215,8 +214,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				window.nkwgokItemSelected(element);
 			}
 		}";
-		}
-		else {
+		} else {
 			$js .= "
 		function unselectSiblings" . $this->objectID . " (jElement) { }
 		function selectGOK" . $this->objectID . "(id) {}
@@ -225,7 +223,6 @@ class tx_nkwgok_tree extends tx_nkwgok {
 
 		$scriptElement->appendChild($this->doc->createTextNode($js));
 	}
-
 
 
 	/**
@@ -271,7 +268,6 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	}
 
 
-
 	/**
 	 * Appends a single subject item child element of type $elementName
 	 * to the element $container inside $this->doc and returns it.
@@ -286,7 +282,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @param string|NULL $extraClass class added to the appended links [defaults to NULL]
 	 * @return DOMElement
 	 */
-	private function appendGOKTreeItem ($container, $elementName, $GOK, $expandMarker = Array(), $autoExpandLevel = 0, $isInteractive = TRUE, $extraClass = NULL) {
+	private function appendGOKTreeItem($container, $elementName, $GOK, $expandMarker = Array(), $autoExpandLevel = 0, $isInteractive = TRUE, $extraClass = NULL) {
 		$PPN = $GOK['ppn'];
 		$expand = Array($PPN);
 
@@ -342,8 +338,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			$titleAddition = '';
 			if ($this->language === 'en' && $GOK['descr_alternate_en'] !== '') {
 				$titleAddition = $GOK['descr_alternate_en'];
-			}
-			else if ($GOK['descr_alternate'] !== '') {
+			} else if ($GOK['descr_alternate'] !== '') {
 				$titleAddition = $GOK['descr_alternate'];
 			}
 
@@ -352,15 +347,16 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				$mainTitle = sprintf($this->localise('%s Unterkategorien anzeigen'), $GOK['childcount']);
 				$alternativeTitle = $this->localise('Unterkategorien ausblenden');
 				$urlComponents = parse_url(\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
-				$baseURL = $urlComponents['scheme'] .  '://' . $urlComponents['host'] . $urlComponents['path'];
+				$baseURL = $urlComponents['scheme'] . '://' . $urlComponents['host'] . $urlComponents['path'];
 				$queryComponents = Array();
 				parse_str($urlComponents['query'], $queryComponents);
 				$queryComponents['no_cache'] = 1;
 
 				if ((array_key_exists('expand', $this->arguments)
-							&& is_array($this->arguments['expand'])
-							&& in_array($PPN, $this->arguments['expand']))
-						|| $GOK['childcount'] <= $autoExpandLevel) {
+								&& is_array($this->arguments['expand'])
+								&& in_array($PPN, $this->arguments['expand']))
+						|| $GOK['childcount'] <= $autoExpandLevel
+				) {
 					$itemClass = 'close';
 					$JSCommand = 'hideGOK' . $this->objectID;
 					$buttonText = '[-]';
@@ -378,14 +374,13 @@ class tx_nkwgok_tree extends tx_nkwgok {
 						$childListContainer = $container->parentNode;
 					}
 					$this->appendGOKTreeChildren($PPN, $childListContainer, $expand, $autoExpandLevel);
-				}
-				else {
+				} else {
 					$itemClass = 'open';
 					$JSCommand = 'expandGOK' . $this->objectID;
 					$buttonText = '[+]';
 					$queryComponents['tx_nkwgok']['expand'] = $expand;
 					$noscriptLink = \TYPO3\CMS\Core\Utility\GeneralUtility::linkThisUrl($baseURL, $queryComponents)
-						. '#c' . $this->objectID . '-' .  $PPN;
+							. '#c' . $this->objectID . '-' . $PPN;
 				}
 
 				$openLink->setAttribute('href', $noscriptLink);
@@ -399,13 +394,11 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				// Set up title attribute and its alternate.
 				$openLink->setAttribute('title', $mainTitle);
 				$openLink->setAttribute('alttitle', $alternativeTitle);
-			}
-			else if ($this->arguments['style'] === 'column') {
+			} else if ($this->arguments['style'] === 'column') {
 				// Column style: set up the JavaScript command.
 				$openLink->setAttribute('href', '#');
 				$JSCommand = 'selectGOK' . $this->objectID;
-			}
-			else {
+			} else {
 				// Tree style: add tooltip to the surrounding anchor tag if an alternative title exists.
 				if ($titleAddition !== '') {
 					$openLink->setAttribute('title', $titleAddition);
@@ -414,7 +407,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		}
 
 		if ($JSCommand) {
-			$openLink->setAttribute('onclick',  $JSCommand . '("' . $PPN . '");return false;');
+			$openLink->setAttribute('onclick', $JSCommand . '("' . $PPN . '");return false;');
 		}
 
 		if ($extraClass !== NULL) {
@@ -428,7 +421,6 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	}
 
 
-
 	/**
 	 * Appends two OPAC search links to $container, one for shallow search and
 	 * one for deep search. One of them will be hidden by CSS.
@@ -437,7 +429,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @param Array $GOK subject record
 	 * @param DOMElement $container the link elements are appended to
 	 */
-	private function appendOpacLinksTo ($GOK, $container) {
+	private function appendOpacLinksTo($GOK, $container) {
 		$opacLinkElement = $this->OPACLinkElement($GOK, True);
 		if ($opacLinkElement) {
 			$container->appendChild($this->doc->createTextNode(' '));
@@ -452,7 +444,6 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	}
 
 
-
 	/**
 	 * Returns DOMElement with complete markup for linking to the OPAC entry.
 	 * The link text indicates the number of results if it is known.
@@ -462,7 +453,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 	 * @param bool $deepSearch
 	 * @return DOMElement
 	 */
-	private function OPACLinkElement ($GOKData, $deepSearch) {
+	private function OPACLinkElement($GOKData, $deepSearch) {
 		$opacLink = Null;
 		$hitCount = $GOKData['hitcount'];
 		$useDeepSearch = $deepSearch && ($GOKData['totalhitcount'] > 0);
@@ -476,8 +467,7 @@ class tx_nkwgok_tree extends tx_nkwgok {
 			$titleString = '';
 			if ($useDeepSearch === True && $GOKData['childcount'] != 0) {
 				$titleString = $this->localise('Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen');
-			}
-			else {
+			} else {
 				$titleString = $this->localise('Bücher zu genau diesem Thema im Opac anzeigen');
 			}
 			$opacLink->setAttribute('title', $titleString);
@@ -488,19 +478,17 @@ class tx_nkwgok_tree extends tx_nkwgok {
 				// we know the number of results: display it
 				$numberString = number_format($hitCount, 0, $this->localise('decimal separator'), $this->localise('thousands separator'));
 				$opacLink->appendChild($this->doc->createTextNode(sprintf($this->localise('%s Treffer anzeigen'), $numberString)));
-			}
-			else {
+			} else {
 				// we don't know the number of results: display a general text
 				$opacLink->appendChild($this->doc->createTextNode($this->localise('Treffer anzeigen')));
 			}
 
-			$linkClass= 'opacLink ' . (($deepSearch === True) ? 'deep' : 'shallow');
+			$linkClass = 'opacLink ' . (($deepSearch === True) ? 'deep' : 'shallow');
 			$opacLink->setAttribute('class', $linkClass);
 		}
 
 		return $opacLink;
 	}
-
 
 
 	/**
@@ -523,17 +511,16 @@ class tx_nkwgok_tree extends tx_nkwgok {
 		$GOKSearchURL = $conf['opacBaseURL'] . 'LNG=' . $picaLanguageCode;
 
 		if ($deepSearch === True
-			&& ($GOKData['type'] === tx_nkwgok_utility::recordTypeGOK || $GOKData['type'] === tx_nkwgok_utility::recordTypeBRK)) {
+				&& ($GOKData['type'] === tx_nkwgok_utility::recordTypeGOK || $GOKData['type'] === tx_nkwgok_utility::recordTypeBRK)
+		) {
 			// Use special command to do the hierarchical search for records related
 			// to the Normsatz PPN.
 			$GOKSearchURL .= '/EPD?PPN=' . $GOKData['ppn'] . '&FRM=';
-		}
-		else if ($GOKData['search']) {
+		} else if ($GOKData['search']) {
 			// Convert CCL string to OPAC-style search string and escape.
 			$searchString = urlencode(str_replace('=', ' ', $GOKData['search']));
 			$GOKSearchURL .= '/REC=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM=' . $searchString;
-		}
-		else {
+		} else {
 			$GOKSearchURL = Null;
 		}
 

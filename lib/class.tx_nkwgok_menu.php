@@ -25,7 +25,6 @@
  ******************************************************************************/
 
 
-
 /**
  * class.tx_nkwgok_menu.php
  *
@@ -40,7 +39,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 	 *
 	 * @return DOMElement containing the markup for a menu
 	 */
-	public function getMarkup () {
+	public function getMarkup() {
 		$this->addGOKMenuJSToElement($this->doc);
 
 		// Create the form and insert the first menu.
@@ -62,18 +61,18 @@ class tx_nkwgok_menu extends tx_nkwgok {
 
 		$startNodes = explode(',', $this->arguments['notation']);
 		if (count($startNodes) > 1) {
-			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('several start nodes given (' . $this->arguments['notation'] . ') but only the first is used in menu mode' , tx_nkwgok_utility::extKey, 2);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('several start nodes given (' . $this->arguments['notation'] . ') but only the first is used in menu mode', tx_nkwgok_utility::extKey, 2);
 		}
 		$startNodeGOK = trim($startNodes[0]);
 		$firstNodeCondition = "notation LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK, tx_nkwgok_utility::dataTable) . ' AND statusID = 0';
 		// run query and collect result
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-					NKWGOKQueryFields,
-					tx_nkwgok_utility::dataTable,
-					$firstNodeCondition,
-					'',
-					'notation ASC',
-					'');
+				NKWGOKQueryFields,
+				tx_nkwgok_utility::dataTable,
+				$firstNodeCondition,
+				'',
+				'notation ASC',
+				'');
 
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
 			$menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
@@ -93,12 +92,12 @@ class tx_nkwgok_menu extends tx_nkwgok {
 	 *
 	 * @return DOMDocument
 	 */
-	public function getAJAXMarkup () {
+	public function getAJAXMarkup() {
 		$menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
-		$this->appendGOKMenuChildren( $this->arguments['expand'],
-										$this->doc,
-										$menuInlineThreshold,
-										(int)$this->arguments['level'] );
+		$this->appendGOKMenuChildren($this->arguments['expand'],
+				$this->doc,
+				$menuInlineThreshold,
+				(int)$this->arguments['level']);
 
 		return $this->doc;
 	}
@@ -109,7 +108,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 	 *
 	 * @param DOMElement $container the <script> tag is inserted into
 	 */
-	private function addGOKMenuJSToElement ($container) {
+	private function addGOKMenuJSToElement($container) {
 		$scriptElement = $this->doc->createElement('script');
 		$container->appendChild($scriptElement);
 		$scriptElement->setAttribute('type', 'text/javascript');
@@ -196,7 +195,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 	private function appendGOKMenuChildren($parentPPN, $container, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0) {
 		$GOKs = $this->getChildren($parentPPN);
 		if (sizeof($GOKs) > 0) {
-			if ( (sizeof($GOKs) <= $autoExpandLevel) && ($level != 0) && $autoExpandStep == 0 ) {
+			if ((sizeof($GOKs) <= $autoExpandLevel) && ($level != 0) && $autoExpandStep == 0) {
 				// We are auto-expanded, so throw away the elements, as they are already present in the previous menu
 				$GOKs = Array();
 			}
@@ -220,10 +219,9 @@ class tx_nkwgok_menu extends tx_nkwgok {
 				if ($level == 0) {
 					$option = $this->doc->createElement('option');
 					$select->appendChild($option);
-					$option->appendChild($this->doc->createTextNode($this->localise('Bitte Fachgebiet auswählen:') ));
+					$option->appendChild($this->doc->createTextNode($this->localise('Bitte Fachgebiet auswählen:')));
 					$option->setAttribute('value', 'pleaseselect');
-				}
-				else {
+				} else {
 					/* Add general menu item(s).
 					 * A menu item searching for all subjects beneath the selected one in the
 					 * hierarchy and one searching for records matching exactly the subject selected.
@@ -234,10 +232,10 @@ class tx_nkwgok_menu extends tx_nkwgok {
 					$select->appendChild($option);
 					$label = '';
 					if ($GOKs[0]['type'] === tx_nkwgok_utility::recordTypeGOK
-						|| $GOKs[0]['type'] === tx_nkwgok_utility::recordTypeBRK) {
+							|| $GOKs[0]['type'] === tx_nkwgok_utility::recordTypeBRK
+					) {
 						$label = 'Treffer für diese Zwischenebene zeigen';
-					}
-					else {
+					} else {
 						$label = 'Treffer aller enthaltenen Untergebiete zeigen';
 					}
 					$option->appendChild($this->doc->createTextNode($this->localise($label)));
@@ -272,7 +270,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 					$this->appendGOKMenuChildren($PPN, $select, $autoExpandLevel, $level, $autoExpandStep + 1);
 				}
 
-				if ( $PPN === $this->arguments['expand'][$level] ) {
+				if ($PPN === $this->arguments['expand'][$level]) {
 					// this item should be selected and the next menu should be added
 					$option->setAttribute('selected', 'selected');
 					$this->appendGOKMenuChildren($PPN, $container, $autoExpandLevel, $level + 1);

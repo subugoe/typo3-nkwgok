@@ -54,7 +54,6 @@ abstract class tx_nkwgok {
 	protected $arguments;
 
 
-
 	/**
 	 * Language code to use for the localisation.
 	 * @var string ISO 639-1 language code
@@ -82,7 +81,7 @@ abstract class tx_nkwgok {
 	 *
 	 * @return DOMDocument
 	 */
-	abstract function getMarkup ();
+	abstract function getMarkup();
 
 	/**
 	 * Implemented by subclasses.
@@ -91,7 +90,7 @@ abstract class tx_nkwgok {
 	 *
 	 * @return DOMDocument
 	 */
-	abstract function getAJAXMarkup ();
+	abstract function getAJAXMarkup();
 
 	/**
 	 * Uses the 'style' field of the $arguments array to determine which subclass
@@ -100,13 +99,12 @@ abstract class tx_nkwgok {
 	 * @param Array $arguments
 	 * @return tx_nkwgok
 	 */
-	public static function instantiateSubclassFor ($arguments) {
+	public static function instantiateSubclassFor($arguments) {
 		$subclass = NULL;
 
 		if ($arguments['style'] === 'menu') {
 			$subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_menu');
-		}
-		else {
+		} else {
 			// Default to displaying the tree. Expected for styles 'tree' and 'column'.
 			$subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_tree');
 			if (!array_key_exists('style', $arguments) || !$arguments['style']) {
@@ -139,7 +137,7 @@ abstract class tx_nkwgok {
 	 * @param string $key key to look up in pi1/locallang.xml
 	 * @return string
 	 */
-	protected function localise ($key) {
+	protected function localise($key) {
 		$result = '';
 
 		$filePath = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName('EXT:' . tx_nkwgok_utility::extKey . '/pi1/locallang.xml');
@@ -161,8 +159,7 @@ abstract class tx_nkwgok {
 
 		if (array_key_exists($key, $this->localisation[$myLanguage])) {
 			$result = $this->localisation[$myLanguage][$key];
-		}
-		else {
+		} else {
 			// Return the original key in upper case if we don’t find a localisation.
 			$result = strtoupper($key);
 		}
@@ -230,12 +227,12 @@ abstract class tx_nkwgok {
 		}
 		$whereClause .= ' AND statusID = 0';
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-					NKWGOKQueryFields,
-					tx_nkwgok_utility::dataTable,
-					$whereClause,
-					'',
-					'hierarchy,notation ASC',
-					'');
+				NKWGOKQueryFields,
+				tx_nkwgok_utility::dataTable,
+				$whereClause,
+				'',
+				'hierarchy,notation ASC',
+				'');
 
 		$children = Array();
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {

@@ -5,7 +5,6 @@
  *
  * @author Sven-S. Porst <porst@sub.uni-goettingen.de>
  */
-
 class tx_nkwgok_utility {
 
 	const extKey = 'nkwgok';
@@ -20,7 +19,6 @@ class tx_nkwgok_utility {
 	const recordTypeUnknown = 'unknown';
 
 
-
 	/**
 	 * Returns the internal type name for the given index name.
 	 * * lkl -> gok
@@ -29,7 +27,7 @@ class tx_nkwgok_utility {
 	 * @param String $indexName
 	 * @return String
 	 */
-	public static function indexNameToType ($indexName) {
+	public static function indexNameToType($indexName) {
 		$type = $indexName;
 
 		if ($indexName === 'lkl') {
@@ -40,7 +38,6 @@ class tx_nkwgok_utility {
 	}
 
 
-
 	/**
 	 * Returns the internal type name for the given index name.
 	 * * gok -> lkl
@@ -49,7 +46,7 @@ class tx_nkwgok_utility {
 	 * @param String $type
 	 * @return String
 	 */
-	public static function typeToIndexName ($type) {
+	public static function typeToIndexName($type) {
 		$indexName = $type;
 
 		if ($type === tx_nkwgok_utility::recordTypeGOK) {
