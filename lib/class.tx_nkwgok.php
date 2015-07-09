@@ -148,7 +148,7 @@ abstract class tx_nkwgok {
 			 * Only the requested languageKey seems to be present and the innermost
 			 * array can also contain a 'source' key.
 			 */
-			$parser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_l10n_parser_Llxml');
+			$parser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser::class);
 			$this->localisation = $parser->getParsedData($filePath, $this->language);
 		}
 
