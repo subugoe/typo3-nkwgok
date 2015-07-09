@@ -23,12 +23,6 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
 
-/**
- * Changes 2011-2012 by Sven-S. Porst <porst@sub.uni-goettingen.de>
- * See the ChangeLog or git repository for details.
- */
-
-
 define('NKWGOKQueryFields', 'ppn, notation, search, descr, descr_en, descr_alternate, descr_alternate_en, parent, hierarchy, childcount, hitcount, totalhitcount, type');
 
 /**
@@ -38,10 +32,6 @@ define('NKWGOKQueryFields', 'ppn, notation, search, descr, descr_en, descr_alter
  * passing the setup as arguments.
  *
  * Then call the getMarkup() or getAJAXMarkup() methods to receive the output.
- *
- * @package TYPO3
- * @author Nils K. Windisch
- * @author Sven-S. Porst
  * */
 abstract class tx_nkwgok {
 
@@ -103,10 +93,10 @@ abstract class tx_nkwgok {
 		$subclass = NULL;
 
 		if ($arguments['style'] === 'menu') {
-			$subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_menu');
+			$subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_menu::class);
 		} else {
 			// Default to displaying the tree. Expected for styles 'tree' and 'column'.
-			$subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_tree');
+			$subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_tree::class);
 			if (!array_key_exists('style', $arguments) || !$arguments['style']) {
 				// Default to tree style if style is not set.
 				$arguments['style'] = 'tree';
@@ -133,7 +123,6 @@ abstract class tx_nkwgok {
 	 * Provide our own localisation function as getLL() is not available when
 	 * running in eID.
 	 *
-	 * @author Sven-S. Porst
 	 * @param string $key key to look up in pi1/locallang.xml
 	 * @return string
 	 */
@@ -182,7 +171,6 @@ abstract class tx_nkwgok {
 	 * when viewed inside the subject hierarchy. The parameter $simplify = True
 	 * removes that indicator.
 	 *
-	 * @author Sven-S. Porst <porst@sub.uni-goettingen.de>
 	 * @param Array $gokRecord
 	 * @param Boolean $simplify should the trailing {…} be removed? [defaults to False]
 	 * @return string

@@ -22,16 +22,10 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-/**
- * Changes 2011-2013 by Sven-S. Porst <porst@sub.uni-goettingen.de>
- * See the Changelog or git repository for details.
- */
-
-
 require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('nkwgok') . 'lib/class.tx_nkwgok_utility.php');
 
 /**
- * Description
+ * See the Changelog or git repository for details.
  */
 class tx_nkwgok_ff {
 	function addFields($config) {
@@ -65,12 +59,12 @@ class tx_nkwgok_ff {
 	 */
 	private function queryForChildrenOf($parentID) {
 		$queryResults = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-				'*',
-				tx_nkwgok_utility::dataTable,
-				"parent = '" . $parentID . "'",
-				'',
-				'notation ASC',
-				'');
+			'*',
+			tx_nkwgok_utility::dataTable,
+			"parent = '" . $parentID . "'",
+			'',
+			'notation ASC',
+			'');
 
 		return $queryResults;
 	}

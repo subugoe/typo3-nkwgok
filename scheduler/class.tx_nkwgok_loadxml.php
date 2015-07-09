@@ -23,67 +23,49 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
 
-
-/**
- * Changes 2011-2013 by Sven-S. Porst <porst@sub.uni-goettingen.de>
- * See the Changelog or git repository for details.
- */
-
-
 /**
  * Class "tx_nkwgok_loadxml" provides task procedures
- *
- * @author		Nils K. Windisch <windisch@sub.uni-goettingen.de>
- * @author		Sven-S. Porst <porst@sub.uni-goettingen.de>
- * @package		TYPO3
- * @subpackage	tx_nkwgok
  */
-
-
-define('NKWGOKMaxHierarchy', 31);
-
-
 class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 
 	/**
 	 * Stores the hitcount for each notation.
 	 * Key: classifiaction system string => Value: Array with
-	 *		Key: notation => Value: hits for this notation
+	 *        Key: notation => Value: hits for this notation
 	 * @var Array
 	 */
 	private $hitCounts;
 
-
+	const NKWGOKMaxHierarchy = 31;
 
 	/**
 	 * Function executed from the Scheduler.
-	 * @return	boolean	TRUE if success, otherwise FALSE
+	 * @return    boolean    TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
 		set_time_limit(1200);
 
 		// Remove records with statusID 1. These should not be around, but can
 		// exist if a previous run of this task was cancelled.
-		$GLOBALS['TYPO3_DB']->exec_DELETEquery(tx_nkwgok_utility::dataTable, 'statusID = 1');
+		$GLOBALS['TYPO3_DB']->exec_DELETEquery(\tx_nkwgok_utility::dataTable, 'statusID = 1');
 
 		// Load hit counts.
 		$this->hitCounts = $this->loadHitCounts();
 
 		// Load XML files. Process those coming from csv files first as they can
 		// be quite large and we are less likely to run into memory limits this way.
-		$result = $this->loadXMLForType(tx_nkwgok_utility::recordTypeCSV);
-		$result &= $this->loadXMLForType(tx_nkwgok_utility::recordTypeGOK);
-		$result &= $this->loadXMLForType(tx_nkwgok_utility::recordTypeBRK);
+		$result = $this->loadXMLForType(\tx_nkwgok_utility::recordTypeCSV);
+		$result &= $this->loadXMLForType(\tx_nkwgok_utility::recordTypeGOK);
+		$result &= $this->loadXMLForType(\tx_nkwgok_utility::recordTypeBRK);
 
 		// Delete all old records with statusID 1, then switch all new records to statusID 0.
-		$GLOBALS['TYPO3_DB']->exec_DELETEquery(tx_nkwgok_utility::dataTable, 'statusID = 0');
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(tx_nkwgok_utility::dataTable, 'statusID = 1', Array('statusID' => 0));
+		$GLOBALS['TYPO3_DB']->exec_DELETEquery(\tx_nkwgok_utility::dataTable, 'statusID = 0');
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(\tx_nkwgok_utility::dataTable, 'statusID = 1', Array('statusID' => 0));
 
 		\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Import of subject hierarchy XML to TYPO3 database completed', tx_nkwgok_utility::extKey, 1);
 
 		return $result;
 	}
-
 
 
 	/**
@@ -93,16 +75,16 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 	 * @param String $type
 	 * @return Boolean
 	 */
-	protected function loadXMLForType ($type) {
+	protected function loadXMLForType($type) {
 		$XMLFolder = PATH_site . 'fileadmin/gok/xml/';
-		$fileList = $this->fileListAtPathForType ($XMLFolder, $type);
+		$fileList = $this->fileListAtPathForType($XMLFolder, $type);
 
 		if (is_array($fileList) && count($fileList) > 0) {
 			// Parse XML files to extract just the tree structure.
 			$subjectTree = $this->loadSubjectTree($fileList);
 
 			// Compute total hit count sums.
-			$totalHitCounts = $this->computeTotalHitCounts(tx_nkwgok_utility::rootNode, $subjectTree, $this->hitCounts);
+			$totalHitCounts = $this->computeTotalHitCounts(\tx_nkwgok_utility::rootNode, $subjectTree, $this->hitCounts);
 
 			// Run through the files again, read all data, add the information
 			// about parent elements and store it to our table in the database.
@@ -129,31 +111,29 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 
 					if ($PPN !== '' && array_key_exists($PPN, $subjectTree)) {
 						$search = '';
-						if ($recordType === tx_nkwgok_utility::recordTypeCSV) {
+						if ($recordType === \tx_nkwgok_utility::recordTypeCSV) {
 							// Subject coming from CSV file with a CCL search query in the 'str/a' field.
 							if (count($csvSearches) > 0) {
 								$csvSearch = trim($csvSearches[0]);
 								$search = $csvSearch;
 							}
-						}
-						else {
+						} else {
 							// Subject coming from a Pica authority record.
 							if (count($mscs) > 0) {
 								// Maths type GOK with an MSC type search term.
 								$msc = trim($mscs[0]);
 								$search = 'msc="' . $msc . '"';
-							}
-							else if (count($notations) > 0) {
-								if ($recordType === tx_nkwgok_utility::recordTypeGOK
-									|| $recordType === tx_nkwgok_utility::recordTypeBRK) {
+							} else if (count($notations) > 0) {
+								if ($recordType === \tx_nkwgok_utility::recordTypeGOK
+									|| $recordType === \tx_nkwgok_utility::recordTypeBRK
+								) {
 									// GOK or BRK OPAC search, using the corresponding index.
-									$indexName = tx_nkwgok_utility::typeToIndexName($recordType);
+									$indexName = \tx_nkwgok_utility::typeToIndexName($recordType);
 									// Requires quotation marks around the search term as notations can begin
 									// with three character strings that could be mistaken for index names.
 									$search = $indexName . '="' . $notation . '"';
-								}
-								else {
-									\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Unknown record type »' . $recordType . '« in record PPN ' . $PPN . '. Skipping.', tx_nkwgok_utility::extKey, 3, $recordElement);
+								} else {
+									\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Unknown record type »' . $recordType . '« in record PPN ' . $PPN . '. Skipping.', \tx_nkwgok_utility::extKey, 3, $recordElement);
 									continue;
 								}
 							}
@@ -172,14 +152,13 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 							$hierarchy++;
 							if (array_key_exists($nextParent, $subjectTree)) {
 								$nextParent = $subjectTree[$nextParent]['parent'];
-							}
-							else {
+							} else {
 								\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN ' . $nextParent . ' for record PPN ' . $PPN . '. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', tx_nkwgok_utility::extKey, 3, $recordElement);
 								$hierarchy = -1;
 								break;
 							}
-							if ($hierarchy > NKWGOKMaxHierarchy) {
-								\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Hierarchy level for PPN ' . $PPN . ' exceeds the maximum limit of ' . NKWGOKMaxHierarchy . ' levels. This needs to be fixed, the subject tree may contain an infinite loop.', tx_nkwgok_utility::extKey, 3, $recordElement);
+							if ($hierarchy > self::NKWGOKMaxHierarchy) {
+								\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Hierarchy level for PPN ' . $PPN . ' exceeds the maximum limit of ' . self::NKWGOKMaxHierarchy . ' levels. This needs to be fixed, the subject tree may contain an infinite loop.', tx_nkwgok_utility::extKey, 3, $recordElement);
 								$hierarchy = -1;
 								break;
 							}
@@ -228,17 +207,17 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 						$hitCount = -1;
 						if (count($mscs) > 0) {
 							$msc = trim($mscs[0]);
-							if (array_key_exists(tx_nkwgok_utility::recordTypeMSC, $this->hitCounts)
-									&& array_key_exists($msc, $this->hitCounts[tx_nkwgok_utility::recordTypeMSC])) {
-								$hitCount = $this->hitCounts[tx_nkwgok_utility::recordTypeMSC][$msc];
+							if (array_key_exists(\tx_nkwgok_utility::recordTypeMSC, $this->hitCounts)
+								&& array_key_exists($msc, $this->hitCounts[\tx_nkwgok_utility::recordTypeMSC])
+							) {
+								$hitCount = $this->hitCounts[\tx_nkwgok_utility::recordTypeMSC][$msc];
 							}
-						}
-						else if (($recordType === tx_nkwgok_utility::recordTypeGOK
-									|| $recordType === tx_nkwgok_utility::recordTypeBRK)
-								 && array_key_exists(strtolower($notation), $this->hitCounts[$recordType])) {
+						} else if (($recordType === \tx_nkwgok_utility::recordTypeGOK
+								|| $recordType === \tx_nkwgok_utility::recordTypeBRK)
+							&& array_key_exists(strtolower($notation), $this->hitCounts[$recordType])
+						) {
 							$hitCount = $this->hitCounts[$recordType][strtolower($notation)];
-						}
-						else if ($recordType === tx_nkwgok_utility::recordTypeCSV && count($csvSearches) > 0) {
+						} else if ($recordType === \tx_nkwgok_utility::recordTypeCSV && count($csvSearches) > 0) {
 							// Try to detect simple GOK and MSC queries from CSV files so hit counts can be displayed for them.
 							$csvSearch = trim($csvSearches[0]);
 
@@ -254,19 +233,19 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 
 							if (count($foundGOKs) > 1
 								&& $foundGOK
-								&& array_key_exists(tx_nkwgok_utility::recordTypeGOK, $this->hitCounts)
-								&& array_key_exists($foundGOK, $this->hitCounts[tx_nkwgok_utility::recordTypeGOK])) {
-								$hitCount = $this->hitCounts[tx_nkwgok_utility::recordTypeGOK][$foundGOK];
-							}
-							else if (count($foundMSCs) > 1
+								&& array_key_exists(\tx_nkwgok_utility::recordTypeGOK, $this->hitCounts)
+								&& array_key_exists($foundGOK, $this->hitCounts[\tx_nkwgok_utility::recordTypeGOK])
+							) {
+								$hitCount = $this->hitCounts[\tx_nkwgok_utility::recordTypeGOK][$foundGOK];
+							} else if (count($foundMSCs) > 1
 								&& $foundMSC
-								&& array_key_exists(tx_nkwgok_utility::recordTypeMSC, $this->hitCounts)
-								&& array_key_exists($foundMSC, $this->hitCounts[tx_nkwgok_utility::recordTypeMSC])) {
-								$hitCount = $this->hitCounts[tx_nkwgok_utility::recordTypeMSC][$foundMSC];
-								$recordType = tx_nkwgok_utility::recordTypeMSC;
+								&& array_key_exists(\tx_nkwgok_utility::recordTypeMSC, $this->hitCounts)
+								&& array_key_exists($foundMSC, $this->hitCounts[\tx_nkwgok_utility::recordTypeMSC])
+							) {
+								$hitCount = $this->hitCounts[\tx_nkwgok_utility::recordTypeMSC][$foundMSC];
+								$recordType = \tx_nkwgok_utility::recordTypeMSC;
 							}
-						}
-						else {
+						} else {
 							$hitCount = 0;
 						}
 
@@ -282,20 +261,18 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 					}
 				} // end of loop over subjects
 				$keyNames = Array('ppn', 'hierarchy', 'notation', 'parent', 'descr', 'descr_en', 'descr_alternate', 'descr_alternate_en', 'search', 'tags', 'childcount', 'type', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID');
-				$result = $GLOBALS['TYPO3_DB']->exec_INSERTmultipleRows(tx_nkwgok_utility::dataTable, $keyNames, $rows);
+				$result = $GLOBALS['TYPO3_DB']->exec_INSERTmultipleRows(\tx_nkwgok_utility::dataTable, $keyNames, $rows);
 
 			} // end of loop over files
 
 			$result = True;
-		}
-		else {
-			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Found no XML files for type ' . $type . '.', tx_nkwgok_utility::extKey, 3);
+		} else {
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Found no XML files for type ' . $type . '.', \tx_nkwgok_utility::extKey, 3);
 			$result = True;
 		}
 
 		return $result;
 	}
-
 
 
 	/**
@@ -311,14 +288,12 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 	 * * [parent => string (record ID of parent element)]
 	 * * notation [gok|brk|msc|bkl|…] => string
 	 *
-	 * @author Sven-S. Porst
-	 *
 	 * @param Array $fileList list of XML files to read
 	 * @return Array containing the subject tree structure
 	 */
-	private function loadSubjectTree ($fileList) {
+	private function loadSubjectTree($fileList) {
 		$tree = Array();
-		$tree[tx_nkwgok_utility::rootNode] = Array('children' => Array());
+		$tree[\tx_nkwgok_utility::rootNode] = Array('children' => Array());
 
 		// Run through all files once to gather information about the
 		// structure of the data we process.
@@ -349,15 +324,14 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 
 					// … and store the PPN of the parent record.
 					$tree[$PPN]['parent'] = $parentPPN;
-				}
-				else {
+				} else {
 					// has no parent record
-					$parentPPN = tx_nkwgok_utility::rootNode;
+					$parentPPN = \tx_nkwgok_utility::rootNode;
 					$tree[$parentPPN]['children'][] = $PPN;
 					$tree[$PPN]['parent'] = $parentPPN;
 				}
 
-				if ($recordType === tx_nkwgok_utility::recordTypeGOK || $recordType === tx_nkwgok_utility::recordTypeBRK) {
+				if ($recordType === \tx_nkwgok_utility::recordTypeGOK || $recordType === \tx_nkwgok_utility::recordTypeBRK) {
 					// Store notation information.
 					$notationStrings = $record->xpath('datafield[@tag="045A"]/subfield[@code="a"]');
 					if (count($notationStrings) > 0) {
@@ -365,16 +339,15 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 						$notation = strtolower(trim($notationString));
 						$tree[$PPN][$recordType] = $notation;
 					}
-				}
-				else {
+				} else {
 					$queries = $record->xpath('datafield[@tag="str"]/subfield[@code="a"]');
 					if (count($queries) === 1) {
 						$query = (string)($queries[0]);
 						$foundQueries = NULL;
 						if (preg_match('/^msc=([^ ]*)$/', $query, $foundQueries) && count($foundQueries) === 2) {
 							$msc = $foundQueries[1];
-							$tree[$PPN][tx_nkwgok_utility::recordTypeMSC] = $msc;
-							$tree[$PPN]['type'] = tx_nkwgok_utility::recordTypeMSC;
+							$tree[$PPN][\tx_nkwgok_utility::recordTypeMSC] = $msc;
+							$tree[$PPN]['type'] = \tx_nkwgok_utility::recordTypeMSC;
 						}
 					}
 				}
@@ -397,16 +370,13 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 	}
 
 
-
 	/**
 	 * Load hitcounts from fileadmin/gok/hitcounts/*.xml.
 	 * These files are downloaded from the OPAC by the loadFromOpac Scheduler task.
 	 *
-	 * @author Sven-S. Porst
-	 *
 	 * @return Array with Key: classification system string => Value: Array with Key: notation => Value: hits for this notation
 	 */
-	private function loadHitCounts () {
+	private function loadHitCounts() {
 		$hitCountFolder = PATH_site . '/fileadmin/gok/hitcounts/';
 		$fileList = $this->fileListAtPathForType($hitCountFolder, 'all');
 
@@ -420,15 +390,13 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 						$hits = Null;
 						$description = Null;
 						$hitCountType = Null;
-						foreach($scanline->attributes() as $name => $value) {
+						foreach ($scanline->attributes() as $name => $value) {
 							if ($name === 'hits') {
 								$hits = (int)$value;
-							}
-							else if ($name === 'description') {
+							} else if ($name === 'description') {
 								$description = (string)$value;
-							}
-							else if ($name === 'mnemonic') {
-								$hitCountType = tx_nkwgok_utility::indexNameToType(strtolower((string)$value));
+							} else if ($name === 'mnemonic') {
+								$hitCountType = \tx_nkwgok_utility::indexNameToType(strtolower((string)$value));
 							}
 						}
 						if ($hits !== Null && $description !== Null && $hitCountType !== Null) {
@@ -438,44 +406,41 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 							$hitCounts[$hitCountType][$description] = $hits;
 						}
 					}
-				}
-				else {
-					\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: could not load/parse XML from ' . $xmlPath, tx_nkwgok_utility::extKey, 3);
+				} else {
+					\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: could not load/parse XML from ' . $xmlPath, \tx_nkwgok_utility::extKey, 3);
 				}
 			}
 		} // end foreach
 
 		foreach ($hitCounts as $hitCountType => $array) {
-			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Loaded ' . count($array) . ' ' . $hitCountType . ' hit count entries.', tx_nkwgok_utility::extKey, 1);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Loaded ' . count($array) . ' ' . $hitCountType . ' hit count entries.', \tx_nkwgok_utility::extKey, 1);
 		}
 
 		return $hitCounts;
 	}
 
 
-
 	/**
 	 * Recursively go through $subjectTree and add up the $hitCounts to return a
 	 * total hit count including the hits for all child elements.
 	 *
-	 * @author Sven-S. Porst
-	 *
 	 * @param String $startPPN - PPN to start at
 	 * @param Array $subjectTree
 	 * @param Array $hitCounts
- 	 * @return Array with Key: PPN => Value: sum of hit counts
+	 * @return Array with Key: PPN => Value: sum of hit counts
 	 */
-	private function computeTotalHitCounts ($startPPN, $subjectTree, $hitCounts) {
+	private function computeTotalHitCounts($startPPN, $subjectTree, $hitCounts) {
 		$totalHitCounts = Array();
 		$myHitCount = 0;
 		if (array_key_exists($startPPN, $subjectTree)) {
 			$record = $subjectTree[$startPPN];
 			$type = $record['type'];
 			$notation = strtolower($record[$type]);
-			if (array_key_exists(tx_nkwgok_utility::recordTypeMSC, $record)
-				&& $type !== tx_nkwgok_utility::recordTypeBRK) {
-				$type = tx_nkwgok_utility::recordTypeMSC;
-				$notation = strtolower($record[tx_nkwgok_utility::recordTypeMSC]);
+			if (array_key_exists(\tx_nkwgok_utility::recordTypeMSC, $record)
+				&& $type !== \tx_nkwgok_utility::recordTypeBRK
+			) {
+				$type = \tx_nkwgok_utility::recordTypeMSC;
+				$notation = strtolower($record[\tx_nkwgok_utility::recordTypeMSC]);
 			}
 
 			if (count($record['children']) > 0) {
@@ -489,14 +454,15 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 				}
 
 				if (array_key_exists($type, $hitCounts)
-					&& array_key_exists($notation, $hitCounts[$type])) {
+					&& array_key_exists($notation, $hitCounts[$type])
+				) {
 					$myHitCount += $hitCounts[$type][$notation];
 				}
-			}
-			else {
+			} else {
 				// A leaf node: just store its hit count.
 				if (array_key_exists($type, $hitCounts)
-					&& array_key_exists($notation, $hitCounts[$type])) {
+					&& array_key_exists($notation, $hitCounts[$type])
+				) {
 					$myHitCount += $hitCounts[$type][$notation];
 				}
 			}
@@ -508,11 +474,10 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 	}
 
 
-
 	/**
 	 * Returns Array of file paths in $basePath of the given type.
 	 * The types are:
-	 *	* 'all': returns all *.xml files
+	 *    * 'all': returns all *.xml files
 	 *  * 'gok': returns all gok-*.xml files
 	 *  * 'brk': returns all brk-*.xml files
 	 *  * otherwise the list given by 'all' - 'gok' - 'brk' is returned
@@ -521,20 +486,18 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 	 * @param String $type
 	 * @return Array of file paths in $basePath
 	 */
-	private function fileListAtPathForType ($basePath, $type) {
+	private function fileListAtPathForType($basePath, $type) {
 		if ($type === 'all') {
 			$fileList = glob($basePath . '*.xml');
-		}
-		else if ($type === tx_nkwgok_utility::recordTypeGOK || $type === tx_nkwgok_utility::recordTypeBRK) {
+		} else if ($type === \tx_nkwgok_utility::recordTypeGOK || $type === \tx_nkwgok_utility::recordTypeBRK) {
 			$fileList = glob($basePath . $type . '-*.xml');
-		}
-		else {
+		} else {
 			$fileList = glob($basePath . '*.xml');
-			$gokFiles = glob($basePath . tx_nkwgok_utility::recordTypeGOK . '-*.xml');
+			$gokFiles = glob($basePath . \tx_nkwgok_utility::recordTypeGOK . '-*.xml');
 			if (is_array($gokFiles)) {
 				$fileList = array_diff($fileList, $gokFiles);
 			}
-			$brkFiles = glob($basePath . tx_nkwgok_utility::recordTypeBRK . '-*.xml');
+			$brkFiles = glob($basePath . \tx_nkwgok_utility::recordTypeBRK . '-*.xml');
 			if (is_array($brkFiles)) {
 				$fileList = array_diff($fileList, $brkFiles);
 			}
@@ -544,7 +507,6 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 	}
 
 
-
 	/**
 	 * Returns the type of the $record passed.
 	 * Logs unknown record types.
@@ -552,42 +514,39 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 	 * @param \DOMElement $record
 	 * @return string - gok|brk|csv|unknown
 	 */
-	private function typeOfRecord ($record) {
-		$recordType = tx_nkwgok_utility::recordTypeUnknown;
+	private function typeOfRecord($record) {
+		$recordType = \tx_nkwgok_utility::recordTypeUnknown;
 		$recordTypes = $record->xpath('datafield[@tag="002@"]/subfield[@code="0"]');
 
 		if ($recordTypes && count($recordTypes) === 1) {
 			$recordTypeCode = (string)$recordTypes[0];
 
 			if ($recordTypeCode === 'Tev') {
-				$recordType = tx_nkwgok_utility::recordTypeGOK;
-			}
-			else if ($recordTypeCode === 'Tov') {
-				$recordType = tx_nkwgok_utility::recordTypeBRK;
-			}
-			else if ($recordTypeCode === 'csv') {
+				$recordType = \tx_nkwgok_utility::recordTypeGOK;
+			} else if ($recordTypeCode === 'Tov') {
+				$recordType = \tx_nkwgok_utility::recordTypeBRK;
+			} else if ($recordTypeCode === 'csv') {
 				$queryElements = $record->xpath('datafield[@tag="str"]/subfield[@code="a"]');
 				if ($queryElements && count($queryElements) === 1
-					&& preg_match('/^msc=[0-9A-Zx-]*/', (string)$queryElements[0] > 0)) {
+					&& preg_match('/^msc=[0-9A-Zx-]*/', (string)$queryElements[0] > 0)
+				) {
 					// Special case: an MSC record.
-					$recordType = tx_nkwgok_utility::recordTypeMSC;
-				}
-				else {
+					$recordType = \tx_nkwgok_utility::recordTypeMSC;
+				} else {
 					// Regular case: a standard CSV record.
-					$recordType = tx_nkwgok_utility::recordTypeCSV;
+					$recordType = \tx_nkwgok_utility::recordTypeCSV;
 				}
 			}
 		}
 
-		if ($recordType === tx_nkwgok_utility::recordTypeUnknown) {
-			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Record of unknown type.', tx_nkwgok_utility::extKey, 1, Array($record->saveXML()));
+		if ($recordType === \tx_nkwgok_utility::recordTypeUnknown) {
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Record of unknown type.', \tx_nkwgok_utility::extKey, 1, Array($record->saveXML()));
 		}
 
 		return $recordType;
 	}
 
 }
-
 
 
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_loadxml.php']) {

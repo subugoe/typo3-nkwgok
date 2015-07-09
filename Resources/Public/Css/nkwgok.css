@@ -1,26 +1,19 @@
 /*
-Stylesheet for GOK tree used in nkwgok TYPO3 plug-in.
-
-2011 by Sven-S. Porst, SUB Göttingen <porst@sub.uni-goettingen.de>
-*/
-
-
-/*
 Styles for the GOK Tree
 */
 .gokContainer.tree a {
 	text-decoration: none;
-	border: 0px none;
+	border: 0 none;
 	position: relative;
 }
 
 .gokContainer.tree ul {
 	list-style-type: none;
-	padding-left: 0em;
+	padding-left: 0;
 }
 
 .gokContainer.tree ul ul {
-	margin: 0em 0em 0em -7.5em;
+	margin: 0 0 0 -7.5em;
 }
 
 .gokContainer.tree ul li {
@@ -48,7 +41,7 @@ Styles for the GOK Tree
 }
 
 .gokContainer.tree.hideGOKID ul ul {
-	margin: 0em 0em 0em -1em;
+	margin: 0 0 0 -1em;
 }
 
 .gokContainer.tree.hideGOKID .GOKID {
@@ -157,13 +150,13 @@ a:hover .GOKID {
 	display: block;
 	position: absolute;
 	top: 0.3em;
-	right: 0px;
+	right: 0;
 	content: '»';
 }
 
 .gokContainer.column li a {
     display: block;
-    padding: 4px 0px 4px 6px;
+    padding: 4px 0 4px 6px;
 }
 
 /* Hide unnecessary elements */

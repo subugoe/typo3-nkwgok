@@ -28,49 +28,49 @@ if (!defined('TYPO3_MODE')) {
 
 // Scheduler task for downloading LKL data from OPAC.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadFromOpac'] = array(
-		'extension' => $_EXTKEY,
-		'title' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadFromOpac.name',
-		'description' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadFromOpac.description',
+	'extension' => $_EXTKEY,
+	'title' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadFromOpac.name',
+	'description' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadFromOpac.description',
 );
 
 // Scheduler task for downloading LKL data from OPAC.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_convertCSV'] = array(
-		'extension' => $_EXTKEY,
-		'title' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.convertCSV.name',
-		'description' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.convertCSV.description',
-		'additionalFields' => 'tx_nkwgok_scheduler_convertcsvadditionalparameters'
+	'extension' => $_EXTKEY,
+	'title' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.convertCSV.name',
+	'description' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.convertCSV.description',
+	'additionalFields' => 'tx_nkwgok_scheduler_convertcsvadditionalparameters'
 );
 
 // Scheduler task for importing Pica authority record XML files into TYPO3 database.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_loadxml'] = array(
-		'extension' => $_EXTKEY,
-		'title' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadxml.name',
-		'description' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadxml.description',
+	'extension' => $_EXTKEY,
+	'title' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadxml.name',
+	'description' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.loadxml.description',
 );
 
 // Scheduler task to determine whether we need to run the scheduler task for
 // converting and importing CSV, and doing that if we do.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_checkNewCSV'] = array(
-		'extension' => $_EXTKEY,
-		'title' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.checkNewCSV.name',
-		'description' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.checkNewCSV.description',
-		'additionalFields' => 'tx_nkwgok_scheduler_convertcsvadditionalparameters'
+	'extension' => $_EXTKEY,
+	'title' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.checkNewCSV.name',
+	'description' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.checkNewCSV.description',
+	'additionalFields' => 'tx_nkwgok_scheduler_convertcsvadditionalparameters'
 );
 
 // Scheduler task 2+3 for converting the CSV files and reimporting the database.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_updateCSV'] = array(
-		'extension' => $_EXTKEY,
-		'title' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.updateCSV.name',
-		'description' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.updateCSV.description',
-		'additionalFields' => 'tx_nkwgok_scheduler_convertcsvadditionalparameters'
+	'extension' => $_EXTKEY,
+	'title' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.updateCSV.name',
+	'description' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.updateCSV.description',
+	'additionalFields' => 'tx_nkwgok_scheduler_convertcsvadditionalparameters'
 );
 
 // Scheduler task 1+2+3 for running our 3 other Scheduler tasks in the correct order.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_importAll'] = array(
-		'extension' => $_EXTKEY,
-		'title' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.importAll.name',
-		'description' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.importAll.description',
-		'additionalFields' => 'tx_nkwgok_scheduler_convertcsvadditionalparameters'
+	'extension' => $_EXTKEY,
+	'title' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.importAll.name',
+	'description' => 'LLL:EXT:' . $_EXTKEY . '/locallang.xml:scheduler.importAll.description',
+	'additionalFields' => 'tx_nkwgok_scheduler_convertcsvadditionalparameters'
 );
 
 $TYPO3_CONF_VARS['FE']['eID_include']['nkwgok'] = 'EXT:nkwgok/lib/get.php';
