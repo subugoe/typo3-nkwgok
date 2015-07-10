@@ -29,8 +29,6 @@
  * class.tx_nkwgok_menu.php
  *
  * Subclass of tx_nkwgok that creates markup for a subject hierarchy as menus.
- *
- * @author Sven-S. Porst <porst@sub-uni-goettingen.de>
  */
 class tx_nkwgok_menu extends tx_nkwgok {
 
@@ -67,12 +65,12 @@ class tx_nkwgok_menu extends tx_nkwgok {
 		$firstNodeCondition = "notation LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK, tx_nkwgok_utility::dataTable) . ' AND statusID = 0';
 		// run query and collect result
 		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-				NKWGOKQueryFields,
-				tx_nkwgok_utility::dataTable,
-				$firstNodeCondition,
-				'',
-				'notation ASC',
-				'');
+			NKWGOKQueryFields,
+			tx_nkwgok_utility::dataTable,
+			$firstNodeCondition,
+			'',
+			'notation ASC',
+			'');
 
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
 			$menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
@@ -95,9 +93,9 @@ class tx_nkwgok_menu extends tx_nkwgok {
 	public function getAJAXMarkup() {
 		$menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
 		$this->appendGOKMenuChildren($this->arguments['expand'],
-				$this->doc,
-				$menuInlineThreshold,
-				(int)$this->arguments['level']);
+			$this->doc,
+			$menuInlineThreshold,
+			(int)$this->arguments['level']);
 
 		return $this->doc;
 	}
@@ -212,7 +210,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 				$select->setAttribute('name', 'tx_' . tx_nkwgok_utility::extKey . '[expand][' . $level . ']');
 				$select->setAttribute('onchange', 'GOKMenuSelectionChanged' . $this->objectID . '(this);');
 				$select->setAttribute('title', $this->localise('Fachgebiet auswählen') . ' ('
-						. $this->localise('Ebene') . ' ' . ($level + 1) . ')');
+					. $this->localise('Ebene') . ' ' . ($level + 1) . ')');
 				$select->setAttribute('level', $level);
 
 				// add dummy item at the beginning of the menu
@@ -232,7 +230,7 @@ class tx_nkwgok_menu extends tx_nkwgok {
 					$select->appendChild($option);
 					$label = '';
 					if ($GOKs[0]['type'] === tx_nkwgok_utility::recordTypeGOK
-							|| $GOKs[0]['type'] === tx_nkwgok_utility::recordTypeBRK
+						|| $GOKs[0]['type'] === tx_nkwgok_utility::recordTypeBRK
 					) {
 						$label = 'Treffer für diese Zwischenebene zeigen';
 					} else {

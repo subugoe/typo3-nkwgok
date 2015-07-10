@@ -1,30 +1,19 @@
 <?php
+
+define('NKWGOKImportChunkSize', 500);
+
 /**
  * TYPO3 Scheduler task to download the OPAC data we need and store them in
  * fileadmin/gok/...
  *
  * Unifies the features provided by class.tx_nkwgok_loadxml.php and
  * getHitCounts.py and makes them accessible from the TYPO3 Scheduler.
- *
- * 2011-2012 Sven-S. Porst <porst@sub.uni-goettingen.de>
- */
-
-
-define('NKWGOKImportChunkSize', 500);
-
-
-/**
- * Class tx_nkwgok_loadFromOpac provides task procedures
- *
- * @author		Sven-S. Porst <porst@sub.uni-goettingen.de>
- * @package		TYPO3
- * @subpackage	tx_nkwgok
  */
 class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 
 	/**
 	 * Function executed from the Scheduler.
-	 * @return	boolean	TRUE if success, otherwise FALSE
+	 * @return    boolean    TRUE if success, otherwise FALSE
 	 */
 	public function execute() {
 		set_time_limit(1200);
@@ -73,7 +62,7 @@ class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 	 * @param string $opacBaseURL
 	 * @param string $folderPath
 	 * @param string $fileBaseName
-	 * @return boolean sucess status of the download
+	 * @return bool sucess status of the download
 	 */
 	private function downloadAuthorityDataFromOpacToFolder($opacBaseURL, $folderPath, $fileBaseName) {
 		$success = True;
@@ -95,20 +84,18 @@ class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 					fwrite($targetFile, $opacDownload);
 					fclose($targetFile);
 					$firstRecord += NKWGOKImportChunkSize;
-				}
-				else {
-					\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , tx_nkwgok_utility::extKey, 3);
+				} else {
+					\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath, \tx_nkwgok_utility::extKey, 3);
 					$success = False;
 				}
-			}
-			else {
-				\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, tx_nkwgok_utility::extKey, 3);
+			} else {
+				\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, \tx_nkwgok_utility::extKey, 3);
 				$success = False;
 			}
 		}
 
 		if ($success) {
-			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: LKL download for ' . $fileBaseName - ' succeeded', tx_nkwgok_utility::extKey, 1);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: LKL download for ' . $fileBaseName - ' succeeded', \tx_nkwgok_utility::extKey, 1);
 		}
 
 		return $success;
@@ -121,7 +108,7 @@ class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 	 * @param string $opacScanURL
 	 * @param string $indexName
 	 * @param string $folderPath
-	 * @return boolean success status of the download
+	 * @return bool success status of the download
 	 */
 	private function downloadHitCountsFromOpacToFolder($opacScanURL, $indexName, $folderPath) {
 		$success = True;
@@ -130,8 +117,7 @@ class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 		$scanNext = '0';
 		if ($indexName === 'lkl') {
 			$scanNext = 'a';
-		}
-		else if ($indexName === 'brk') {
+		} else if ($indexName === 'brk') {
 			$scanNext = '01';
 		}
 		$index = 0;
@@ -146,23 +132,21 @@ class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 				if ($targetFile) {
 					fwrite($targetFile, $opacDownload);
 					fclose($targetFile);
-				}
-				else {
-					\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath , tx_nkwgok_utility::extKey, 3);
+				} else {
+					\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath, \tx_nkwgok_utility::extKey, 3);
 					$success = False;
 				}
 
 				$termAttribute = simplexml_load_string($opacDownload)->xpath('/RESULT/SCANNEXT/@term');
 				$scanNext = $termAttribute[0];
-			}
-			else {
-				\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, tx_nkwgok_utility::extKey, 3);
+			} else {
+				\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: failed to load ' . $URL, \tx_nkwgok_utility::extKey, 3);
 				$success = False;
 			}
 		}
 
 		if ($success) {
-			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: hitcount download for index ' . $indexName . ' succeeded', tx_nkwgok_utility::extKey, 1);
+			\TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: hitcount download for index ' . $indexName . ' succeeded', \tx_nkwgok_utility::extKey, 1);
 		}
 
 		return $success;

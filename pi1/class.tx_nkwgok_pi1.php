@@ -24,25 +24,16 @@
  * ************************************************************* */
 
 /**
- * Changes 2011-2012 by Sven-S. Porst <porst@sub.uni-goettingen.de>
  * See the ChangeLog or git repository for details.
- */
-
-
-/**
- * @package TYPO3
- * @subpackage tx_nkwgok
  */
 class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 
 	/**
 	 * Main method of the PlugIn
 	 *
-	 * @author    Nils K. Windisch <windisch@sub.uni-goettingen.de>
-	 * @author    Sven-S. Porst <porst@sub.uni-goettingen.de>
-	 * @param    string $content : The PlugIn content
-	 * @param    array $conf : The PlugIn configuration
-	 * @return    string The content that is displayed on the website
+	 * @param string $content : The PlugIn content
+	 * @param array $conf : The PlugIn configuration
+	 * @return string The content that is displayed on the website
 	 */
 	function main($content, $conf) {
 		// basic
@@ -77,7 +68,8 @@ class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 		$arguments['pageLink'] = $this->pi_getPageLink($GLOBALS['TSFE']->id);
 		$arguments['language'] = $GLOBALS['TSFE']->lang;
 
-		$nkwgok = tx_nkwgok::instantiateSubclassFor($arguments);
+		/** @var tx_nkwgok $nkwgok */
+		$nkwgok = \tx_nkwgok::instantiateSubclassFor($arguments);
 		$doc = $nkwgok->getMarkup();
 		$content .= $doc->saveHTML();
 
@@ -87,9 +79,6 @@ class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 	/**
 	 * Helper function to add our default stylesheet or the one at the path
 	 * set up in Extension Manager configuration to the page’s head.
-	 *
-	 * @author Sven-S. Porst
-	 * @return void
 	 */
 	protected function addStylesheet() {
 		$nkwgokGlobalConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][tx_nkwgok_utility::extKey]);

@@ -2,8 +2,6 @@
 
 /**
  * Class providing helper functions and constants.
- *
- * @author Sven-S. Porst <porst@sub.uni-goettingen.de>
  */
 class tx_nkwgok_utility {
 
@@ -31,7 +29,7 @@ class tx_nkwgok_utility {
 		$type = $indexName;
 
 		if ($indexName === 'lkl') {
-			$type = tx_nkwgok_utility::recordTypeGOK;
+			$type = self::recordTypeGOK;
 		}
 
 		return $type;
@@ -49,7 +47,7 @@ class tx_nkwgok_utility {
 	public static function typeToIndexName($type) {
 		$indexName = $type;
 
-		if ($type === tx_nkwgok_utility::recordTypeGOK) {
+		if ($type === self::recordTypeGOK) {
 			$indexName = 'lkl';
 		}
 

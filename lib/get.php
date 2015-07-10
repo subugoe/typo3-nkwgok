@@ -23,38 +23,25 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
 
-/**
- * Changes 2011-2012 by Sven-S. Porst <porst@sub.uni-goettingen.de>
- * See the ChangeLog or git repository for details.
- */
-
-
 if (!defined('PATH_typo3conf')) {
 	die('Could not access this script directly!');
 }
 
-
-/**
- * @package default
- * @author Nils K. Windisch
- * */
 class tx_nkwgok_eid {
 
 	/**
-	 * @return void
-	 * @author Nils K. Windisch
-	 * @author Sven-S. Porst <porst@sub.uni-goettingen.de>
-	 * */
-	function eid_main() {
+	 * @return string
+	 */
+	public function eid_main() {
 
 		$arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GET('tx_nkwgok');
 		$nkwgok = tx_nkwgok::instantiateSubclassFor($arguments);
 		$output = $nkwgok->getAJAXMarkup();
 
-		echo $output->saveHTML();
+		return $output->saveHTML();
 	}
 
 }
 
-$nkwgok_eid = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_eid');
-$nkwgok_eid->eid_main();
+$nkwgok_eid = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_eid::class);
+echo $nkwgok_eid->eid_main();
