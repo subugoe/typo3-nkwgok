@@ -33,201 +33,217 @@ define('NKWGOKQueryFields', 'ppn, notation, search, descr, descr_en, descr_alter
  *
  * Then call the getMarkup() or getAJAXMarkup() methods to receive the output.
  * */
-abstract class tx_nkwgok {
+abstract class tx_nkwgok
+{
 
-	/**
-	 * Arguments from the GET query as well as further settings that may have
-	 * been added. This variable lets us have the same interface for accessing the
-	 * date when running in pibase or eID.
-	 * @var Array
-	 */
-	protected $arguments;
+    /**
+     * Arguments from the GET query as well as further settings that may have
+     * been added. This variable lets us have the same interface for accessing the
+     * date when running in pibase or eID.
+     * @var Array
+     */
+    protected $arguments;
 
 
-	/**
-	 * Language code to use for the localisation.
-	 * @var string ISO 639-1 language code
-	 */
-	protected $language;
+    /**
+     * Language code to use for the localisation.
+     * @var string ISO 639-1 language code
+     */
+    protected $language;
 
-	/**
-	 * TYPO3 content object ID for our content element. This variable
-	 * is initialised by the instantiateSubclassFor() method.
-	 * @var string
-	 */
-	protected $objectID;
+    /**
+     * TYPO3 content object ID for our content element. This variable
+     * is initialised by the instantiateSubclassFor() method.
+     * @var string
+     */
+    protected $objectID;
 
-	/**
-	 * DOMDocument used by subclasses to create their content. This variable
-	 * is initialised by the instantiateSubclassFor() method.
-	 * @var DOMDocument
-	 */
-	protected $doc;
+    /**
+     * DOMDocument used by subclasses to create their content. This variable
+     * is initialised by the instantiateSubclassFor() method.
+     * @var \DOMDocument
+     */
+    protected $doc;
 
-	/**
-	 * Implemented by subclasses.
-	 * Returns a DOMDocument with markup for the subject hierarchy based on the
-	 * settings passed to instantiateSubclassFor.
-	 *
-	 * @return DOMDocument
-	 */
-	abstract function getMarkup();
+    /**
+     * @var Array
+     */
+    protected $localisation;
 
-	/**
-	 * Implemented by subclasses.
-	 * Returns a DOMDocument with markup for the partial subject hierarchy based
-	 * on the settings passed to instantiateSubclassFor.
-	 *
-	 * @return DOMDocument
-	 */
-	abstract function getAJAXMarkup();
+    /**
+     * @var \TYPO3\CMS\Dbal\Database\DatabaseConnection
+     */
+    protected $db;
 
-	/**
-	 * Uses the 'style' field of the $arguments array to determine which subclass
-	 * to instantiate, instantiates it, and adds $arguments to it.
-	 *
-	 * @param Array $arguments
-	 * @return tx_nkwgok
-	 */
-	public static function instantiateSubclassFor($arguments) {
-		$subclass = NULL;
+    public function __construct()
+    {
+        $this->db = $GLOBALS['TYPO3_DB'];
+    }
 
-		if ($arguments['style'] === 'menu') {
-			$subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_menu::class);
-		} else {
-			// Default to displaying the tree. Expected for styles 'tree' and 'column'.
-			$subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_tree::class);
-			if (!array_key_exists('style', $arguments) || !$arguments['style']) {
-				// Default to tree style if style is not set.
-				$arguments['style'] = 'tree';
-			}
-		}
+    /**
+     * Uses the 'style' field of the $arguments array to determine which subclass
+     * to instantiate, instantiates it, and adds $arguments to it.
+     *
+     * @param Array $arguments
+     * @return \tx_nkwgok
+     */
+    public static function instantiateSubclassFor($arguments)
+    {
+        $subclass = null;
 
-		if ($subclass) {
-			// Configure the newly created instance.
-			$subclass->arguments = $arguments;
-			$subclass->doc = \DOMImplementation::createDocument();
-			$subclass->objectID = $arguments['objectID'];
-			$subclass->language = $arguments['language'];
-		}
+        if ($arguments['style'] === 'menu') {
+            $subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_menu::class);
+        } else {
+            // Default to displaying the tree. Expected for styles 'tree' and 'column'.
+            $subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_tree::class);
+            if (!array_key_exists('style', $arguments) || !$arguments['style']) {
+                // Default to tree style if style is not set.
+                $arguments['style'] = 'tree';
+            }
+        }
 
-		return $subclass;
-	}
+        if ($subclass) {
+            // Configure the newly created instance.
+            $subclass->arguments = $arguments;
+            /** @var \DOMImplementation $dom */
+            $dom = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\DOMImplementation::class);
+            $subclass->doc = $dom->createDocument();
+            $subclass->objectID = $arguments['objectID'];
+            $subclass->language = $arguments['language'];
+        }
 
-	/**
-	 * @var Array
-	 */
-	protected $localisation;
+        return $subclass;
+    }
 
-	/**
-	 * Provide our own localisation function as getLL() is not available when
-	 * running in eID.
-	 *
-	 * @param string $key key to look up in pi1/locallang.xml
-	 * @return string
-	 */
-	protected function localise($key) {
-		$result = '';
+    /**
+     * Implemented by subclasses.
+     * Returns a DOMDocument with markup for the subject hierarchy based on the
+     * settings passed to instantiateSubclassFor.
+     *
+     * @return DOMDocument
+     */
+    abstract function getMarkup();
 
-		$filePath = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName('EXT:' . tx_nkwgok_utility::extKey . '/pi1/locallang.xml');
-		if (!$this->localisation) {
-			/**
-			 * The returned $localisation seems to have the following structure:
-			 * array('languageKey' => array('stringKey' => array(array('target' => 'localisedString'))))
-			 * Only the requested languageKey seems to be present and the innermost
-			 * array can also contain a 'source' key.
-			 */
-			$parser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser::class);
-			$this->localisation = $parser->getParsedData($filePath, $this->language);
-		}
+    /**
+     * Implemented by subclasses.
+     * Returns a DOMDocument with markup for the partial subject hierarchy based
+     * on the settings passed to instantiateSubclassFor.
+     *
+     * @return DOMDocument
+     */
+    abstract function getAJAXMarkup();
 
-		$myLanguage = $this->language;
-		if (!array_key_exists($this->language, $this->localisation)) {
-			$myLanguage = 'default';
-		}
+    /**
+     * Provide our own localisation function as getLL() is not available when
+     * running in eID.
+     *
+     * @param string $key key to look up in pi1/locallang.xml
+     * @return string
+     */
+    protected function localise($key)
+    {
 
-		if (array_key_exists($key, $this->localisation[$myLanguage])) {
-			$result = $this->localisation[$myLanguage][$key];
-		} else {
-			// Return the original key in upper case if we don’t find a localisation.
-			$result = strtoupper($key);
-		}
+        $filePath = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName('EXT:' . tx_nkwgok_utility::extKey . '/pi1/locallang.xml');
+        if (!$this->localisation) {
+            /**
+             * The returned $localisation seems to have the following structure:
+             * array('languageKey' => array('stringKey' => array(array('target' => 'localisedString'))))
+             * Only the requested languageKey seems to be present and the innermost
+             * array can also contain a 'source' key.
+             */
+            $parser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser::class);
+            $this->localisation = $parser->getParsedData($filePath, $this->language);
+        }
 
-		// In TYPO3 >=4.6 $result is an array. Extract the relevant string from that.
-		if (is_array($result)) {
-			$result = $result[0]['target'];
-		}
+        $myLanguage = $this->language;
+        if (!array_key_exists($this->language, $this->localisation)) {
+            $myLanguage = 'default';
+        }
 
-		return $result;
-	}
+        if (array_key_exists($key, $this->localisation[$myLanguage])) {
+            $result = $this->localisation[$myLanguage][$key];
+        } else {
+            // Return the original key in upper case if we don’t find a localisation.
+            $result = strtoupper($key);
+        }
 
-	/**
-	 * Return subject name for display.
-	 *
-	 * Use English if the language code is 'en' and German otherwise.
-	 *
-	 * Some subject names end with a super-subject indicator enclosed in { }.
-	 * This is helpful when viewing the subject name on its own but is redundant
-	 * when viewed inside the subject hierarchy. The parameter $simplify = True
-	 * removes that indicator.
-	 *
-	 * @param Array $gokRecord
-	 * @param Boolean $simplify should the trailing {…} be removed? [defaults to False]
-	 * @return string
-	 */
-	protected function GOKName($gokRecord, $simplify = False) {
-		$displayName = $gokRecord['descr'];
+        // In TYPO3 >=4.6 $result is an array. Extract the relevant string from that.
+        if (is_array($result)) {
+            $result = $result[0]['target'];
+        }
 
-		if ($this->language == 'en') {
-			$englishName = $gokRecord['descr_en'];
+        return $result;
+    }
 
-			if ($englishName) {
-				$displayName = $englishName;
-			}
-		}
+    /**
+     * Return subject name for display.
+     *
+     * Use English if the language code is 'en' and German otherwise.
+     *
+     * Some subject names end with a super-subject indicator enclosed in { }.
+     * This is helpful when viewing the subject name on its own but is redundant
+     * when viewed inside the subject hierarchy. The parameter $simplify = True
+     * removes that indicator.
+     *
+     * @param Array $gokRecord
+     * @param Boolean $simplify should the trailing {…} be removed? [defaults to False]
+     * @return string
+     */
+    protected function GOKName($gokRecord, $simplify = false)
+    {
+        $displayName = $gokRecord['descr'];
 
-		// Remove trailing ' - Allgemein- und Gesamtdarstellungen'
-		// Remove trailing super-subject designator in { }
-		if ($simplify) {
-			$displayName = preg_replace("/ - Allgemein- und Gesamtdarstellungen$/", "", $displayName);
-			$displayName = preg_replace("/( \{.*\})$/", "", $displayName);
-		}
-		return trim($displayName);
-	}
+        if ($this->language == 'en') {
+            $englishName = $gokRecord['descr_en'];
 
-	/**
-	 * Returns subject records for the children of a given identifier (PPN)
-	 * ordered by their notation.
-	 *
-	 * @param string $parentPPN
-	 * @param Boolean $includeParent if True, the parent item is included
-	 * @return Array of subject records of the $parentPPN’s children
-	 */
-	protected function getChildren($parentPPN, $includeParent = False) {
-		$parentEscaped = $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, tx_nkwgok_utility::dataTable);
-		$whereClause = 'parent = ' . $parentEscaped;
-		if ($this->arguments['omitXXX']) {
-			$whereClause .= ' AND NOT notation LIKE "%XXX"';
-		}
-		$whereClause = '(' . $whereClause . ')';
-		if ($includeParent) {
-			$whereClause = '(' . $whereClause . ' OR ppn = ' . $parentEscaped . ')';
-		}
-		$whereClause .= ' AND statusID = 0';
-		$queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-				NKWGOKQueryFields,
-				tx_nkwgok_utility::dataTable,
-				$whereClause,
-				'',
-				'hierarchy,notation ASC',
-				'');
+            if ($englishName) {
+                $displayName = $englishName;
+            }
+        }
 
-		$children = Array();
-		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
-			$children[] = $row;
-		}
+        // Remove trailing ' - Allgemein- und Gesamtdarstellungen'
+        // Remove trailing super-subject designator in { }
+        if ($simplify) {
+            $displayName = preg_replace("/ - Allgemein- und Gesamtdarstellungen$/", "", $displayName);
+            $displayName = preg_replace("/( \{.*\})$/", "", $displayName);
+        }
+        return trim($displayName);
+    }
 
-		return $children;
-	}
+    /**
+     * Returns subject records for the children of a given identifier (PPN)
+     * ordered by their notation.
+     *
+     * @param string $parentPPN
+     * @param Boolean $includeParent if True, the parent item is included
+     * @return Array of subject records of the $parentPPN’s children
+     */
+    protected function getChildren($parentPPN, $includeParent = false)
+    {
+        $parentEscaped = $this->db->fullQuoteStr($parentPPN, tx_nkwgok_utility::dataTable);
+        $whereClause = 'parent = ' . $parentEscaped;
+        if ($this->arguments['omitXXX']) {
+            $whereClause .= ' AND NOT notation LIKE "%XXX"';
+        }
+        $whereClause = '(' . $whereClause . ')';
+        if ($includeParent) {
+            $whereClause = '(' . $whereClause . ' OR ppn = ' . $parentEscaped . ')';
+        }
+        $whereClause .= ' AND statusID = 0';
+        $queryResult = $this->db->exec_SELECTquery(
+            NKWGOKQueryFields,
+            tx_nkwgok_utility::dataTable,
+            $whereClause,
+            '',
+            'hierarchy,notation ASC',
+            '');
+
+        $children = [];
+        while ($row = $this->db->sql_fetch_assoc($queryResult)) {
+            $children[] = $row;
+        }
+
+        return $children;
+    }
 
 }

@@ -27,46 +27,59 @@ require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('nkwgok
 /**
  * See the Changelog or git repository for details.
  */
-class tx_nkwgok_ff {
-	function addFields($config) {
-		$rootNodes = $this->queryForChildrenOf(tx_nkwgok_utility::rootNode);
+class tx_nkwgok_ff
+{
+    /**
+     * @var \TYPO3\CMS\Dbal\Database\DatabaseConnection
+     */
+    protected $db;
 
-		$options = array();
-		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($rootNodes)) {
-			$optionTitle = '[' . $row['notation'] . '] ' . $row['descr'];
-			$optionValue = $row['notation'];
-			$options[] = array($optionTitle, $optionValue);
+    public function __construct()
+    {
+        $this->db = $GLOBALS['TYPO3_DB'];
+    }
 
-			$childNodes = $this->queryForChildrenOf($row['ppn']);
-			while ($childRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($childNodes)) {
-				$childOptionTitle = '—[' . $childRow['notation'] . '] ' . $childRow['descr'];
-				$childOptionValue = $childRow['notation'];
-				$options[] = array($childOptionTitle, $childOptionValue);
-			}
-		}
+    public function addFields($config)
+    {
+        $rootNodes = $this->queryForChildrenOf(tx_nkwgok_utility::rootNode);
 
-		$config['items'] = array_merge($config['items'], $options);
-		return $config;
-	}
+        $options = [];
+        while ($row = $this->db->sql_fetch_assoc($rootNodes)) {
+            $optionTitle = '[' . $row['notation'] . '] ' . $row['descr'];
+            $optionValue = $row['notation'];
+            $options[] = [$optionTitle, $optionValue];
+
+            $childNodes = $this->queryForChildrenOf($row['ppn']);
+            while ($childRow = $this->db->sql_fetch_assoc($childNodes)) {
+                $childOptionTitle = '—[' . $childRow['notation'] . '] ' . $childRow['descr'];
+                $childOptionValue = $childRow['notation'];
+                $options[] = [$childOptionTitle, $childOptionValue];
+            }
+        }
+
+        $config['items'] = array_merge($config['items'], $options);
+        return $config;
+    }
 
 
-	/**
-	 * Queries the database for all records having the $parentID parameter as
-	 * their parent element and returns the query result.
-	 *
-	 * @param string $parentID
-	 * @return array
-	 */
-	private function queryForChildrenOf($parentID) {
-		$queryResults = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-			'*',
-			tx_nkwgok_utility::dataTable,
-			"parent = '" . $parentID . "'",
-			'',
-			'notation ASC',
-			'');
+    /**
+     * Queries the database for all records having the $parentID parameter as
+     * their parent element and returns the query result.
+     *
+     * @param string $parentID
+     * @return array
+     */
+    protected function queryForChildrenOf($parentID)
+    {
+        $queryResults = $this->db->exec_SELECTquery(
+            '*',
+            tx_nkwgok_utility::dataTable,
+            "parent = '" . $parentID . "'",
+            '',
+            'notation ASC',
+            '');
 
-		return $queryResults;
-	}
+        return $queryResults;
+    }
 
 }

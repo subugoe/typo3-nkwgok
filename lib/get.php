@@ -24,22 +24,24 @@
  * ************************************************************* */
 
 if (!defined('PATH_typo3conf')) {
-	die('Could not access this script directly!');
+    die('Could not access this script directly!');
 }
 
-class tx_nkwgok_eid {
+class tx_nkwgok_eid
+{
 
-	/**
-	 * @return string
-	 */
-	public function eid_main() {
+    /**
+     * @return string
+     */
+    public function eid_main()
+    {
 
-		$arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GET('tx_nkwgok');
-		$nkwgok = tx_nkwgok::instantiateSubclassFor($arguments);
-		$output = $nkwgok->getAJAXMarkup();
+        $arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GET('tx_nkwgok');
+        $nkwgok = \tx_nkwgok::instantiateSubclassFor($arguments);
+        $output = $nkwgok->getAJAXMarkup();
 
-		return $output->saveHTML();
-	}
+        return $output->saveHTML();
+    }
 
 }
 
