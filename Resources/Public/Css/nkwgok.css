@@ -1,26 +1,17 @@
-/*
-Stylesheet for GOK tree used in nkwgok TYPO3 plug-in.
-
-2011 by Sven-S. Porst, SUB Göttingen <porst@sub.uni-goettingen.de>
-*/
-
-
-/*
-Styles for the GOK Tree
-*/
+/* Styles for the GOK Tree */
 .gokContainer.tree a {
 	text-decoration: none;
-	border: 0px none;
+	border: 0 none;
 	position: relative;
 }
 
 .gokContainer.tree ul {
 	list-style-type: none;
-	padding-left: 0em;
+	padding-left: 0;
 }
 
 .gokContainer.tree ul ul {
-	margin: 0em 0em 0em -7.5em;
+	margin: 0 0 0 -7.5em;
 }
 
 .gokContainer.tree ul li {
@@ -34,8 +25,8 @@ Styles for the GOK Tree
 
 .gokContainer.tree a .GOKID {
 	font-weight: normal;
-	display:block;
-	float:left;
+	display: block;
+	float: left;
 	width: 6em;
 	text-align: right;
 	color: #999;
@@ -48,11 +39,11 @@ Styles for the GOK Tree
 }
 
 .gokContainer.tree.hideGOKID ul ul {
-	margin: 0em 0em 0em -1em;
+	margin: 0 0 0 -1em;
 }
 
 .gokContainer.tree.hideGOKID .GOKID {
-	display:none;
+	display: none;
 }
 
 .gokContainer.tree .rootNode .GOKID {
@@ -68,7 +59,6 @@ a:hover .GOKID {
 	text-decoration: none;
 	color: #666;
 }
-
 
 .gokContainer.tree .plusMinus, .gokTreeContainer .GOKID {
 	font-family: monospace;
@@ -121,30 +111,28 @@ a:hover .GOKID {
 	display: none;
 }
 
-
-
 /*  Styles for the GOK Columns  */
 
 .gokContainer.column {
-    background: #eee;
-    overflow: visible;
+	background: #eee;
+	overflow: visible;
 }
 
 .gokContainer.column ul {
-    position: relative;
-    width: 22%;
-    margin: 0;
-    padding: 0 10px 0 0 ;
-    list-style-type: none;
-    background: #eef;
-    border-left: 1px solid #999;
+	position: relative;
+	width: 22%;
+	margin: 0;
+	padding: 0 10px 0 0;
+	list-style-type: none;
+	background: #eef;
+	border-left: 1px solid #999;
 	float: left;
 }
 
 .gokContainer.column li {
 	position: relative;
 	margin: 0;
-    border-bottom: 1px dotted #999;
+	border-bottom: 1px dotted #999;
 }
 
 .gokContainer.column li.close a,
@@ -157,13 +145,13 @@ a:hover .GOKID {
 	display: block;
 	position: absolute;
 	top: 0.3em;
-	right: 0px;
+	right: 0;
 	content: '»';
 }
 
 .gokContainer.column li a {
-    display: block;
-    padding: 4px 0px 4px 6px;
+	display: block;
+	padding: 4px 0 4px 6px;
 }
 
 /* Hide unnecessary elements */
@@ -172,13 +160,12 @@ a:hover .GOKID {
 .gokContainer.column .general-items-node,
 .gokContainer.column .rootNode,
 .gokContainer.column ul.level-0 .GOKID {
-    display: none;
+	display: none;
 }
-
 
 /*  Styles for the GOK Menu  */
 
 .gokMenuForm select {
 	width: 50%;
-	display:block;
+	display: block;
 }
