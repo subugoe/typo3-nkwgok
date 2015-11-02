@@ -82,10 +82,10 @@ abstract class tx_nkwgok
         $subclass = NULL;
 
         if ($arguments['style'] === 'menu') {
-            $subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_menu');
+            $subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_menu::class);
         } else {
             // Default to displaying the tree. Expected for styles 'tree' and 'column'.
-            $subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_tree');
+            $subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_tree::class);
             if (!array_key_exists('style', $arguments) || !$arguments['style']) {
                 // Default to tree style if style is not set.
                 $arguments['style'] = 'tree';
@@ -140,7 +140,7 @@ abstract class tx_nkwgok
              * Only the requested languageKey seems to be present and the innermost
              * array can also contain a 'source' key.
              */
-            $parser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_l10n_parser_Llxml');
+            $parser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser::class);
             $this->localisation = $parser->getParsedData($filePath, $this->language);
         }
 

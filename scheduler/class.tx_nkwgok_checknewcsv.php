@@ -15,13 +15,15 @@ class tx_nkwgok_checkNewCSV extends \TYPO3\CMS\Scheduler\Task\AbstractTask
     {
         $success = True;
         if ($this->needsUpdate()) {
-            $convertCSVTask = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_convertCSV');
+            /** @var \tx_nkwgok_convertCSV $convertCSVTask */
+            $convertCSVTask = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_convertCSV::class);
             $success = $convertCSVTask->execute();
             if (!$success) {
                 \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('checkNewCSV Scheduler Task: Problem during conversion of CSV files. Stopping.',
                     tx_nkwgok_utility::extKey, 3);
             } else {
-                $loadxmlTask = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_loadxml');
+                /** @var \tx_nkwgok_loadxml $loadxmlTask */
+                $loadxmlTask = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_loadxml::class);
                 $success = $loadxmlTask->execute();
                 if (!$success) {
                     \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('checkNewCSV Scheduler Task: could not import XML to TYPO3 database.',

@@ -42,5 +42,6 @@ class tx_nkwgok_eid
 
 }
 
-$nkwgok_eid = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('tx_nkwgok_eid');
+/** @var \tx_nkwgok_eid $nkwgok_eid */
+$nkwgok_eid = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_eid::class);
 $nkwgok_eid->eid_main();
