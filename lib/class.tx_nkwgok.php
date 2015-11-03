@@ -95,7 +95,9 @@ abstract class tx_nkwgok
         if ($subclass) {
             // Configure the newly created instance.
             $subclass->arguments = $arguments;
-            $subclass->doc = \DOMImplementation::createDocument();
+            /** @var \DOMImplementation $domImplementation */
+            $domImplementation = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\DOMImplementation::class);
+            $subclass->doc = $domImplementation->createDocument();
             $subclass->objectID = $arguments['objectID'];
             $subclass->language = $arguments['language'];
         }

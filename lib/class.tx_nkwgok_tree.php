@@ -419,7 +419,7 @@ class tx_nkwgok_tree extends tx_nkwgok
         if ($hitCount != 0 && $URL) {
             $opacLink = $this->doc->createElement('a');
             $opacLink->setAttribute('href', $URL);
-            $titleString = '';
+
             if ($useDeepSearch === True && $GOKData['childcount'] != 0) {
                 $titleString = $this->localise('Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen');
             } else {
@@ -535,7 +535,6 @@ class tx_nkwgok_tree extends tx_nkwgok
     public function getAJAXMarkup()
     {
         $parentPPN = $this->arguments['expand'][0];
-
         $this->appendGOKTreeChildren($parentPPN, $this->doc, [$parentPPN], 1);
 
         return $this->doc;

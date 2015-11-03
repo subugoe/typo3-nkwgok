@@ -131,7 +131,10 @@ class tx_nkwgok_convertCSV extends \TYPO3\CMS\Scheduler\Task\AbstractTask
         foreach ($CSVLines as $lineNumber => $line) {
             // Set up document.
             if ($doc === Null) {
-                $doc = \DOMImplementation::createDocument();
+                /** @var \DOMImplementation  $domImplementation */
+                $domImplementation = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\DOMImplementation::class);
+
+                $doc = $domImplementation->createDocument();
                 $result = $doc->createElement('RESULT');
                 $doc->appendChild($result);
                 $set = $doc->createElement('SET');

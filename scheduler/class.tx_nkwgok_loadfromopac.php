@@ -44,7 +44,7 @@ class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask
 
 
         // Create the hitcounts folder if necessary and delete all files inside it if it exists.
-        \TYPO3\CMS\Core\Utility\GeneralUtility::mkdir(PATH_site, 'fileadmin/gok/hitcounts');
+        \TYPO3\CMS\Core\Utility\GeneralUtility::mkdir(PATH_site . 'fileadmin/gok/hitcounts');
         $hitCountDir = $baseDir . 'hitcounts/';
         $hitCountFileList = glob($hitCountDir . '*');
         foreach ($hitCountFileList as $file) {
