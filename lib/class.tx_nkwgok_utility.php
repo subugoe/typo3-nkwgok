@@ -3,55 +3,54 @@
 /**
  * Class providing helper functions and constants.
  */
-class tx_nkwgok_utility {
+class tx_nkwgok_utility
+{
+    const extKey = 'nkwgok';
+    const dataTable = 'tx_nkwgok_data';
 
-	const extKey = 'nkwgok';
-	const dataTable = 'tx_nkwgok_data';
+    const rootNode = 'Root';
 
-	const rootNode = 'Root';
+    const recordTypeGOK = 'gok';
+    const recordTypeBRK = 'brk';
+    const recordTypeCSV = 'csv';
+    const recordTypeMSC = 'msc';
+    const recordTypeUnknown = 'unknown';
 
-	const recordTypeGOK = 'gok';
-	const recordTypeBRK = 'brk';
-	const recordTypeCSV = 'csv';
-	const recordTypeMSC = 'msc';
-	const recordTypeUnknown = 'unknown';
+    /**
+     * Returns the internal type name for the given index name.
+     * * lkl -> gok
+     * * pass others through unchanged
+     *
+     * @param String $indexName
+     * @return String
+     */
+    public static function indexNameToType($indexName)
+    {
+        $type = $indexName;
 
+        if ($indexName === 'lkl') {
+            $type = self::recordTypeGOK;
+        }
 
-	/**
-	 * Returns the internal type name for the given index name.
-	 * * lkl -> gok
-	 * * pass others through unchanged
-	 *
-	 * @param String $indexName
-	 * @return String
-	 */
-	public static function indexNameToType($indexName) {
-		$type = $indexName;
+        return $type;
+    }
 
-		if ($indexName === 'lkl') {
-			$type = self::recordTypeGOK;
-		}
+    /**
+     * Returns the internal type name for the given index name.
+     * * gok -> lkl
+     * * pass others through unchanged
+     *
+     * @param String $type
+     * @return String
+     */
+    public static function typeToIndexName($type)
+    {
+        $indexName = $type;
 
-		return $type;
-	}
+        if ($type === self::recordTypeGOK) {
+            $indexName = 'lkl';
+        }
 
-
-	/**
-	 * Returns the internal type name for the given index name.
-	 * * gok -> lkl
-	 * * pass others through unchanged
-	 *
-	 * @param String $type
-	 * @return String
-	 */
-	public static function typeToIndexName($type) {
-		$indexName = $type;
-
-		if ($type === self::recordTypeGOK) {
-			$indexName = 'lkl';
-		}
-
-		return $indexName;
-	}
-
+        return $indexName;
+    }
 }
