@@ -30,18 +30,18 @@ if (!defined('PATH_typo3conf')) {
 class tx_nkwgok_eid
 {
 
-    function eid_main()
+    /**
+     * @return string
+     */
+    public function eid_main()
     {
-
         $arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GET('tx_nkwgok');
         $nkwgok = tx_nkwgok::instantiateSubclassFor($arguments);
         $output = $nkwgok->getAJAXMarkup();
 
-        echo $output->saveHTML();
+        return $output->saveHTML();
     }
-
 }
 
-/** @var \tx_nkwgok_eid $nkwgok_eid */
 $nkwgok_eid = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_eid::class);
-$nkwgok_eid->eid_main();
+echo $nkwgok_eid->eid_main();

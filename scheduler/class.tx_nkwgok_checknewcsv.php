@@ -9,11 +9,11 @@ class tx_nkwgok_checkNewCSV extends \TYPO3\CMS\Scheduler\Task\AbstractTask
 
     /**
      * Function executed by the Scheduler.
-     * @return boolean TRUE if success, otherwise FALSE
+     * @return bool TRUE if success, otherwise FALSE
      */
     public function execute()
     {
-        $success = True;
+        $success = true;
         if ($this->needsUpdate()) {
             /** @var \tx_nkwgok_convertCSV $convertCSVTask */
             $convertCSVTask = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_convertCSV::class);
@@ -35,15 +35,14 @@ class tx_nkwgok_checkNewCSV extends \TYPO3\CMS\Scheduler\Task\AbstractTask
         return $success;
     }
 
-
     /**
      * Returns whether all CSV files in filadmin/gok/csv/ have corresponding
      * XML files in fileadmin/gok/xml with a newer modification date.
-     * @return boolean
+     * @return bool
      */
     private function needsUpdate()
     {
-        $needsUpdate = False;
+        $needsUpdate = false;
         $CSVFiles = glob(PATH_site . 'fileadmin/gok/csv/*.csv');
         foreach ($CSVFiles as $CSVPath) {
             $CSVPathInfo = pathinfo($CSVPath);
@@ -51,13 +50,13 @@ class tx_nkwgok_checkNewCSV extends \TYPO3\CMS\Scheduler\Task\AbstractTask
             if (!file_exists($XMLPath)) {
                 \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('Need to convert CSV files because ' . $XMLPath . ' is missing.',
                     tx_nkwgok_utility::extKey, 1);
-                $needsUpdate = True;
+                $needsUpdate = true;
                 break;
             } else {
                 if (filemtime($XMLPath) < filemtime($CSVPath)) {
                     \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('Need to convert CSV files because ' . $CSVPath . ' is newer than the corresponding XML file.',
                         tx_nkwgok_utility::extKey, 1);
-                    $needsUpdate = True;
+                    $needsUpdate = true;
                     break;
                 }
             }
@@ -65,7 +64,6 @@ class tx_nkwgok_checkNewCSV extends \TYPO3\CMS\Scheduler\Task\AbstractTask
 
         return $needsUpdate;
     }
-
 }
 
 if (defined('TYPO3_MODE')

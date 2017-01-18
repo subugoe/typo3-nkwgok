@@ -24,7 +24,6 @@
  * THE SOFTWARE.
  ******************************************************************************/
 
-
 /**
  * Subclass of tx_nkwgok that creates markup for a subject hierarchy as menus.
  */
@@ -34,7 +33,7 @@ class tx_nkwgok_menu extends tx_nkwgok
     /**
      * Returns markup for subject menus based on the configuration in $this->arguments.
      *
-     * @return DOMElement containing the markup for a menu
+     * @return \DOMNode containing the markup for a menu
      */
     public function getMarkup()
     {
@@ -59,12 +58,10 @@ class tx_nkwgok_menu extends tx_nkwgok
 
         $startNodes = explode(',', $this->arguments['notation']);
         if (count($startNodes) > 1) {
-            \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('several start nodes given (' . $this->arguments['notation'] . ') but only the first is used in menu mode',
-                tx_nkwgok_utility::extKey, 2);
+            \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('several start nodes given (' . $this->arguments['notation'] . ') but only the first is used in menu mode', tx_nkwgok_utility::extKey, 2);
         }
         $startNodeGOK = trim($startNodes[0]);
-        $firstNodeCondition = "notation LIKE " . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK,
-                tx_nkwgok_utility::dataTable) . ' AND statusID = 0';
+        $firstNodeCondition = 'notation LIKE ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK, tx_nkwgok_utility::dataTable) . ' AND statusID = 0';
         // run query and collect result
         $queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
             NKWGOKQueryFields,
@@ -74,7 +71,8 @@ class tx_nkwgok_menu extends tx_nkwgok
             'notation ASC',
             '');
 
-        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
+        $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult);
+        while ($row) {
             $menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
             $this->appendGOKMenuChildren($row['ppn'], $form, $menuInlineThreshold);
         }
@@ -88,10 +86,26 @@ class tx_nkwgok_menu extends tx_nkwgok
     }
 
     /**
+     * Returns markup for subject menus based on the configuration in $this->arguments.
+     *
+     * @return DOMDocument
+     */
+    public function getAJAXMarkup()
+    {
+        $menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
+        $this->appendGOKMenuChildren($this->arguments['expand'],
+            $this->doc,
+            $menuInlineThreshold,
+            (int)$this->arguments['level']);
+
+        return $this->doc;
+    }
+
+    /**
      * Helper function to insert JavaScript for the subject menu into the passed
      * $container element.
      *
-     * @param DOMElement $container the <script> tag is inserted into
+     * @param \DOMNode $container the <script> tag is inserted into
      */
     private function addGOKMenuJSToElement($container)
     {
@@ -113,19 +127,19 @@ class tx_nkwgok_menu extends tx_nkwgok
 			if (selectedOption.value != 'pleaseselect') {
 				jQuery('option[value=\"pleaseselect\"]', menu).remove();
 			}
-			startSearch" . $this->objectID . "(selectedOption);
+			startSearch" . $this->objectID . '(selectedOption);
 		}
 
-		function newMenuForSelection" . $this->objectID . " (option) {
+		function newMenuForSelection' . $this->objectID . " (option) {
 			var URL = location.protocol + '//' + location.host + location.pathname;
 			var PPN = option.value;
 			var level = parseInt(option.parentNode.getAttribute('level')) + 1;
 			var parameters = location.search.replace(/^\?/, '') + '&tx_" . tx_nkwgok_utility::extKey . "[expand]=' + PPN
-				+ '&tx_" . tx_nkwgok_utility::extKey . "[language]=" . $this->language . "&eID=" . tx_nkwgok_utility::extKey . "'
+				+ '&tx_" . tx_nkwgok_utility::extKey . '[language]=' . $this->language . '&eID=' . tx_nkwgok_utility::extKey . "'
 				+ '&tx_" . tx_nkwgok_utility::extKey . "[level]=' + level
 				+ '&tx_" . tx_nkwgok_utility::extKey . "[style]=menu'
-				+ '&tx_" . tx_nkwgok_utility::extKey . "[objectID]=" . $this->objectID . "'
-				+ '&tx_" . tx_nkwgok_utility::extKey . "[menuInlineThreshold]=" . $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'] . "';
+				+ '&tx_" . tx_nkwgok_utility::extKey . '[objectID]=' . $this->objectID . "'
+				+ '&tx_" . tx_nkwgok_utility::extKey . '[menuInlineThreshold]=' . $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'] . "';
 
 			jQuery(option.parentNode).nextAll().remove();
 			var newSelect = document.createElement('select');
@@ -156,10 +170,10 @@ class tx_nkwgok_menu extends tx_nkwgok
 			};
 			jQuery.get(URL, parameters, downloadFinishedFunction);
 		}
-		function startSearch" . $this->objectID . " (option) {
+		function startSearch" . $this->objectID . ' (option) {
 			nkwgokItemSelected(option);
 		}
-";
+';
         $scriptElement->appendChild($this->doc->createTextNode($js));
     }
 
@@ -173,18 +187,12 @@ class tx_nkwgok_menu extends tx_nkwgok
      * submenus in higher level menus, adding an indent to their titles.
      *
      * @param string $parentPPN
-     * @param DOMElement $container the created markup is appended to (needs to be a child element of $this->doc). Is expected to be a <select> element if the $autoExpandStep paramter is not 0 and a <form> element otherwise.
+     * @param \DOMNode $container the created markup is appended to (needs to be a child element of $this->doc). Is expected to be a <select> element if the $autoExpandStep paramter is not 0 and a <form> element otherwise.
      * @param int $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
      * @param int $level the depth in the menu hierarchy [defaults to 0]
      * @param int $autoExpandStep the depth of auto-expansion [defaults to 0]
      */
-    private function appendGOKMenuChildren(
-        $parentPPN,
-        $container,
-        $autoExpandLevel = 0,
-        $level = 0,
-        $autoExpandStep = 0
-    )
+    private function appendGOKMenuChildren($parentPPN, $container, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0)
     {
         $GOKs = $this->getChildren($parentPPN);
         if (sizeof($GOKs) > 0) {
@@ -252,7 +260,7 @@ class tx_nkwgok_menu extends tx_nkwgok
                 $option->setAttribute('value', $PPN);
                 $option->setAttribute('query', $GOK['search']);
                 // Careful: non-breaking spaces used here to create in-menu indentation
-                $menuItemString = str_repeat('   ', $autoExpandStep) . $this->GOKName($GOK, True);
+                $menuItemString = str_repeat('   ', $autoExpandStep) . $this->GOKName($GOK, true);
                 if ($GOK['childcount'] > 0) {
                     $menuItemString .= $this->localise(' ...');
                     $option->setAttribute('hasChildren', $GOK['childcount']);
@@ -272,21 +280,4 @@ class tx_nkwgok_menu extends tx_nkwgok
             }
         }
     }
-
-    /**
-     * Returns markup for subject menus based on the configuration in $this->arguments.
-     *
-     * @return DOMDocument
-     */
-    public function getAJAXMarkup()
-    {
-        $menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
-        $this->appendGOKMenuChildren($this->arguments['expand'],
-            $this->doc,
-            $menuInlineThreshold,
-            (int)$this->arguments['level']);
-
-        return $this->doc;
-    }
-
 }

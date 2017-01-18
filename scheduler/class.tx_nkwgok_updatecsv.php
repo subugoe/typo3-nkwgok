@@ -12,7 +12,7 @@ class tx_nkwgok_updateCSV extends \TYPO3\CMS\Scheduler\Task\AbstractTask
 
     /**
      * Function executed by the Scheduler.
-     * @return boolean TRUE if success, otherwise FALSE
+     * @return bool TRUE if success, otherwise FALSE
      */
     public function execute()
     {
@@ -20,21 +20,18 @@ class tx_nkwgok_updateCSV extends \TYPO3\CMS\Scheduler\Task\AbstractTask
         $convertCSVTask = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_convertCSV::class);
         $success = $convertCSVTask->execute();
         if (!$success) {
-            \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('updateCSV Scheduler Task: Problem during conversion of CSV files. Stopping.',
-                tx_nkwgok_utility::extKey, 3);
+            \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('updateCSV Scheduler Task: Problem during conversion of CSV files. Stopping.', \tx_nkwgok_utility::extKey, 3);
         } else {
             /** @var \tx_nkwgok_loadxml $loadxmlTask */
             $loadxmlTask = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_loadxml::class);
             $success = $loadxmlTask->execute();
             if (!$success) {
-                \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('updateCSV Scheduler Task: could not import XML to TYPO3 database.',
-                    tx_nkwgok_utility::extKey, 3);
+                \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('updateCSV Scheduler Task: could not import XML to TYPO3 database.', \tx_nkwgok_utility::extKey, 3);
             }
         }
 
         return $success;
     }
-
 }
 
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/lib/class.tx_nkwgok_updatecsv.php']) {

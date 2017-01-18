@@ -32,7 +32,6 @@ define('NKWGOKQueryFields', 'ppn, notation, search, descr, descr_en, descr_alter
  * passing the setup as arguments.
  *
  * Then call the getMarkup() or getAJAXMarkup() methods to receive the output.
- *
  * */
 abstract class tx_nkwgok
 {
@@ -44,7 +43,6 @@ abstract class tx_nkwgok
      * @var array
      */
     protected $arguments;
-
 
     /**
      * Language code to use for the localisation.
@@ -65,21 +63,35 @@ abstract class tx_nkwgok
      * @var DOMDocument
      */
     protected $doc;
+
     /**
-     * @var array
+     * Implemented by subclasses.
+     * Returns a DOMDocument with markup for the subject hierarchy based on the
+     * settings passed to instantiateSubclassFor.
+     *
+     * @return DOMDocument
      */
-    protected $localisation;
+    abstract public function getMarkup();
+
+    /**
+     * Implemented by subclasses.
+     * Returns a DOMDocument with markup for the partial subject hierarchy based
+     * on the settings passed to instantiateSubclassFor.
+     *
+     * @return DOMDocument
+     */
+    abstract public function getAJAXMarkup();
 
     /**
      * Uses the 'style' field of the $arguments array to determine which subclass
      * to instantiate, instantiates it, and adds $arguments to it.
      *
      * @param array $arguments
-     * @return tx_nkwgok
+     * @return \tx_nkwgok
      */
     public static function instantiateSubclassFor($arguments)
     {
-        $subclass = NULL;
+        $subclass = null;
 
         if ($arguments['style'] === 'menu') {
             $subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_menu::class);
@@ -95,8 +107,7 @@ abstract class tx_nkwgok
         if ($subclass) {
             // Configure the newly created instance.
             $subclass->arguments = $arguments;
-            /** @var \DOMImplementation $domImplementation */
-            $domImplementation = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\DOMImplementation::class);
+            $domImplementation = new \DOMImplementation();
             $subclass->doc = $domImplementation->createDocument();
             $subclass->objectID = $arguments['objectID'];
             $subclass->language = $arguments['language'];
@@ -106,22 +117,9 @@ abstract class tx_nkwgok
     }
 
     /**
-     * Implemented by subclasses.
-     * Returns a DOMDocument with markup for the subject hierarchy based on the
-     * settings passed to instantiateSubclassFor.
-     *
-     * @return DOMDocument
+     * @var array
      */
-    abstract function getMarkup();
-
-    /**
-     * Implemented by subclasses.
-     * Returns a DOMDocument with markup for the partial subject hierarchy based
-     * on the settings passed to instantiateSubclassFor.
-     *
-     * @return DOMDocument
-     */
-    abstract function getAJAXMarkup();
+    protected $localisation;
 
     /**
      * Provide our own localisation function as getLL() is not available when
@@ -134,7 +132,7 @@ abstract class tx_nkwgok
     {
         $result = '';
 
-        $filePath = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName('EXT:' . tx_nkwgok_utility::extKey . '/pi1/locallang.xml');
+        $filePath = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName('EXT:' . \tx_nkwgok_utility::extKey . '/pi1/locallang.xml');
         if (!$this->localisation) {
             /**
              * The returned $localisation seems to have the following structure:
@@ -180,7 +178,7 @@ abstract class tx_nkwgok
      * @param Boolean $simplify should the trailing {…} be removed? [defaults to False]
      * @return string
      */
-    protected function GOKName($gokRecord, $simplify = False)
+    protected function GOKName($gokRecord, $simplify = false)
     {
         $displayName = $gokRecord['descr'];
 
@@ -195,8 +193,8 @@ abstract class tx_nkwgok
         // Remove trailing ' - Allgemein- und Gesamtdarstellungen'
         // Remove trailing super-subject designator in { }
         if ($simplify) {
-            $displayName = preg_replace("/ - Allgemein- und Gesamtdarstellungen$/", "", $displayName);
-            $displayName = preg_replace("/( \{.*\})$/", "", $displayName);
+            $displayName = preg_replace('/ - Allgemein- und Gesamtdarstellungen$/', '', $displayName);
+            $displayName = preg_replace("/( \{.*\})$/", '', $displayName);
         }
         return trim($displayName);
     }
@@ -209,9 +207,9 @@ abstract class tx_nkwgok
      * @param Boolean $includeParent if True, the parent item is included
      * @return array of subject records of the $parentPPN’s children
      */
-    protected function getChildren($parentPPN, $includeParent = False)
+    protected function getChildren($parentPPN, $includeParent = false)
     {
-        $parentEscaped = $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, tx_nkwgok_utility::dataTable);
+        $parentEscaped = $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, \tx_nkwgok_utility::dataTable);
         $whereClause = 'parent = ' . $parentEscaped;
         if ($this->arguments['omitXXX']) {
             $whereClause .= ' AND NOT notation LIKE "%XXX"';
@@ -222,19 +220,19 @@ abstract class tx_nkwgok
         }
         $whereClause .= ' AND statusID = 0';
         $queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-            NKWGOKQueryFields,
-            tx_nkwgok_utility::dataTable,
-            $whereClause,
-            '',
-            'hierarchy,notation ASC',
-            '');
+                NKWGOKQueryFields,
+                \tx_nkwgok_utility::dataTable,
+                $whereClause,
+                '',
+                'hierarchy,notation ASC',
+                '');
 
         $children = [];
-        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
+        $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult);
+        while ($row) {
             $children[] = $row;
         }
 
         return $children;
     }
-
 }

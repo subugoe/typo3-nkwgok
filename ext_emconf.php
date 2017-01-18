@@ -7,7 +7,7 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Nils K. Windisch, Sven-S. Porst',
     'author_email' => 'www@sub.uni-goettingen.de',
     'shy' => '',
-    'dependencies' => 't3jquery',
+    'dependencies' => '',
     'conflicts' => '',
     'suggests' => '',
     'priority' => '',
@@ -24,9 +24,10 @@ $EM_CONF[$_EXTKEY] = [
     'constraints' => [
         'depends' => [
             'typo3' => '6.2.0-7.99.99',
-            't3jquery' => '1.8.15-0.0.0',
         ],
-        'conflicts' => [],
-        'suggests' => [],
+        'conflicts' => [
+        ],
+        'suggests' => [
+        ],
     ],
 ];

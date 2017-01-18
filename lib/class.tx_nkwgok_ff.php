@@ -24,20 +24,29 @@
 
 require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('nkwgok') . 'lib/class.tx_nkwgok_utility.php');
 
+/**
+ * See the Changelog or git repository for details.
+ */
 class tx_nkwgok_ff
 {
-    function addFields($config)
+    /**
+     * @param $config
+     * @return mixed
+     */
+    public function addFields($config)
     {
         $rootNodes = $this->queryForChildrenOf(tx_nkwgok_utility::rootNode);
 
         $options = [];
-        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($rootNodes)) {
+        $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($rootNodes);
+        while ($row) {
             $optionTitle = '[' . $row['notation'] . '] ' . $row['descr'];
             $optionValue = $row['notation'];
             $options[] = [$optionTitle, $optionValue];
 
             $childNodes = $this->queryForChildrenOf($row['ppn']);
-            while ($childRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($childNodes)) {
+            $childRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($childNodes);
+            while ($childRow) {
                 $childOptionTitle = '—[' . $childRow['notation'] . '] ' . $childRow['descr'];
                 $childOptionValue = $childRow['notation'];
                 $options[] = [$childOptionTitle, $childOptionValue];
@@ -47,7 +56,6 @@ class tx_nkwgok_ff
         $config['items'] = array_merge($config['items'], $options);
         return $config;
     }
-
 
     /**
      * Queries the database for all records having the $parentID parameter as
@@ -68,5 +76,4 @@ class tx_nkwgok_ff
 
         return $queryResults;
     }
-
 }

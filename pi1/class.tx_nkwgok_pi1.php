@@ -1,4 +1,5 @@
 <?php
+
 /* * *************************************************************
  *  Copyright notice
  *
@@ -22,17 +23,20 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
 
+/**
+ * See the ChangeLog or git repository for details.
+ */
 class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 {
 
     /**
      * Main method of the PlugIn
      *
-     * @param    string $content : The PlugIn content
-     * @param    array $conf : The PlugIn configuration
-     * @return    string The content that is displayed on the website
+     * @param string $content : The PlugIn content
+     * @param array $conf : The PlugIn configuration
+     * @return string The content that is displayed on the website
      */
-    function main($content, $conf)
+    public function main($content, $conf)
     {
         // basic
         $this->pi_setPiVarDefaults();
@@ -66,7 +70,8 @@ class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $arguments['pageLink'] = $this->pi_getPageLink($GLOBALS['TSFE']->id);
         $arguments['language'] = $GLOBALS['TSFE']->lang;
 
-        $nkwgok = tx_nkwgok::instantiateSubclassFor($arguments);
+        /** @var \tx_nkwgok $nkwgok */
+        $nkwgok = \tx_nkwgok::instantiateSubclassFor($arguments);
         $doc = $nkwgok->getMarkup();
         $content .= $doc->saveHTML();
 
@@ -76,8 +81,6 @@ class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
     /**
      * Helper function to add our default stylesheet or the one at the path
      * set up in Extension Manager configuration to the page’s head.
-     *
-     * @return void
      */
     protected function addStylesheet()
     {
@@ -89,7 +92,6 @@ class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
 
         $GLOBALS['TSFE']->pSetup['includeCSS.'][tx_nkwgok_utility::extKey] = $cssPath;
     }
-
 }
 
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/pi1/class.tx_nkwgok_pi1.php']) {

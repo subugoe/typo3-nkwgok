@@ -2,10 +2,9 @@
 
 /**
  * Class providing helper functions and constants.
- **/
+ */
 class tx_nkwgok_utility
 {
-
     const extKey = 'nkwgok';
     const dataTable = 'tx_nkwgok_data';
 
@@ -16,7 +15,6 @@ class tx_nkwgok_utility
     const recordTypeCSV = 'csv';
     const recordTypeMSC = 'msc';
     const recordTypeUnknown = 'unknown';
-
 
     /**
      * Returns the internal type name for the given index name.
@@ -31,12 +29,11 @@ class tx_nkwgok_utility
         $type = $indexName;
 
         if ($indexName === 'lkl') {
-            $type = tx_nkwgok_utility::recordTypeGOK;
+            $type = self::recordTypeGOK;
         }
 
         return $type;
     }
-
 
     /**
      * Returns the internal type name for the given index name.
@@ -50,11 +47,10 @@ class tx_nkwgok_utility
     {
         $indexName = $type;
 
-        if ($type === tx_nkwgok_utility::recordTypeGOK) {
+        if ($type === self::recordTypeGOK) {
             $indexName = 'lkl';
         }
 
         return $indexName;
     }
-
 }
