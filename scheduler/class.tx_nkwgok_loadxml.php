@@ -510,16 +510,15 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      * Returns the type of the $record passed.
      * Logs unknown record types.
      *
-     * @param \DOMDocument $record
+     * @param \SimpleXMLElement $record
      * @return string - gok|brk|csv|unknown
      */
     private function typeOfRecord($record)
     {
         $recordType = \tx_nkwgok_utility::recordTypeUnknown;
-        $xpath = new \DOMXPath($record);
-        $recordTypes = $xpath->query('datafield[@tag="002@"]/subfield[@code="0"]');
+        $recordTypes = $record->xpath('datafield[@tag="002@"]/subfield[@code="0"]');
 
-        if ($recordTypes && $recordTypes->length === 1) {
+        if ($recordTypes && count($recordTypes) === 1) {
             $recordTypeCode = (string)$recordTypes[0];
 
             if ($recordTypeCode === 'Tev') {
@@ -527,8 +526,8 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask
             } elseif ($recordTypeCode === 'Tov') {
                 $recordType = \tx_nkwgok_utility::recordTypeBRK;
             } elseif ($recordTypeCode === 'csv') {
-                $queryElements = $xpath->query('datafield[@tag="str"]/subfield[@code="a"]');
-                if ($queryElements && $queryElements->length === 1
+                $queryElements = $record->xpath('datafield[@tag="str"]/subfield[@code="a"]');
+                if ($queryElements && count($queryElements) === 1
                     && preg_match('/^msc=[0-9A-Zx-]*/', (string)$queryElements[0] > 0)
                 ) {
                     // Special case: an MSC record.
