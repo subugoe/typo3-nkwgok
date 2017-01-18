@@ -195,8 +195,7 @@ class tx_nkwgok_convertCSV extends \TYPO3\CMS\Scheduler\Task\AbstractTask
                         \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('convertCSV Scheduler Task: Duplicate PPN "' . $PPN . '" in file ' . $CSVPath, \tx_nkwgok_utility::extKey, 2);
                     }
                     if ($this->PPNList[$PPN]) {
-                        \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('convertCSV Scheduler Task: Duplicate PPN "' . $PPN . '" in file ' . $CSVPath,
-                            tx_nkwgok_utility::extKey, 2);
+                        \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('convertCSV Scheduler Task: Duplicate PPN "' . $PPN . '" in file ' . $CSVPath, \tx_nkwgok_utility::extKey, 2);
                     }
 
                     // Add current PPN to PPN list.

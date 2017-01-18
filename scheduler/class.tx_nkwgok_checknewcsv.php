@@ -20,14 +20,14 @@ class tx_nkwgok_checkNewCSV extends \TYPO3\CMS\Scheduler\Task\AbstractTask
             $success = $convertCSVTask->execute();
             if (!$success) {
                 \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('checkNewCSV Scheduler Task: Problem during conversion of CSV files. Stopping.',
-                    tx_nkwgok_utility::extKey, 3);
+                    \tx_nkwgok_utility::extKey, 3);
             } else {
                 /** @var \tx_nkwgok_loadxml $loadxmlTask */
                 $loadxmlTask = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_loadxml::class);
                 $success = $loadxmlTask->execute();
                 if (!$success) {
                     \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('checkNewCSV Scheduler Task: could not import XML to TYPO3 database.',
-                        tx_nkwgok_utility::extKey, 3);
+                        \tx_nkwgok_utility::extKey, 3);
                 }
             }
         }
@@ -49,13 +49,13 @@ class tx_nkwgok_checkNewCSV extends \TYPO3\CMS\Scheduler\Task\AbstractTask
             $XMLPath = PATH_site . 'fileadmin/gok/xml/' . $CSVPathInfo['filename'] . '-0.xml';
             if (!file_exists($XMLPath)) {
                 \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('Need to convert CSV files because ' . $XMLPath . ' is missing.',
-                    tx_nkwgok_utility::extKey, 1);
+                    \tx_nkwgok_utility::extKey, 1);
                 $needsUpdate = true;
                 break;
             } else {
                 if (filemtime($XMLPath) < filemtime($CSVPath)) {
                     \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('Need to convert CSV files because ' . $CSVPath . ' is newer than the corresponding XML file.',
-                        tx_nkwgok_utility::extKey, 1);
+                        \tx_nkwgok_utility::extKey, 1);
                     $needsUpdate = true;
                     break;
                 }

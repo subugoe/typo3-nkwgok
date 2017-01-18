@@ -36,7 +36,7 @@ class tx_nkwgok_eid
     public function eid_main()
     {
         $arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GET('tx_nkwgok');
-        $nkwgok = tx_nkwgok::instantiateSubclassFor($arguments);
+        $nkwgok = \tx_nkwgok::instantiateSubclassFor($arguments);
         $output = $nkwgok->getAJAXMarkup();
 
         return $output->saveHTML();

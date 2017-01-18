@@ -64,7 +64,7 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask
         $GLOBALS['TYPO3_DB']->exec_DELETEquery(\tx_nkwgok_utility::dataTable, 'statusID = 0');
         $GLOBALS['TYPO3_DB']->exec_UPDATEquery(\tx_nkwgok_utility::dataTable, 'statusID = 1', ['statusID' => 0]);
 
-        \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Import of subject hierarchy XML to TYPO3 database completed', tx_nkwgok_utility::extKey, 1);
+        \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Import of subject hierarchy XML to TYPO3 database completed', \tx_nkwgok_utility::extKey, 1);
 
         return $result;
     }
@@ -150,17 +150,17 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask
                         // Cut off at 32 to prevent an infinite loop.
                         $hierarchy = 0;
                         $nextParent = $parentID;
-                        while ($nextParent !== null && $nextParent !== tx_nkwgok_utility::rootNode) {
+                        while ($nextParent !== null && $nextParent !== \tx_nkwgok_utility::rootNode) {
                             $hierarchy++;
                             if (array_key_exists($nextParent, $subjectTree)) {
                                 $nextParent = $subjectTree[$nextParent]['parent'];
                             } else {
-                                \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN ' . $nextParent . ' for record PPN ' . $PPN . '. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', tx_nkwgok_utility::extKey, 3, $recordElement);
+                                \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN ' . $nextParent . ' for record PPN ' . $PPN . '. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', \tx_nkwgok_utility::extKey, 3, $recordElement);
                                 $hierarchy = -1;
                                 break;
                             }
                             if ($hierarchy > self::NKWGOKMaxHierarchy) {
-                                \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Hierarchy level for PPN ' . $PPN . ' exceeds the maximum limit of ' . self::NKWGOKMaxHierarchy . ' levels. This needs to be fixed, the subject tree may contain an infinite loop.', tx_nkwgok_utility::extKey, 3, $recordElement);
+                                \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadXML Scheduler Task: Hierarchy level for PPN ' . $PPN . ' exceeds the maximum limit of ' . self::NKWGOKMaxHierarchy . ' levels. This needs to be fixed, the subject tree may contain an infinite loop.', \tx_nkwgok_utility::extKey, 3, $recordElement);
                                 $hierarchy = -1;
                                 break;
                             }
@@ -510,15 +510,16 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      * Returns the type of the $record passed.
      * Logs unknown record types.
      *
-     * @param \DOMElement $record
+     * @param \DOMDocument $record
      * @return string - gok|brk|csv|unknown
      */
     private function typeOfRecord($record)
     {
         $recordType = \tx_nkwgok_utility::recordTypeUnknown;
-        $recordTypes = $record->xpath('datafield[@tag="002@"]/subfield[@code="0"]');
+        $xpath = new \DOMXPath($record);
+        $recordTypes = $xpath->query('datafield[@tag="002@"]/subfield[@code="0"]');
 
-        if ($recordTypes && count($recordTypes) === 1) {
+        if ($recordTypes && $recordTypes->length === 1) {
             $recordTypeCode = (string)$recordTypes[0];
 
             if ($recordTypeCode === 'Tev') {
@@ -526,8 +527,8 @@ class tx_nkwgok_loadxml extends \TYPO3\CMS\Scheduler\Task\AbstractTask
             } elseif ($recordTypeCode === 'Tov') {
                 $recordType = \tx_nkwgok_utility::recordTypeBRK;
             } elseif ($recordTypeCode === 'csv') {
-                $queryElements = $record->xpath('datafield[@tag="str"]/subfield[@code="a"]');
-                if ($queryElements && count($queryElements) === 1
+                $queryElements = $xpath->query('datafield[@tag="str"]/subfield[@code="a"]');
+                if ($queryElements && $queryElements->length === 1
                     && preg_match('/^msc=[0-9A-Zx-]*/', (string)$queryElements[0] > 0)
                 ) {
                     // Special case: an MSC record.

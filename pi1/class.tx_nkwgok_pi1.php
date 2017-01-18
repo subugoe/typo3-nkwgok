@@ -84,13 +84,13 @@ class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
      */
     protected function addStylesheet()
     {
-        $nkwgokGlobalConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][tx_nkwgok_utility::extKey]);
+        $nkwgokGlobalConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][\tx_nkwgok_utility::extKey]);
         $cssPath = $nkwgokGlobalConf['CSSPath'];
         if (!$cssPath) {
             $cssPath = 'EXT:nkwgok/Resources/Public/Css/nkwgok.css';
         }
 
-        $GLOBALS['TSFE']->pSetup['includeCSS.'][tx_nkwgok_utility::extKey] = $cssPath;
+        $GLOBALS['TSFE']->pSetup['includeCSS.'][\tx_nkwgok_utility::extKey] = $cssPath;
     }
 }
 

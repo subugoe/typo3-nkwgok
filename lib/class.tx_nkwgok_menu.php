@@ -58,14 +58,14 @@ class tx_nkwgok_menu extends tx_nkwgok
 
         $startNodes = explode(',', $this->arguments['notation']);
         if (count($startNodes) > 1) {
-            \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('several start nodes given (' . $this->arguments['notation'] . ') but only the first is used in menu mode', tx_nkwgok_utility::extKey, 2);
+            \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('several start nodes given (' . $this->arguments['notation'] . ') but only the first is used in menu mode', \tx_nkwgok_utility::extKey, 2);
         }
         $startNodeGOK = trim($startNodes[0]);
-        $firstNodeCondition = 'notation LIKE ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK, tx_nkwgok_utility::dataTable) . ' AND statusID = 0';
+        $firstNodeCondition = 'notation LIKE ' . $GLOBALS['TYPO3_DB']->fullQuoteStr($startNodeGOK, \tx_nkwgok_utility::dataTable) . ' AND statusID = 0';
         // run query and collect result
         $queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-            NKWGOKQueryFields,
-            tx_nkwgok_utility::dataTable,
+            \tx_nkwgok::NKWGOKQueryFields,
+            \tx_nkwgok_utility::dataTable,
             $firstNodeCondition,
             '',
             'notation ASC',
@@ -114,65 +114,65 @@ class tx_nkwgok_menu extends tx_nkwgok
         $scriptElement->setAttribute('type', 'text/javascript');
 
         $js = "
-		jQuery(document).ready(function() {
-			jQuery('.gokMenuForm input[type=\'submit\']').hide();
-		});
+        jQuery(document).ready(function() {
+            jQuery('.gokMenuForm input[type=\'submit\']').hide();
+        });
 
-		function GOKMenuSelectionChanged" . $this->objectID . " (menu) {
-			var selectedOption = menu.options[menu.selectedIndex];
-			jQuery(menu).nextAll().remove();
-			if (selectedOption.getAttribute('haschildren') && !selectedOption.getAttribute('isautoexpanded')) {
-				newMenuForSelection" . $this->objectID . "(selectedOption);
-			}
-			if (selectedOption.value != 'pleaseselect') {
-				jQuery('option[value=\"pleaseselect\"]', menu).remove();
-			}
-			startSearch" . $this->objectID . '(selectedOption);
-		}
+        function GOKMenuSelectionChanged" . $this->objectID . " (menu) {
+            var selectedOption = menu.options[menu.selectedIndex];
+            jQuery(menu).nextAll().remove();
+            if (selectedOption.getAttribute('haschildren') && !selectedOption.getAttribute('isautoexpanded')) {
+                newMenuForSelection" . $this->objectID . "(selectedOption);
+            }
+            if (selectedOption.value != 'pleaseselect') {
+                jQuery('option[value=\"pleaseselect\"]', menu).remove();
+            }
+            startSearch" . $this->objectID . '(selectedOption);
+        }
 
-		function newMenuForSelection' . $this->objectID . " (option) {
-			var URL = location.protocol + '//' + location.host + location.pathname;
-			var PPN = option.value;
-			var level = parseInt(option.parentNode.getAttribute('level')) + 1;
-			var parameters = location.search.replace(/^\?/, '') + '&tx_" . tx_nkwgok_utility::extKey . "[expand]=' + PPN
-				+ '&tx_" . tx_nkwgok_utility::extKey . '[language]=' . $this->language . '&eID=' . tx_nkwgok_utility::extKey . "'
-				+ '&tx_" . tx_nkwgok_utility::extKey . "[level]=' + level
-				+ '&tx_" . tx_nkwgok_utility::extKey . "[style]=menu'
-				+ '&tx_" . tx_nkwgok_utility::extKey . '[objectID]=' . $this->objectID . "'
-				+ '&tx_" . tx_nkwgok_utility::extKey . '[menuInlineThreshold]=' . $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'] . "';
+        function newMenuForSelection' . $this->objectID . " (option) {
+            var URL = location.protocol + '//' + location.host + location.pathname;
+            var PPN = option.value;
+            var level = parseInt(option.parentNode.getAttribute('level')) + 1;
+            var parameters = location.search.replace(/^\?/, '') + '&tx_" . \tx_nkwgok_utility::extKey . "[expand]=' + PPN
+                + '&tx_" . \tx_nkwgok_utility::extKey . '[language]=' . $this->language . '&eID=' . \tx_nkwgok_utility::extKey . "'
+                + '&tx_" . \tx_nkwgok_utility::extKey . "[level]=' + level
+                + '&tx_" . \tx_nkwgok_utility::extKey . "[style]=menu'
+                + '&tx_" . \tx_nkwgok_utility::extKey . '[objectID]=' . $this->objectID . "'
+                + '&tx_" . \tx_nkwgok_utility::extKey . '[menuInlineThreshold]=' . $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'] . "';
 
-			jQuery(option.parentNode).nextAll().remove();
-			var newSelect = document.createElement('select');
-			var jNewSelect = jQuery(newSelect);
-			newSelect.setAttribute('level', level);
-			var isIE = (navigator.appVersion.indexOf('MSIE ') !== -1);
-			if (!isIE) {
-				jNewSelect.hide();
-			}
-			option.form.appendChild(newSelect);
-			if (!isIE) {
-				jNewSelect.slideDown('fast');
-			}
-			var loadingOption = document.createElement('option');
-			newSelect.appendChild(loadingOption);
-			loadingOption.appendChild(document.createTextNode('" . $this->localise('Laden ...') . "'));
-			var downloadFinishedFunction = function (HTML) {
-				jNewSelect.empty();
-				var jHTML = jQuery(HTML);
-				var newOptions = jQuery('option, optgroup', jHTML);
-				if (newOptions.length > 0) {
-					newOptions[0].setAttribute('query', option.getAttribute('query'));
-				}
-				jNewSelect.attr('onchange', jHTML.attr('onchange'));
-				jNewSelect.attr('title', jHTML.attr('title'));
-				jNewSelect.append(newOptions);
-				newSelect.selectedIndex = 0;
-			};
-			jQuery.get(URL, parameters, downloadFinishedFunction);
-		}
-		function startSearch" . $this->objectID . ' (option) {
-			nkwgokItemSelected(option);
-		}
+            jQuery(option.parentNode).nextAll().remove();
+            var newSelect = document.createElement('select');
+            var jNewSelect = jQuery(newSelect);
+            newSelect.setAttribute('level', level);
+            var isIE = (navigator.appVersion.indexOf('MSIE ') !== -1);
+            if (!isIE) {
+                jNewSelect.hide();
+            }
+            option.form.appendChild(newSelect);
+            if (!isIE) {
+                jNewSelect.slideDown('fast');
+            }
+            var loadingOption = document.createElement('option');
+            newSelect.appendChild(loadingOption);
+            loadingOption.appendChild(document.createTextNode('" . $this->localise('Laden ...') . "'));
+            var downloadFinishedFunction = function (HTML) {
+                jNewSelect.empty();
+                var jHTML = jQuery(HTML);
+                var newOptions = jQuery('option, optgroup', jHTML);
+                if (newOptions.length > 0) {
+                    newOptions[0].setAttribute('query', option.getAttribute('query'));
+                }
+                jNewSelect.attr('onchange', jHTML.attr('onchange'));
+                jNewSelect.attr('title', jHTML.attr('title'));
+                jNewSelect.append(newOptions);
+                newSelect.selectedIndex = 0;
+            };
+            jQuery.get(URL, parameters, downloadFinishedFunction);
+        }
+        function startSearch" . $this->objectID . ' (option) {
+            nkwgokItemSelected(option);
+        }
 ';
         $scriptElement->appendChild($this->doc->createTextNode($js));
     }
@@ -210,7 +210,7 @@ class tx_nkwgok_menu extends tx_nkwgok
                 $select = $this->doc->createElement('select');
                 $container->appendChild($select);
                 $select->setAttribute('id', 'select-' . $this->objectID . '-' . $parentPPN);
-                $select->setAttribute('name', 'tx_' . tx_nkwgok_utility::extKey . '[expand][' . $level . ']');
+                $select->setAttribute('name', 'tx_' . \tx_nkwgok_utility::extKey . '[expand][' . $level . ']');
                 $select->setAttribute('onchange', 'GOKMenuSelectionChanged' . $this->objectID . '(this);');
                 $select->setAttribute('title', $this->localise('Fachgebiet auswählen') . ' ('
                     . $this->localise('Ebene') . ' ' . ($level + 1) . ')');
@@ -232,8 +232,8 @@ class tx_nkwgok_menu extends tx_nkwgok
                     $option = $this->doc->createElement('option');
                     $select->appendChild($option);
                     $label = '';
-                    if ($GOKs[0]['type'] === tx_nkwgok_utility::recordTypeGOK
-                        || $GOKs[0]['type'] === tx_nkwgok_utility::recordTypeBRK
+                    if ($GOKs[0]['type'] === \tx_nkwgok_utility::recordTypeGOK
+                        || $GOKs[0]['type'] === \tx_nkwgok_utility::recordTypeBRK
                     ) {
                         $label = 'Treffer für diese Zwischenebene zeigen';
                     } else {

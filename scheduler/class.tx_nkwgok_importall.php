@@ -23,7 +23,7 @@ class tx_nkwgok_importAll extends \TYPO3\CMS\Scheduler\Task\AbstractTask
         if (!$success) {
             \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('importALL Scheduler Task: could not load OPAC data. Stopping.', \tx_nkwgok_utility::extKey, 3);
         } else {
-            /** @var tx_nkwgok_convertCSV $convertCSVTask */
+            /** @var \tx_nkwgok_convertCSV $convertCSVTask */
             $convertCSVTask = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_convertCSV::class);
             $success = $convertCSVTask->execute();
             if (!$success) {

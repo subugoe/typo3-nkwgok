@@ -23,10 +23,8 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
 
-define('NKWGOKQueryFields', 'ppn, notation, search, descr, descr_en, descr_alternate, descr_alternate_en, parent, hierarchy, childcount, hitcount, totalhitcount, type');
-
 /**
- * Class tx_nkwgok: provides output for the nkwgok extension.
+ * Provide output for the nkwgok extension.
  *
  * Instantiate the required subclass using the instantiateSubclassFor() method
  * passing the setup as arguments.
@@ -35,6 +33,7 @@ define('NKWGOKQueryFields', 'ppn, notation, search, descr, descr_en, descr_alter
  * */
 abstract class tx_nkwgok
 {
+    const NKWGOKQueryFields = 'ppn, notation, search, descr, descr_en, descr_alternate, descr_alternate_en, parent, hierarchy, childcount, hitcount, totalhitcount, type';
 
     /**
      * Arguments from the GET query as well as further settings that may have
@@ -220,7 +219,7 @@ abstract class tx_nkwgok
         }
         $whereClause .= ' AND statusID = 0';
         $queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
-                NKWGOKQueryFields,
+                self::NKWGOKQueryFields,
                 \tx_nkwgok_utility::dataTable,
                 $whereClause,
                 '',

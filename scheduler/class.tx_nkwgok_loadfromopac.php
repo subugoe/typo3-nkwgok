@@ -1,7 +1,5 @@
 <?php
 
-define('NKWGOKImportChunkSize', 500);
-
 /**
  * TYPO3 Scheduler task to download the OPAC data we need and store them in
  * fileadmin/gok/...
@@ -11,7 +9,7 @@ define('NKWGOKImportChunkSize', 500);
  */
 class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask
 {
-
+    const NKWGOKImportChunkSize = 500;
     /**
      * Function executed from the Scheduler.
      * @return    bool    TRUE if success, otherwise FALSE
@@ -20,7 +18,7 @@ class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask
     {
         set_time_limit(1200);
 
-        $conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][tx_nkwgok_utility::extKey]);
+        $conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][\tx_nkwgok_utility::extKey]);
         $opacBaseURL = $conf['opacBaseURL'] . 'XML=1/XMLSAVE=N/';
         $baseDir = PATH_site . 'fileadmin/gok/';
 
@@ -48,7 +46,7 @@ class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask
             unlink($file);
         }
 
-        $opacHitCountURL = $opacBaseURL . 'CMD?ACT=BRWS&SCNST=' . NKWGOKImportChunkSize;
+        $opacHitCountURL = $opacBaseURL . 'CMD?ACT=BRWS&SCNST=' . self::NKWGOKImportChunkSize;
         $success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, \tx_nkwgok_utility::typeToIndexName(\tx_nkwgok_utility::recordTypeGOK), $hitCountDir);
         $success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, \tx_nkwgok_utility::typeToIndexName(\tx_nkwgok_utility::recordTypeBRK), $hitCountDir);
         $success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, \tx_nkwgok_utility::typeToIndexName(\tx_nkwgok_utility::recordTypeMSC), $hitCountDir);
@@ -73,7 +71,7 @@ class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask
         $resultCount = (int)$hitsAttribute[0];
 
         while (($firstRecord < $resultCount) && $success) {
-            $URL = $opacBaseURL . '/SHRTST=' . NKWGOKImportChunkSize . '/FRST=' . $firstRecord;
+            $URL = $opacBaseURL . '/SHRTST=' . self::NKWGOKImportChunkSize . '/FRST=' . $firstRecord;
             $opacDownload = file_get_contents($URL);
             if ($opacDownload) {
                 $targetFilePath = $folderPath . $fileBaseName . '-' . $firstRecord . '.xml';
@@ -85,7 +83,7 @@ class tx_nkwgok_loadFromOpac extends \TYPO3\CMS\Scheduler\Task\AbstractTask
 
                     fwrite($targetFile, $opacDownload);
                     fclose($targetFile);
-                    $firstRecord += NKWGOKImportChunkSize;
+                    $firstRecord += self::NKWGOKImportChunkSize;
                 } else {
                     \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path ' . $targetFilePath, \tx_nkwgok_utility::extKey, 3);
                     $success = false;
