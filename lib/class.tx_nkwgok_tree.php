@@ -98,8 +98,7 @@ class tx_nkwgok_tree extends \tx_nkwgok
             $topItemContainer = $ul;
         }
 
-        $GOK = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult);
-        while ($GOK) {
+        while ($GOK = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
             $topElement = $this->appendGOKTreeItem($topItemContainer, $topElementType, $GOK, [], 1, ($resultCount > 1));
             $topElement->setAttribute('class', 'rootNode');
 

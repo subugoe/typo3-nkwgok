@@ -38,15 +38,14 @@ class tx_nkwgok_ff
         $rootNodes = $this->queryForChildrenOf(\tx_nkwgok_utility::rootNode);
 
         $options = [];
-        $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($rootNodes);
-        while ($row) {
+
+        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($rootNodes)) {
             $optionTitle = '[' . $row['notation'] . '] ' . $row['descr'];
             $optionValue = $row['notation'];
             $options[] = [$optionTitle, $optionValue];
 
             $childNodes = $this->queryForChildrenOf($row['ppn']);
-            $childRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($childNodes);
-            while ($childRow) {
+            while ($childRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($childNodes)) {
                 $childOptionTitle = '—[' . $childRow['notation'] . '] ' . $childRow['descr'];
                 $childOptionValue = $childRow['notation'];
                 $options[] = [$childOptionTitle, $childOptionValue];
