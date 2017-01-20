@@ -71,8 +71,7 @@ class tx_nkwgok_menu extends tx_nkwgok
             'notation ASC',
             '');
 
-        $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult);
-        while ($row) {
+        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
             $menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
             $this->appendGOKMenuChildren($row['ppn'], $form, $menuInlineThreshold);
         }

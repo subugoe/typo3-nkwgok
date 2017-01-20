@@ -129,8 +129,6 @@ abstract class tx_nkwgok
      */
     protected function localise($key)
     {
-        $result = '';
-
         $filePath = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName('EXT:' . \tx_nkwgok_utility::extKey . '/pi1/locallang.xml');
         if (!$this->localisation) {
             /**
@@ -227,8 +225,7 @@ abstract class tx_nkwgok
                 '');
 
         $children = [];
-        $row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult);
-        while ($row) {
+        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
             $children[] = $row;
         }
 
