@@ -1,0 +1,15 @@
+{
+    "name": "subugoe/nkwgok",
+    "description": "Subject hierarchy for TYPO3",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Ingo Pfennigstorf",
+            "email": "i.pfennigstorf@gmail.com"
+        }
+    ],
+    "autoload": {
+        "classmap": ["pi1/", "lib/", "scheduler/"]
+    } 
+}
