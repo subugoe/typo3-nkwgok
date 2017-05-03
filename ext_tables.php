@@ -30,7 +30,7 @@ if (!defined('TYPO3_MODE')) {
 
 $TCA['tx_nkwgok_data'] = [
     'ctrl' => [
-        'title' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data',
+        'title' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data',
         'label' => 'notation',
         'label_alt' => 'descr',
         'label_alt_force' => 1,
@@ -38,25 +38,25 @@ $TCA['tx_nkwgok_data'] = [
         'crdate' => 'crdate',
         'cruser_id' => 'cruser_id',
         'default_sortby' => 'ORDER BY crdate',
-        'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY) . 'Configuration/TCA/Data.php',
-        'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath($_EXTKEY) . 'Resources/Public/Images/ext_icon.gif',
-        'searchFields' => 'descr, descr_en, notation'
+        'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY).'Configuration/TCA/Data.php',
+        'iconfile' => \TYPO3\CMS\Core\Utility\PathUtility::getAbsoluteWebPath($_EXTKEY).'Resources/Public/Images/ext_icon.gif',
+        'searchFields' => 'descr, descr_en, notation',
     ],
 ];
-$TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY . '_pi1'] = 'layout,select_key,pages';
-$TCA['tt_content']['types']['list']['subtypes_addlist'][$_EXTKEY . '_pi1'] = 'pi_flexform';
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue($_EXTKEY . '_pi1', 'FILE:EXT:nkwgok/pi1/flexform.xml');
+$TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY.'_pi1'] = 'layout,select_key,pages';
+$TCA['tt_content']['types']['list']['subtypes_addlist'][$_EXTKEY.'_pi1'] = 'pi_flexform';
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue($_EXTKEY.'_pi1', 'FILE:EXT:nkwgok/Resources/Private/Flexform/flexform.xml');
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin(
     [
         'LLL:EXT:nkwgok/locallang_db.xml:tt_content.list_type_pi1',
-        $_EXTKEY . '_pi1',
-        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath($_EXTKEY) . 'Resources/Public/Images/ext_icon.gif'],
+        $_EXTKEY.'_pi1',
+        \TYPO3\CMS\Core\Utility\PathUtility::getAbsoluteWebPath($_EXTKEY).'Resources/Public/Images/ext_icon.gif', ],
     'list_type'
 );
 
 if (TYPO3_MODE == 'BE') {
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('xMOD_tx_nkwgok', 'EXT:' . $_EXTKEY . '/locallang_csh.xml');
+    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('xMOD_tx_nkwgok', 'EXT:'.$_EXTKEY.'/locallang_csh.xml');
 }
 
 // class for dynamic FF
-include_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY) . '/lib/class.tx_nkwgok_ff.php');
+include_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY).'/Classes/Elements/Flexform.php';

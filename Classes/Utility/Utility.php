@@ -1,9 +1,13 @@
 <?php
 
+namespace Subugoe\Nkwgok\Utility;
+
+use TYPO3\CMS\Core\Database\DatabaseConnection;
+
 /**
  * Class providing helper functions and constants.
  */
-class tx_nkwgok_utility
+class Utility
 {
     const extKey = 'nkwgok';
     const dataTable = 'tx_nkwgok_data';
@@ -19,10 +23,11 @@ class tx_nkwgok_utility
     /**
      * Returns the internal type name for the given index name.
      * * lkl -> gok
-     * * pass others through unchanged
+     * * pass others through unchanged.
      *
-     * @param String $indexName
-     * @return String
+     * @param string $indexName
+     *
+     * @return string
      */
     public static function indexNameToType($indexName)
     {
@@ -36,12 +41,21 @@ class tx_nkwgok_utility
     }
 
     /**
+     * @return DatabaseConnection
+     */
+    public static function getDatabaseConnection()
+    {
+        return $GLOBALS['TYPO3_DB'];
+    }
+
+    /**
      * Returns the internal type name for the given index name.
      * * gok -> lkl
-     * * pass others through unchanged
+     * * pass others through unchanged.
      *
-     * @param String $type
-     * @return String
+     * @param string $type
+     *
+     * @return string
      */
     public static function typeToIndexName($type)
     {

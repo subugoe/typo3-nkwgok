@@ -1,5 +1,7 @@
 <?php
 
+namespace Subugoe\Nkwgok\Elements;
+
 /* * *************************************************************
  *  Copyright notice
  *
@@ -22,6 +24,9 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
+use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Provide output for the nkwgok extension.
@@ -31,7 +36,7 @@
  *
  * Then call the getMarkup() or getAJAXMarkup() methods to receive the output.
  * */
-abstract class tx_nkwgok
+abstract class Element
 {
     const NKWGOKQueryFields = 'ppn, notation, search, descr, descr_en, descr_alternate, descr_alternate_en, parent, hierarchy, childcount, hitcount, totalhitcount, type';
 
@@ -39,12 +44,14 @@ abstract class tx_nkwgok
      * Arguments from the GET query as well as further settings that may have
      * been added. This variable lets us have the same interface for accessing the
      * date when running in pibase or eID.
+     *
      * @var array
      */
     protected $arguments;
 
     /**
      * Language code to use for the localisation.
+     *
      * @var string ISO 639-1 language code
      */
     protected $language;
@@ -52,6 +59,7 @@ abstract class tx_nkwgok
     /**
      * TYPO3 content object ID for our content element. This variable
      * is initialised by the instantiateSubclassFor() method.
+     *
      * @var string
      */
     protected $objectID;
@@ -59,7 +67,8 @@ abstract class tx_nkwgok
     /**
      * DOMDocument used by subclasses to create their content. This variable
      * is initialised by the instantiateSubclassFor() method.
-     * @var DOMDocument
+     *
+     * @var \DOMDocument
      */
     protected $doc;
 
@@ -68,7 +77,7 @@ abstract class tx_nkwgok
      * Returns a DOMDocument with markup for the subject hierarchy based on the
      * settings passed to instantiateSubclassFor.
      *
-     * @return DOMDocument
+     * @return \DOMDocument
      */
     abstract public function getMarkup();
 
@@ -77,7 +86,7 @@ abstract class tx_nkwgok
      * Returns a DOMDocument with markup for the partial subject hierarchy based
      * on the settings passed to instantiateSubclassFor.
      *
-     * @return DOMDocument
+     * @return \DOMDocument
      */
     abstract public function getAJAXMarkup();
 
@@ -86,17 +95,18 @@ abstract class tx_nkwgok
      * to instantiate, instantiates it, and adds $arguments to it.
      *
      * @param array $arguments
-     * @return \tx_nkwgok
+     *
+     * @return Element
      */
     public static function instantiateSubclassFor($arguments)
     {
         $subclass = null;
 
         if ($arguments['style'] === 'menu') {
-            $subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_menu::class);
+            $subclass = GeneralUtility::makeInstance(Menu::class);
         } else {
             // Default to displaying the tree. Expected for styles 'tree' and 'column'.
-            $subclass = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\tx_nkwgok_tree::class);
+            $subclass = GeneralUtility::makeInstance(Tree::class);
             if (!array_key_exists('style', $arguments) || !$arguments['style']) {
                 // Default to tree style if style is not set.
                 $arguments['style'] = 'tree';
@@ -125,11 +135,12 @@ abstract class tx_nkwgok
      * running in eID.
      *
      * @param string $key key to look up in pi1/locallang.xml
+     *
      * @return string
      */
     protected function localise($key)
     {
-        $filePath = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName('EXT:' . \tx_nkwgok_utility::extKey . '/pi1/locallang.xml');
+        $filePath = GeneralUtility::getFileAbsFileName('EXT:'.Utility::extKey.'/Resources/Private/Language/locallang.xml');
         if (!$this->localisation) {
             /**
              * The returned $localisation seems to have the following structure:
@@ -137,7 +148,7 @@ abstract class tx_nkwgok
              * Only the requested languageKey seems to be present and the innermost
              * array can also contain a 'source' key.
              */
-            $parser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser::class);
+            $parser = GeneralUtility::makeInstance(LocallangXmlParser::class);
             $this->localisation = $parser->getParsedData($filePath, $this->language);
         }
 
@@ -172,7 +183,8 @@ abstract class tx_nkwgok
      * removes that indicator.
      *
      * @param array $gokRecord
-     * @param Boolean $simplify should the trailing {…} be removed? [defaults to False]
+     * @param bool  $simplify  should the trailing {…} be removed? [defaults to False]
+     *
      * @return string
      */
     protected function GOKName($gokRecord, $simplify = false)
@@ -193,6 +205,7 @@ abstract class tx_nkwgok
             $displayName = preg_replace('/ - Allgemein- und Gesamtdarstellungen$/', '', $displayName);
             $displayName = preg_replace("/( \{.*\})$/", '', $displayName);
         }
+
         return trim($displayName);
     }
 
@@ -201,31 +214,32 @@ abstract class tx_nkwgok
      * ordered by their notation.
      *
      * @param string $parentPPN
-     * @param Boolean $includeParent if True, the parent item is included
+     * @param bool   $includeParent if True, the parent item is included
+     *
      * @return array of subject records of the $parentPPN’s children
      */
     protected function getChildren($parentPPN, $includeParent = false)
     {
-        $parentEscaped = $GLOBALS['TYPO3_DB']->fullQuoteStr($parentPPN, \tx_nkwgok_utility::dataTable);
-        $whereClause = 'parent = ' . $parentEscaped;
+        $parentEscaped = Utility::getDatabaseConnection()->fullQuoteStr($parentPPN, Utility::dataTable);
+        $whereClause = 'parent = '.$parentEscaped;
         if ($this->arguments['omitXXX']) {
             $whereClause .= ' AND NOT notation LIKE "%XXX"';
         }
-        $whereClause = '(' . $whereClause . ')';
+        $whereClause = '('.$whereClause.')';
         if ($includeParent) {
-            $whereClause = '(' . $whereClause . ' OR ppn = ' . $parentEscaped . ')';
+            $whereClause = '('.$whereClause.' OR ppn = '.$parentEscaped.')';
         }
         $whereClause .= ' AND statusID = 0';
-        $queryResult = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+        $queryResult = Utility::getDatabaseConnection()->exec_SELECTquery(
                 self::NKWGOKQueryFields,
-                \tx_nkwgok_utility::dataTable,
+                Utility::dataTable,
                 $whereClause,
                 '',
                 'hierarchy,notation ASC',
                 '');
 
         $children = [];
-        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($queryResult)) {
+        while ($row = Utility::getDatabaseConnection()->sql_fetch_assoc($queryResult)) {
             $children[] = $row;
         }
 

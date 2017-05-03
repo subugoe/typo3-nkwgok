@@ -1,4 +1,9 @@
 <?php
+
+namespace Subugoe\Nkwgok\Elements;
+
+use Subugoe\Nkwgok\Utility\Utility;
+
 /***************************************************************
  *  Copyright notice
  *
@@ -22,37 +27,37 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('nkwgok') . 'lib/class.tx_nkwgok_utility.php');
-
 /**
  * See the Changelog or git repository for details.
  */
-class tx_nkwgok_ff
+class Flexform
 {
     /**
      * @param $config
+     *
      * @return mixed
      */
     public function addFields($config)
     {
-        $rootNodes = $this->queryForChildrenOf(\tx_nkwgok_utility::rootNode);
+        $rootNodes = $this->queryForChildrenOf(Utility::rootNode);
 
         $options = [];
 
-        while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($rootNodes)) {
-            $optionTitle = '[' . $row['notation'] . '] ' . $row['descr'];
+        while ($row = Utility::getDatabaseConnection()->sql_fetch_assoc($rootNodes)) {
+            $optionTitle = '['.$row['notation'].'] '.$row['descr'];
             $optionValue = $row['notation'];
             $options[] = [$optionTitle, $optionValue];
 
             $childNodes = $this->queryForChildrenOf($row['ppn']);
-            while ($childRow = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($childNodes)) {
-                $childOptionTitle = '—[' . $childRow['notation'] . '] ' . $childRow['descr'];
+            while ($childRow = Utility::getDatabaseConnection()->sql_fetch_assoc($childNodes)) {
+                $childOptionTitle = '—['.$childRow['notation'].'] '.$childRow['descr'];
                 $childOptionValue = $childRow['notation'];
                 $options[] = [$childOptionTitle, $childOptionValue];
             }
         }
 
         $config['items'] = array_merge($config['items'], $options);
+
         return $config;
     }
 
@@ -61,14 +66,15 @@ class tx_nkwgok_ff
      * their parent element and returns the query result.
      *
      * @param string $parentID
+     *
      * @return array
      */
     private function queryForChildrenOf($parentID)
     {
-        $queryResults = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+        $queryResults = Utility::getDatabaseConnection()->exec_SELECTquery(
             '*',
-            \tx_nkwgok_utility::dataTable,
-            "parent = '" . $parentID . "'",
+            Utility::dataTable,
+            "parent = '".$parentID."'",
             '',
             'notation ASC',
             '');

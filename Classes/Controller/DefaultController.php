@@ -1,5 +1,12 @@
 <?php
 
+namespace Subugoe\Nkwgok\Controller;
+
+use Subugoe\Nkwgok\Elements\Element;
+use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\Plugin\AbstractPlugin;
+
 /* * *************************************************************
  *  Copyright notice
  *
@@ -26,14 +33,14 @@
 /**
  * See the ChangeLog or git repository for details.
  */
-class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
+class DefaultController extends AbstractPlugin
 {
-
     /**
-     * Main method of the PlugIn
+     * Main method of the PlugIn.
      *
      * @param string $content : The PlugIn content
-     * @param array $conf : The PlugIn configuration
+     * @param array  $conf    : The PlugIn configuration
+     *
      * @return string The content that is displayed on the website
      */
     public function main($content, $conf)
@@ -48,7 +55,7 @@ class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $this->addStylesheet();
 
         // get getvars
-        $arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GET('tx_nkwgok');
+        $arguments = GeneralUtility::_GET('tx_nkwgok');
 
         // get flexform
         $arguments['notation'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'source', 'sDEF');
@@ -70,8 +77,8 @@ class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
         $arguments['pageLink'] = $this->pi_getPageLink($GLOBALS['TSFE']->id);
         $arguments['language'] = $GLOBALS['TSFE']->lang;
 
-        /** @var \tx_nkwgok $nkwgok */
-        $nkwgok = \tx_nkwgok::instantiateSubclassFor($arguments);
+        /** @var Element $nkwgok */
+        $nkwgok = Element::instantiateSubclassFor($arguments);
         $doc = $nkwgok->getMarkup();
         $content .= $doc->saveHTML();
 
@@ -84,16 +91,12 @@ class tx_nkwgok_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin
      */
     protected function addStylesheet()
     {
-        $nkwgokGlobalConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][\tx_nkwgok_utility::extKey]);
+        $nkwgokGlobalConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][Utility::extKey]);
         $cssPath = $nkwgokGlobalConf['CSSPath'];
         if (!$cssPath) {
             $cssPath = 'EXT:nkwgok/Resources/Public/Css/nkwgok.css';
         }
 
-        $GLOBALS['TSFE']->pSetup['includeCSS.'][\tx_nkwgok_utility::extKey] = $cssPath;
+        $GLOBALS['TSFE']->pSetup['includeCSS.'][Utility::extKey] = $cssPath;
     }
-}
-
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/pi1/class.tx_nkwgok_pi1.php']) {
-    include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/nkwgok/pi1/class.tx_nkwgok_pi1.php']);
 }

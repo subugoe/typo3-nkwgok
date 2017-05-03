@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+    <meta type="array">
+        <type>module</type>
+        <description>General language labels for extension 'nkwgok'</description>
+    </meta>
+    <data type="array">
+        <languageKey index="en" type="array">
+            <label index="scheduler.loadFromOpac.name">1: Load subject authority data from OPAC</label>
+            <label index="scheduler.loadFromOpac.description">Loads Pica-XML subject authority records from OPAC to fileadmin/gok/xml/ and result counts to fileadmin/gok/hitcounts/.</label>
+
+            <label index="scheduler.convertCSV.name">2: Convert CSV-files to XML</label>
+            <label index="scheduler.convertCSV.description">Converts CSV files in fileadmin/gok/csv/ with subject tree information to Pica-XML which can be imported to the database.</label>
+
+            <label index="scheduler.loadxml.name">3: Import subject information from XML</label>
+            <label index="scheduler.loadxml.description">Imports Pica-XML files in fileadmin/gok/xml/ with subject tree information to the TYPO3 database.</label>
+
+            <label index="scheduler.checkNewCSV.name">auto 2+3: Check whether CSV files have been updated, convert and update if they have</label>
+            <label index="scheduler.checkNewCSV.description">Checks whether CSV files in fileadmin/gok/csv/ have been updated. If they have, converts the CSV files to Pica-XML and re-imports all XML files in fileadmin/gok/xml/ to the TYPO3 database.</label>
+
+            <label index="scheduler.updateCSV.name">2+3: Convert CSV and re-import all XML</label>
+            <label index="scheduler.updateCSV.description">Converts CSV files in fileadmin/gok/csv/ with subject tree information to Pica-XML and re-imports all XML files in fileadmin/gok/xml/ to the TYPO3 database.</label>
+
+            <label index="scheduler.importAll.name">1+2+3: Download, convert and import subject information</label>
+            <label index="scheduler.importAll.description">Downloads Pica-XML subject authority records from OPAC, converts CSV files in fileadmin/gok/csv/ with subject tree information information to Pica-XML and then imports all of them into the TYPO3 database.</label>
+
+        </languageKey>
+
+
+        <languageKey index="de" type="array">
+            <label index="scheduler.loadFromOpac.name">1: Normdatensätze für Themengebiete aus OPAC laden</label>
+            <label index="scheduler.loadFromOpac.description">Lädt Pica-XML Normdatensätze aus dem OPAC nach fileadmin/gok/xml/ und die Trefferzahlen nach fileadmin/gok/hitcounts/.</label>
+
+            <label index="scheduler.convertCSV.name">2: CSV Dateien zu XML konvertieren</label>
+            <label index="scheduler.convertCSV.description">Konvertiert CSV Dateien mit Fachhierarchieinformationen in fileadmin/gok/csv/ zu Pica-XML Dateien in fileadmin/gok/xml, die in die Datenbank importiert werden können.</label>
+
+            <label index="scheduler.loadxml.name">3: Fachhierarchie aus XML Dateien importieren</label>
+            <label index="scheduler.loadxml.description">Importiert Fachhierarchie aus Pica-XML Dateien in fileadmin/gok/xml/ in die TYPO3-Datenbank.</label>
+
+            <label index="scheduler.checkNewCSV.name">auto 2+3: Prüfen, ob die CSV Dateien aktualisiert wurden und konvertieren/reimportieren wenn sie es sind</label>
+            <label index="scheduler.checkNewCSV.description">Prüft, ob die CSV Dateien in fileadmin/gok/csv/ seit dem letzten Import aktualisiert wurden. Falls sie neuer sind, werden sie konvertiert und die XML Dateien in fileadmin/gok/xml neu in die TYPO3-Datenbank importiert.</label>
+
+            <label index="scheduler.updateCSV.name">2+3: CSV Dateien konvertieren und alle XML Dateien neu importieren</label>
+            <label index="scheduler.updateCSV.description">Konvertiert CSV Dateien in fileadmin/gok/csv/ in das Pica-XML Format und importiert alle Pica-XML Dateien in fileadmin/gok/xml/ in die TYPO3-Datenbank.</label>
+
+            <label index="scheduler.importAll.name">1+2+3: Fachhierarchiedaten laden, konvertieren und importieren</label>
+            <label index="scheduler.importAll.description">Lädt und konvertiert alle Daten zu Fachhierarchieen und importiert sie in die TYPO3-Datenbank.</label>
+
+        </languageKey>
+
+    </data>
+</T3locallang>

@@ -29,14 +29,13 @@ if (!defined('PATH_typo3conf')) {
 
 class tx_nkwgok_eid
 {
-
     /**
      * @return string
      */
     public function eid_main()
     {
         $arguments = \TYPO3\CMS\Core\Utility\GeneralUtility::_GET('tx_nkwgok');
-        $nkwgok = \tx_nkwgok::instantiateSubclassFor($arguments);
+        $nkwgok = \Subugoe\Nkwgok\Elements\Element::instantiateSubclassFor($arguments);
         $output = $nkwgok->getAJAXMarkup();
 
         return $output->saveHTML();

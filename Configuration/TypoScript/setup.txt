@@ -1,13 +1,13 @@
-plugin.tx_nkwgok_pi1{
-	# Add URLs like in the following example
-	downloadUrl {
-		# link1 = http://www.sub.uni-goettingen.de/download/library.csv
-		# link2 = http://www.sub.uni-goettingen.de/download/geography.csv
-	}
+plugin.tx_nkwgok_pi1 {
+    # Add URLs like in the following example
+    downloadUrl {
+        # link1 = http://www.sub.uni-goettingen.de/download/library.csv
+        # link2 = http://www.sub.uni-goettingen.de/download/geography.csv
+    }
 
-	# Do OPAC links in the tree perform a deep or shallow search?
-	shallowSearch = 0
+    # Do OPAC links in the tree perform a deep or shallow search?
+    shallowSearch = 0
 
-	# When using menus expand the hierarchy in-place when there are <= child elements
-	menuInlineThreshold = 2
+    # When using menus expand the hierarchy in-place when there are <= child elements
+    menuInlineThreshold = 2
 }

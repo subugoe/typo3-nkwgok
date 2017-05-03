@@ -10,6 +10,8 @@
         }
     ],
     "autoload": {
-        "classmap": ["pi1/", "lib/", "scheduler/"]
-    } 
+        "psr-4": {
+            "Subugoe\\Nkwgok\\": "Classes/"
+        }
+    }
 }
