@@ -1,39 +1,15 @@
 <?php
 
-namespace Subugoe\Nkwgok\Command;
+namespace Subugoe\Nkwgok\Importer;
 
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
-/* * *************************************************************
- *  Copyright notice
- *
- *  (c) 2009 Nils K. Windisch (windisch@sub.uni-goettingen.de)
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- * ************************************************************* */
-
-/**
- * Class "tx_nkwgok_loadxml" provides task procedures.
- */
-class LoadXmlCommandController extends CommandController
+class LoadXml implements ImporterInterface
 {
+    const NKWGOKMaxHierarchy = 31;
+
     /**
      * Stores the hitcount for each notation.
      * Key: classifiaction system string => Value: Array with
@@ -43,20 +19,15 @@ class LoadXmlCommandController extends CommandController
      */
     private $hitCounts;
 
-    const NKWGOKMaxHierarchy = 31;
-
-    /**
-     * Function executed from the Scheduler.
-     *
-     * @return bool TRUE if success, otherwise FALSE
-     */
-    public function executeCommand()
+    public function run(): bool
     {
-        set_time_limit(1200);
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
 
         // Remove records with statusID 1. These should not be around, but can
         // exist if a previous run of this task was cancelled.
-        Utility::getDatabaseConnection()->exec_DELETEquery(Utility::dataTable, 'statusID = 1');
+        $queryBuilder->delete(Utility::dataTable)
+            ->where($queryBuilder->expr()->eq('statusID', 1))
+            ->execute();
 
         // Load hit counts.
         $this->hitCounts = $this->loadHitCounts();
@@ -68,10 +39,17 @@ class LoadXmlCommandController extends CommandController
         $result &= $this->loadXMLForType(Utility::recordTypeBRK);
 
         // Delete all old records with statusID 1, then switch all new records to statusID 0.
-        Utility::getDatabaseConnection()->exec_DELETEquery(Utility::dataTable, 'statusID = 0');
-        Utility::getDatabaseConnection()->exec_UPDATEquery(Utility::dataTable, 'statusID = 1', ['statusID' => 0]);
+        $queryBuilder->delete(Utility::dataTable)
+            ->where($queryBuilder->expr()->eq('statusID', 0))
+            ->execute();
 
-        GeneralUtility::devLog('loadXML Scheduler Task: Import of subject hierarchy XML to TYPO3 database completed', Utility::extKey, 1);
+        $queryBuilder->update(Utility::dataTable)
+            ->set('statusID', 0)
+            ->where($queryBuilder->expr()->eq('statusID', 1))
+            ->execute();
+
+        GeneralUtility::devLog('loadXML Scheduler Task: Import of subject hierarchy XML to TYPO3 database completed',
+            Utility::extKey, 1);
 
         return $result;
     }
@@ -143,7 +121,8 @@ class LoadXmlCommandController extends CommandController
                                     // with three character strings that could be mistaken for index names.
                                     $search = $indexName.'="'.$notation.'"';
                                 } else {
-                                    GeneralUtility::devLog('loadXML Scheduler Task: Unknown record type »'.$recordType.'« in record PPN '.$PPN.'. Skipping.', Utility::extKey, 3, $recordElement);
+                                    GeneralUtility::devLog('loadXML Scheduler Task: Unknown record type »'.$recordType.'« in record PPN '.$PPN.'. Skipping.',
+                                        Utility::extKey, 3, $recordElement);
                                     continue;
                                 }
                             }
@@ -163,12 +142,14 @@ class LoadXmlCommandController extends CommandController
                             if (array_key_exists($nextParent, $subjectTree)) {
                                 $nextParent = $subjectTree[$nextParent]['parent'];
                             } else {
-                                GeneralUtility::devLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN '.$nextParent.' for record PPN '.$PPN.'. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', Utility::extKey, 3, $recordElement);
+                                GeneralUtility::devLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN '.$nextParent.' for record PPN '.$PPN.'. This needs to be fixed if he subject is meant to appear in a subject hierarchy.',
+                                    Utility::extKey, 3, $recordElement);
                                 $hierarchy = -1;
                                 break;
                             }
                             if ($hierarchy > self::NKWGOKMaxHierarchy) {
-                                GeneralUtility::devLog('loadXML Scheduler Task: Hierarchy level for PPN '.$PPN.' exceeds the maximum limit of '.self::NKWGOKMaxHierarchy.' levels. This needs to be fixed, the subject tree may contain an infinite loop.', Utility::extKey, 3, $recordElement);
+                                GeneralUtility::devLog('loadXML Scheduler Task: Hierarchy level for PPN '.$PPN.' exceeds the maximum limit of '.self::NKWGOKMaxHierarchy.' levels. This needs to be fixed, the subject tree may contain an infinite loop.',
+                                    Utility::extKey, 3, $recordElement);
                                 $hierarchy = -1;
                                 break;
                             }
@@ -267,16 +248,54 @@ class LoadXmlCommandController extends CommandController
 
                         $childCount = count($treeElement['children']);
 
-                        $rows[] = [$PPN, $hierarchy, $notation, $parentID, $descr, $descr_en, $descr_alternate, $descr_alternate_en, $search, $tags, $childCount, $recordType, $hitCount, $totalHitCount, time(), time(), 1];
+                        $rows[] = [
+                            $PPN,
+                            $hierarchy,
+                            $notation,
+                            $parentID,
+                            $descr,
+                            $descr_en,
+                            $descr_alternate,
+                            $descr_alternate_en,
+                            $search,
+                            $tags,
+                            $childCount,
+                            $recordType,
+                            $hitCount,
+                            $totalHitCount,
+                            time(),
+                            time(),
+                            1,
+                        ];
                     }
                 } // end of loop over subjects
-                $keyNames = ['ppn', 'hierarchy', 'notation', 'parent', 'descr', 'descr_en', 'descr_alternate', 'descr_alternate_en', 'search', 'tags', 'childcount', 'type', 'hitcount', 'totalhitcount', 'crdate', 'tstamp', 'statusID'];
-                $result = Utility::getDatabaseConnection()->exec_INSERTmultipleRows(Utility::dataTable, $keyNames, $rows);
+                $keyNames = [
+                    'ppn',
+                    'hierarchy',
+                    'notation',
+                    'parent',
+                    'descr',
+                    'descr_en',
+                    'descr_alternate',
+                    'descr_alternate_en',
+                    'search',
+                    'tags',
+                    'childcount',
+                    'type',
+                    'hitcount',
+                    'totalhitcount',
+                    'crdate',
+                    'tstamp',
+                    'statusID',
+                ];
+                $result = Utility::getDatabaseConnection()->exec_INSERTmultipleRows(Utility::dataTable, $keyNames,
+                    $rows);
             } // end of loop over files
 
             $result = true;
         } else {
-            GeneralUtility::devLog('loadXML Scheduler Task: Found no XML files for type '.$type.'.', Utility::extKey, 3);
+            GeneralUtility::devLog('loadXML Scheduler Task: Found no XML files for type '.$type.'.',
+                Utility::extKey, 3);
             $result = true;
         }
 
@@ -416,13 +435,15 @@ class LoadXmlCommandController extends CommandController
                         }
                     }
                 } else {
-                    GeneralUtility::devLog('loadXML Scheduler Task: could not load/parse XML from '.$xmlPath, Utility::extKey, 3);
+                    GeneralUtility::devLog('loadXML Scheduler Task: could not load/parse XML from '.$xmlPath,
+                        Utility::extKey, 3);
                 }
             }
         } // end foreach
 
         foreach ($hitCounts as $hitCountType => $array) {
-            GeneralUtility::devLog('loadXML Scheduler Task: Loaded '.count($array).' '.$hitCountType.' hit count entries.', Utility::extKey, 1);
+            GeneralUtility::devLog('loadXML Scheduler Task: Loaded '.count($array).' '.$hitCountType.' hit count entries.',
+                Utility::extKey, 1);
         }
 
         return $hitCounts;
@@ -552,7 +573,8 @@ class LoadXmlCommandController extends CommandController
         }
 
         if ($recordType === Utility::recordTypeUnknown) {
-            GeneralUtility::devLog('loadXML Scheduler Task: Record of unknown type.', Utility::extKey, 1, [$record->saveXML()]);
+            GeneralUtility::devLog('loadXML Scheduler Task: Record of unknown type.', Utility::extKey, 1,
+                [$record->saveXML()]);
         }
 
         return $recordType;

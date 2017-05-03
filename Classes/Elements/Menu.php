@@ -27,6 +27,7 @@ namespace Subugoe\Nkwgok\Elements;
  * THE SOFTWARE.
  ******************************************************************************/
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Subclass of tx_nkwgok that creates markup for a subject hierarchy as menus.
@@ -61,7 +62,7 @@ class Menu extends Element
 
         $startNodes = explode(',', $this->arguments['notation']);
         if (count($startNodes) > 1) {
-            \TYPO3\CMS\Core\Utility\GeneralUtility::devLog('several start nodes given ('.$this->arguments['notation'].') but only the first is used in menu mode', Utility::extKey, 2);
+            GeneralUtility::devLog('several start nodes given ('.$this->arguments['notation'].') but only the first is used in menu mode', Utility::extKey, 2);
         }
         $startNodeGOK = trim($startNodes[0]);
         $firstNodeCondition = 'notation LIKE '.Utility::getDatabaseConnection()->fullQuoteStr($startNodeGOK, Utility::dataTable).' AND statusID = 0';
@@ -233,7 +234,6 @@ class Menu extends Element
                      */
                     $option = $this->doc->createElement('option');
                     $select->appendChild($option);
-                    $label = '';
                     if ($GOKs[0]['type'] === Utility::recordTypeGOK
                         || $GOKs[0]['type'] === Utility::recordTypeBRK
                     ) {

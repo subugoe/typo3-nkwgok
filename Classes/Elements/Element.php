@@ -25,6 +25,7 @@ namespace Subugoe\Nkwgok\Elements;
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -220,7 +221,9 @@ abstract class Element
      */
     protected function getChildren($parentPPN, $includeParent = false)
     {
-        $parentEscaped = Utility::getDatabaseConnection()->fullQuoteStr($parentPPN, Utility::dataTable);
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
+
+        $parentEscaped = $queryBuilder->quote($parentPPN);
         $whereClause = 'parent = '.$parentEscaped;
         if ($this->arguments['omitXXX']) {
             $whereClause .= ' AND NOT notation LIKE "%XXX"';
@@ -229,20 +232,16 @@ abstract class Element
         if ($includeParent) {
             $whereClause = '('.$whereClause.' OR ppn = '.$parentEscaped.')';
         }
-        $whereClause .= ' AND statusID = 0';
-        $queryResult = Utility::getDatabaseConnection()->exec_SELECTquery(
-                self::NKWGOKQueryFields,
-                Utility::dataTable,
-                $whereClause,
-                '',
-                'hierarchy,notation ASC',
-                '');
 
-        $children = [];
-        while ($row = Utility::getDatabaseConnection()->sql_fetch_assoc($queryResult)) {
-            $children[] = $row;
-        }
+        $queryResult = $queryBuilder
+            ->select('*')
+            ->from(Utility::dataTable)
+            ->where($whereClause)
+            ->andWhere($queryBuilder->expr()->eq('statusID', 0))
+            ->orderBy('hierarchy', 'ASC')
+            ->addOrderBy('notation', 'ASC')
+            ->execute();
 
-        return $children;
+        return $queryResult->fetchAll();
     }
 }

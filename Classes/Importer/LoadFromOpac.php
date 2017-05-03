@@ -1,33 +1,24 @@
 <?php
 
-namespace Subugoe\Nkwgok\Command;
+namespace Subugoe\Nkwgok\Importer;
 
 use Subugoe\Nkwgok\Utility\Utility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
-/**
- * TYPO3 Scheduler task to download the OPAC data we need and store them in
- * fileadmin/gok/...
- *
- * Unifies the features provided by class.tx_nkwgok_loadxml.php and
- * getHitCounts.py and makes them accessible from the TYPO3 Scheduler.
- */
-class LoadFromOpacCommandController extends CommandController
+class LoadFromOpac implements ImporterInterface
 {
     const NKWGOKImportChunkSize = 500;
 
     /**
-     * Function executed from the Scheduler.
-     *
-     * @return bool TRUE if success, otherwise FALSE
+     * @var array
      */
-    public function executeCommand()
-    {
-        set_time_limit(1200);
+    protected $configuration;
 
-        $conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][Utility::extKey]);
-        $opacBaseURL = $conf['opacBaseURL'].'XML=1/XMLSAVE=N/';
+    public function run(): bool
+    {
+        $this->configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][Utility::extKey]);
+        $opacBaseURL = $this->configuration['opacBaseURL'].'XML=1/XMLSAVE=N/';
+
         $baseDir = PATH_site.'fileadmin/gok/';
 
         GeneralUtility::mkdir_deep(PATH_site, 'fileadmin/gok/xml');
@@ -55,9 +46,12 @@ class LoadFromOpacCommandController extends CommandController
         }
 
         $opacHitCountURL = $opacBaseURL.'CMD?ACT=BRWS&SCNST='.self::NKWGOKImportChunkSize;
-        $success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, Utility::typeToIndexName(Utility::recordTypeGOK), $hitCountDir);
-        $success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, Utility::typeToIndexName(Utility::recordTypeBRK), $hitCountDir);
-        $success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL, Utility::typeToIndexName(Utility::recordTypeMSC), $hitCountDir);
+        $success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
+            Utility::typeToIndexName(Utility::recordTypeGOK), $hitCountDir);
+        $success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
+            Utility::typeToIndexName(Utility::recordTypeBRK), $hitCountDir);
+        $success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
+            Utility::typeToIndexName(Utility::recordTypeMSC), $hitCountDir);
 
         return $success;
     }
@@ -94,7 +88,8 @@ class LoadFromOpacCommandController extends CommandController
                     fclose($targetFile);
                     $firstRecord += self::NKWGOKImportChunkSize;
                 } else {
-                    GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path '.$targetFilePath, Utility::extKey, 3);
+                    GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path '.$targetFilePath,
+                        Utility::extKey, 3);
                     $success = false;
                 }
             } else {
@@ -104,7 +99,8 @@ class LoadFromOpacCommandController extends CommandController
         }
 
         if ($success) {
-            GeneralUtility::devLog('loadFromOpac Scheduler Task: LKL download for '.$fileBaseName - ' succeeded', Utility::extKey, 1);
+            GeneralUtility::devLog('loadFromOpac Scheduler Task: LKL download for '.$fileBaseName - ' succeeded',
+                Utility::extKey, 1);
         }
 
         return $success;
@@ -144,7 +140,8 @@ class LoadFromOpacCommandController extends CommandController
                     fwrite($targetFile, $opacDownload);
                     fclose($targetFile);
                 } else {
-                    GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path '.$targetFilePath, Utility::extKey, 3);
+                    GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path '.$targetFilePath,
+                        Utility::extKey, 3);
                     $success = false;
                 }
 
@@ -157,7 +154,8 @@ class LoadFromOpacCommandController extends CommandController
         }
 
         if ($success) {
-            GeneralUtility::devLog('loadFromOpac Scheduler Task: hitcount download for index '.$indexName.' succeeded', Utility::extKey, 1);
+            GeneralUtility::devLog('loadFromOpac Scheduler Task: hitcount download for index '.$indexName.' succeeded',
+                Utility::extKey, 1);
         }
 
         return $success;

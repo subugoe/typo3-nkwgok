@@ -2,7 +2,10 @@
 
 namespace Subugoe\Nkwgok\Elements;
 
+use Doctrine\DBAL\Driver\Statement;
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /***************************************************************
  *  Copyright notice
@@ -43,13 +46,13 @@ class Flexform
 
         $options = [];
 
-        while ($row = Utility::getDatabaseConnection()->sql_fetch_assoc($rootNodes)) {
+        foreach ($rootNodes->fetchAll() as $row) {
             $optionTitle = '['.$row['notation'].'] '.$row['descr'];
             $optionValue = $row['notation'];
             $options[] = [$optionTitle, $optionValue];
 
             $childNodes = $this->queryForChildrenOf($row['ppn']);
-            while ($childRow = Utility::getDatabaseConnection()->sql_fetch_assoc($childNodes)) {
+            foreach ($childNodes->fetchAll() as $childRow) {
                 $childOptionTitle = '—['.$childRow['notation'].'] '.$childRow['descr'];
                 $childOptionValue = $childRow['notation'];
                 $options[] = [$childOptionTitle, $childOptionValue];
@@ -67,17 +70,16 @@ class Flexform
      *
      * @param string $parentID
      *
-     * @return array
+     * @return Statement
      */
     private function queryForChildrenOf($parentID)
     {
-        $queryResults = Utility::getDatabaseConnection()->exec_SELECTquery(
-            '*',
-            Utility::dataTable,
-            "parent = '".$parentID."'",
-            '',
-            'notation ASC',
-            '');
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
+        $queryResults = $queryBuilder->select('*')
+            ->from(Utility::dataTable)
+            ->where($queryBuilder->expr()->eq('parent', $queryBuilder->quote($parentID)))
+            ->orderBy('notation', 'ASC')
+            ->execute();
 
         return $queryResults;
     }

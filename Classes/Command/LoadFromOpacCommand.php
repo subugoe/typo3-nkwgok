@@ -1,19 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Subugoe\Nkwgok\Command;
 
-use Subugoe\Nkwgok\Importer\ConvertCsv;
+use Subugoe\Nkwgok\Importer\LoadFromOpac;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * TYPO3 Scheduler task to process CSV files with subject tree information.
+ * TYPO3 Scheduler task to download the OPAC data we need and store them in
+ * fileadmin/gok/...
  *
- * The file format is described in the processCSVFile function.
+ * Unifies the features provided by class.tx_nkwgok_loadxml.php and
+ * getHitCounts.py and makes them accessible from the TYPO3 Scheduler.
  */
-class ConvertCsvCommandController extends Command
+class LoadFromOpacCommand extends Command
 {
     /**
      * Function executed from the Scheduler.
@@ -22,7 +26,9 @@ class ConvertCsvCommandController extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $service = GeneralUtility::makeInstance(ConvertCsv::class);
+        set_time_limit(1200);
+
+        $service = GeneralUtility::makeInstance(LoadFromOpac::class);
 
         return $service->run();
     }

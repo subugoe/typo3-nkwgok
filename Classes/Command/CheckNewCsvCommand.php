@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Subugoe\Nkwgok\Command;
 
-use Subugoe\Nkwgok\Utility\Utility;
+use Subugoe\Nkwgok\Importer\CheckNewCsv;
+use Subugoe\Nkwgok\Importer\ConvertCsv;
+use Subugoe\Nkwgok\Importer\LoadXml;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,54 +25,23 @@ class CheckNewCsvCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $service = GeneralUtility::makeInstance(CheckNewCsv::class);
+
         $success = true;
-        if ($this->needsUpdate()) {
-            $convertCSVTask = GeneralUtility::makeInstance(ConvertCsvCommandController::class);
-            $success = $convertCSVTask->executeCommand();
+        if ($service->run()) {
+            $convertCSVTask = GeneralUtility::makeInstance(ConvertCsv::class);
+            $success = $convertCSVTask->run();
             if (!$success) {
-                GeneralUtility::devLog('checkNewCSV Scheduler Task: Problem during conversion of CSV files. Stopping.',
-                    Utility::extKey, 3);
+                $output->writeln('<error>checkNewCSV Scheduler Task: Problem during conversion of CSV files. Stopping.</error>');
             } else {
-                $loadxmlTask = GeneralUtility::makeInstance(LoadXmlCommandController::class);
-                $success = $loadxmlTask->executeCommand();
+                $loadxmlTask = GeneralUtility::makeInstance(LoadXml::class);
+                $success = $loadxmlTask->run();
                 if (!$success) {
-                    GeneralUtility::devLog('checkNewCSV Scheduler Task: could not import XML to TYPO3 database.',
-                        Utility::extKey, 3);
+                    $output->writeln('<error>checkNewCSV Scheduler Task: could not import XML to TYPO3 database.</error>');
                 }
             }
         }
 
         return $success;
-    }
-
-    /**
-     * Returns whether all CSV files in filadmin/gok/csv/ have corresponding
-     * XML files in fileadmin/gok/xml with a newer modification date.
-     *
-     * @return bool
-     */
-    private function needsUpdate()
-    {
-        $needsUpdate = false;
-        $CSVFiles = glob(PATH_site.'fileadmin/gok/csv/*.csv');
-        foreach ($CSVFiles as $CSVPath) {
-            $CSVPathInfo = pathinfo($CSVPath);
-            $XMLPath = PATH_site.'fileadmin/gok/xml/'.$CSVPathInfo['filename'].'-0.xml';
-            if (!file_exists($XMLPath)) {
-                GeneralUtility::devLog('Need to convert CSV files because '.$XMLPath.' is missing.',
-                    Utility::extKey, 1);
-                $needsUpdate = true;
-                break;
-            } else {
-                if (filemtime($XMLPath) < filemtime($CSVPath)) {
-                    GeneralUtility::devLog('Need to convert CSV files because '.$CSVPath.' is newer than the corresponding XML file.',
-                        Utility::extKey, 1);
-                    $needsUpdate = true;
-                    break;
-                }
-            }
-        }
-
-        return $needsUpdate;
     }
 }

@@ -8,8 +8,7 @@
         </TCEforms>
         <type>array</type>
         <el>
-
-            <source>
+            <settings.source>
                 <TCEforms>
                     <label>LLL:EXT:nkwgok/Resources/Private/Language/locallang.xml:source</label>
                     <config>
@@ -17,9 +16,9 @@
                         <itemsProcFunc>Subugoe\Nkwgok\Elements\Flexform->addFields</itemsProcFunc>
                     </config>
                 </TCEforms>
-            </source>
+            </settings.source>
 
-            <altSource>
+            <settings.altSource>
                 <TCEforms>
                     <label>LLL:EXT:nkwgok/Resources/Private/Language/locallang.xml:altSource</label>
                     <config>
@@ -27,9 +26,9 @@
                         <size>30</size>
                     </config>
                 </TCEforms>
-            </altSource>
+            </settings.altSource>
 
-            <style>
+            <settings.style>
                 <TCEforms>
                     <label>LLL:EXT:nkwgok/Resources/Private/Language/locallang.xml:style</label>
                     <config>
@@ -50,9 +49,9 @@
                         </items>
                     </config>
                 </TCEforms>
-            </style>
+            </settings.style>
 
-            <showGOKID>
+            <settings.showGOKID>
                 <TCEforms>
                     <label>LLL:EXT:nkwgok/Resources/Private/Language/locallang.xml:showGOKID</label>
                     <config>
@@ -60,9 +59,9 @@
                         <default>1</default>
                     </config>
                 </TCEforms>
-            </showGOKID>
+            </settings.showGOKID>
 
-            <omitXXX>
+            <settings.omitXXX>
                 <TCEforms>
                     <label>LLL:EXT:nkwgok/Resources/Private/Language/locallang.xml:omitXXX</label>
                     <config>
@@ -70,7 +69,7 @@
                         <default>0</default>
                     </config>
                 </TCEforms>
-            </omitXXX>
+            </settings.omitXXX>
 
         </el>
     </ROOT>

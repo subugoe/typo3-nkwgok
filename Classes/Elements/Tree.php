@@ -29,6 +29,7 @@ namespace Subugoe\Nkwgok\Elements;
  * THE SOFTWARE.
  ******************************************************************************/
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -54,6 +55,8 @@ class Tree extends Element
      */
     public function getMarkup()
     {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
+
         $this->addGOKTreeJSToElement($this->doc);
 
         // Create container.
@@ -81,18 +84,19 @@ class Tree extends Element
         $startNodes = explode(',', $this->arguments['notation']);
         $queryParts = [];
         foreach ($startNodes as $startNodeGOK) {
-            $queryParts[] = 'notation = '.Utility::getDatabaseConnection()->fullQuoteStr(trim($startNodeGOK), Utility::dataTable);
+            $queryParts[] = 'notation = '.$queryBuilder->quote(trim($startNodeGOK));
         }
-        $query = implode(' OR ', $queryParts).' AND statusID = 0';
-        $queryResult = Utility::getDatabaseConnection()->exec_SELECTquery(
-            Element::NKWGOKQueryFields,
-            Utility::dataTable,
-            $query,
-            '',
-            'notation ASC',
-            '');
+        $query = implode(' OR ', $queryParts);
 
-        $resultCount = Utility::getDatabaseConnection()->sql_num_rows($queryResult);
+        $queryResult = $queryBuilder->select('*')
+            ->from(Utility::dataTable)
+            ->where($query)
+            ->andWhere($queryBuilder->expr()->eq('statusID', 0))
+            ->orderBy('notation', 'ASC')
+            ->execute()
+            ->fetchAll();
+        $resultCount = count($queryResult);
+
         $topElementType = 'span';
         $topItemContainer = $container;
         if ($resultCount > 1) {
@@ -102,7 +106,7 @@ class Tree extends Element
             $topItemContainer = $ul;
         }
 
-        while ($GOK = Utility::getDatabaseConnection()->sql_fetch_assoc($queryResult)) {
+        foreach ($queryResult as $GOK) {
             $topElement = $this->appendGOKTreeItem($topItemContainer, $topElementType, $GOK, [], 1, ($resultCount > 1));
             $topElement->setAttribute('class', 'rootNode');
 
@@ -171,7 +175,7 @@ class Tree extends Element
             var functionText = 'hideGOK".$this->objectID."(\"' + id + '\");return false;';
             link[0].onclick = new Function(functionText);
             jQuery.get("
-            ."'".GeneralUtility::getIndpEnv('TYPO3_SITE_URL')."index.php',
+            ."'".GeneralUtility::getIndpEnv('TYPO3_SITE_URL')."',
                 {'eID': '".Utility::extKey."', "
             ."'tx_".Utility::extKey."[language]': '".$this->language."', "
             ."'tx_".Utility::extKey."[expand][0]': id, "
@@ -240,7 +244,7 @@ class Tree extends Element
     private function appendGOKTreeChildren($parentPPN, $container, $expandMarker, $autoExpandLevel)
     {
         $GOKs = $this->getChildren($parentPPN, true);
-        if (sizeof($GOKs) > 1) {
+        if (count($GOKs) > 1) {
             $ul = $this->doc->createElement('ul');
             $container->appendChild($ul);
             $ul->setAttribute('id', 'ul-'.$this->objectID.'-'.$parentPPN);
@@ -341,7 +345,6 @@ class Tree extends Element
             }
 
             if ($GOK['childcount'] > 0) {
-                $noscriptLink = '#';
                 $mainTitle = sprintf($this->localise('%s Unterkategorien anzeigen'), $GOK['childcount']);
                 $alternativeTitle = $this->localise('Unterkategorien ausblenden');
                 $urlComponents = parse_url(GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
@@ -461,7 +464,6 @@ class Tree extends Element
         if ($hitCount != 0 && $URL) {
             $opacLink = $this->doc->createElement('a');
             $opacLink->setAttribute('href', $URL);
-            $titleString = '';
             if ($useDeepSearch === true && $GOKData['childcount'] != 0) {
                 $titleString = $this->localise('Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen');
             } else {

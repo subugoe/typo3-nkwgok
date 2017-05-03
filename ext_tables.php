@@ -46,12 +46,11 @@ $TCA['tx_nkwgok_data'] = [
 $TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY.'_pi1'] = 'layout,select_key,pages';
 $TCA['tt_content']['types']['list']['subtypes_addlist'][$_EXTKEY.'_pi1'] = 'pi_flexform';
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue($_EXTKEY.'_pi1', 'FILE:EXT:nkwgok/Resources/Private/Flexform/flexform.xml');
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPlugin(
-    [
-        'LLL:EXT:nkwgok/locallang_db.xml:tt_content.list_type_pi1',
-        $_EXTKEY.'_pi1',
-        \TYPO3\CMS\Core\Utility\PathUtility::getAbsoluteWebPath($_EXTKEY).'Resources/Public/Images/ext_icon.gif', ],
-    'list_type'
+
+\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
+        'Subugoe.'.$_EXTKEY,
+        'Pi1',
+        'Nkwgok'
 );
 
 if (TYPO3_MODE == 'BE') {

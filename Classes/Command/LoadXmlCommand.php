@@ -1,9 +1,17 @@
 <?php
 
+namespace Subugoe\Nkwgok\Command;
+
+use Subugoe\Nkwgok\Importer\LoadXml;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /* * *************************************************************
  *  Copyright notice
  *
- *  (c) 2010 Nils K. Windisch <windisch@sub.uni-goettingen.de>
+ *  (c) 2009 Nils K. Windisch (windisch@sub.uni-goettingen.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -23,9 +31,21 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
 
-if (!defined('PATH_typo3conf')) {
-    die('Could not access this script directly!');
-}
+/**
+ * Class "tx_nkwgok_loadxml" provides task procedures.
+ */
+class LoadXmlCommand extends Command
+{
+    /**
+     * Function executed from the Scheduler.
+     *
+     * @return bool TRUE if success, otherwise FALSE
+     */
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        set_time_limit(1200);
+        $service = GeneralUtility::makeInstance(LoadXml::class);
 
-$menu = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\Subugoe\Nkwgok\Ajax\Menu::class);
-echo $menu->main();
+        return $service->run();
+    }
+}

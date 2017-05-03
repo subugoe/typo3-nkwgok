@@ -5,7 +5,7 @@ namespace Subugoe\Nkwgok\Controller;
 use Subugoe\Nkwgok\Elements\Element;
 use Subugoe\Nkwgok\Utility\Utility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\Plugin\AbstractPlugin;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 /* * *************************************************************
  *  Copyright notice
@@ -33,24 +33,15 @@ use TYPO3\CMS\Frontend\Plugin\AbstractPlugin;
 /**
  * See the ChangeLog or git repository for details.
  */
-class DefaultController extends AbstractPlugin
+class DefaultController extends ActionController
 {
     /**
      * Main method of the PlugIn.
      *
-     * @param string $content : The PlugIn content
-     * @param array  $conf    : The PlugIn configuration
-     *
      * @return string The content that is displayed on the website
      */
-    public function main($content, $conf)
+    public function mainAction()
     {
-        // basic
-        $this->pi_setPiVarDefaults();
-        $this->pi_loadLL();
-        $this->pi_initPIflexform();
-        $this->pi_USER_INT_obj = 1;
-
         // CSS
         $this->addStylesheet();
 
@@ -58,8 +49,8 @@ class DefaultController extends AbstractPlugin
         $arguments = GeneralUtility::_GET('tx_nkwgok');
 
         // get flexform
-        $arguments['notation'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'source', 'sDEF');
-        $altSource = trim($this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'altSource', 'sDEF'));
+        $arguments['notation'] = $this->settings['source'];
+        $altSource = trim($this->settings['altSource']);
         // alternative source overrides first definition
         if ($altSource) {
             $arguments['notation'] = $altSource;
@@ -69,20 +60,21 @@ class DefaultController extends AbstractPlugin
         if (array_key_exists('expand', $arguments) && is_array($arguments['expand'])) {
             $arguments['expand'] = array_unique($arguments['expand']);
         }
-
-        $arguments['style'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'style', 'sDEF');
-        $arguments['showGOKID'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'showGOKID');
-        $arguments['omitXXX'] = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'omitXXX');
-        $arguments['objectID'] = $this->cObj->data['uid'];
-        $arguments['pageLink'] = $this->pi_getPageLink($GLOBALS['TSFE']->id);
+        $contentObject = $this->configurationManager->getContentObject();
+        $arguments['style'] = $this->settings['style'];
+        $arguments['showGOKID'] = $this->settings['showGOKID'];
+        $arguments['omitXXX'] = $this->settings['omitXXX'];
+        $arguments['objectID'] = $contentObject->data['uid'];
         $arguments['language'] = $GLOBALS['TSFE']->lang;
+        $arguments['pageLink'] = $this->uriBuilder->reset()
+            ->setTargetPageUid($GLOBALS['TSFE']->id)
+            ->setCreateAbsoluteUri(true)
+            ->build();
 
         /** @var Element $nkwgok */
         $nkwgok = Element::instantiateSubclassFor($arguments);
-        $doc = $nkwgok->getMarkup();
-        $content .= $doc->saveHTML();
 
-        return $content;
+        return $nkwgok->getMarkup()->saveHTML();
     }
 
     /**
