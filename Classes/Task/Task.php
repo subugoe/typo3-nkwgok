@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Subugoe\Nkwgok\Task;
 
 use Symfony\Component\Console\Input\StringInput;

@@ -20,10 +20,10 @@ $EM_CONF[$_EXTKEY] = [
     'clearCacheOnLoad' => 0,
     'lockType' => '',
     'author_company' => 'Göttingen State and University Library, Germany http://www.sub.uni-goettingen.de',
-    'version' => '4.0.0',
+    'version' => '5.0.0',
     'constraints' => [
         'depends' => [
-            'typo3' => '6.2.0-8.7.99',
+            'typo3' => '8.7.0-8.7.99',
         ],
         'conflicts' => [
         ],

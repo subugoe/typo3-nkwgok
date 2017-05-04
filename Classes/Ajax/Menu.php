@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Subugoe\Nkwgok\Ajax;
 
 use Subugoe\Nkwgok\Elements\Element;

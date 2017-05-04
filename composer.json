@@ -13,15 +13,5 @@
         "psr-4": {
             "Subugoe\\Nkwgok\\": "Classes/"
         }
-    },
-    "extra": {
-        "typo3/class-alias-loader": {
-            "class-alias-maps": [
-                "Migrations/Code/ClassAliasMap.php"
-            ]
-        }
-    },
-    "require": {
-        "typo3/class-alias-loader": "^1.0"
     }
 }

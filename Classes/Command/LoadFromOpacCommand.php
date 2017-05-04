@@ -32,4 +32,9 @@ class LoadFromOpacCommand extends Command
 
         return $service->run();
     }
+
+    public function configure()
+    {
+        $this->setName('Load from Opac');
+    }
 }
