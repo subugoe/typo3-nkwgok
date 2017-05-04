@@ -24,7 +24,7 @@ class ImportAllCommand extends Command
      *
      * @return bool TRUE if success, otherwise FALSE
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output)
     {
         $loadFromOpacTask = GeneralUtility::makeInstance(LoadFromOpac::class);
         $output->writeln('<info>Starting import from Opac</info>');

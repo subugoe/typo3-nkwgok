@@ -1,0 +1,19 @@
+<?php
+
+namespace Subugoe\Nkwgok\Task;
+
+use Subugoe\Nkwgok\Command\ConvertCsvCommand;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
+/**
+ * Scheduler Task - just a wrapper for the real task to appear in the scheduler menu.
+ */
+class ConvertCsvTask extends Task
+{
+    public function execute()
+    {
+        $task = GeneralUtility::makeInstance(ConvertCsvCommand::class);
+
+        return $task->execute($this->input, $this->output);
+    }
+}

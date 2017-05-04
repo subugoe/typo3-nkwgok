@@ -2,8 +2,6 @@
 
 namespace Subugoe\Nkwgok\Utility;
 
-use TYPO3\CMS\Core\Database\DatabaseConnection;
-
 /**
  * Class providing helper functions and constants.
  */
@@ -38,14 +36,6 @@ class Utility
         }
 
         return $type;
-    }
-
-    /**
-     * @return DatabaseConnection
-     */
-    public static function getDatabaseConnection()
-    {
-        return $GLOBALS['TYPO3_DB'];
     }
 
     /**

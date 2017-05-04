@@ -66,6 +66,7 @@ class LoadXml implements ImporterInterface
     {
         $XMLFolder = PATH_site.'fileadmin/gok/xml/';
         $fileList = $this->fileListAtPathForType($XMLFolder, $type);
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
 
         if (is_array($fileList) && count($fileList) > 0) {
             // Parse XML files to extract just the tree structure.
@@ -249,47 +250,33 @@ class LoadXml implements ImporterInterface
                         $childCount = count($treeElement['children']);
 
                         $rows[] = [
-                            $PPN,
-                            $hierarchy,
-                            $notation,
-                            $parentID,
-                            $descr,
-                            $descr_en,
-                            $descr_alternate,
-                            $descr_alternate_en,
-                            $search,
-                            $tags,
-                            $childCount,
-                            $recordType,
-                            $hitCount,
-                            $totalHitCount,
-                            time(),
-                            time(),
-                            1,
+                            'ppn' => $PPN,
+                            'hierarchy' => $hierarchy,
+                            'notation' => $notation,
+                            'parent' => $parentID,
+                            'descr' => $descr,
+                            'descr_en' => $descr_en,
+                            'descr_alternate' => $descr_alternate,
+                            'descr_alternate_en' => $descr_alternate_en,
+                            'search' => $search,
+                            'tags' => $tags,
+                            'childcount' => $childCount,
+                            'type' => $recordType,
+                            'hitcount' => $hitCount,
+                            'totalhitcount' => $totalHitCount,
+                            'crdate' => time(),
+                            'tstamp' => time(),
+                            'statusID' => 1,
                         ];
                     }
                 } // end of loop over subjects
-                $keyNames = [
-                    'ppn',
-                    'hierarchy',
-                    'notation',
-                    'parent',
-                    'descr',
-                    'descr_en',
-                    'descr_alternate',
-                    'descr_alternate_en',
-                    'search',
-                    'tags',
-                    'childcount',
-                    'type',
-                    'hitcount',
-                    'totalhitcount',
-                    'crdate',
-                    'tstamp',
-                    'statusID',
-                ];
-                $result = Utility::getDatabaseConnection()->exec_INSERTmultipleRows(Utility::dataTable, $keyNames,
-                    $rows);
+
+                foreach ($rows as $row) {
+                    $queryBuilder
+                        ->insert(Utility::dataTable)
+                        ->values($row)
+                        ->execute();
+                }
             } // end of loop over files
 
             $result = true;

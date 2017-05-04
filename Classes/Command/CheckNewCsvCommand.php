@@ -23,7 +23,7 @@ class CheckNewCsvCommand extends Command
      *
      * @return bool TRUE if success, otherwise FALSE
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output)
     {
         $service = GeneralUtility::makeInstance(CheckNewCsv::class);
 

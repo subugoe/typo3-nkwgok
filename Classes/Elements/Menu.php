@@ -27,6 +27,7 @@ namespace Subugoe\Nkwgok\Elements;
  * THE SOFTWARE.
  ******************************************************************************/
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -41,6 +42,8 @@ class Menu extends Element
      */
     public function getMarkup()
     {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
+
         $this->addGOKMenuJSToElement($this->doc);
 
         // Create the form and insert the first menu.
@@ -65,17 +68,16 @@ class Menu extends Element
             GeneralUtility::devLog('several start nodes given ('.$this->arguments['notation'].') but only the first is used in menu mode', Utility::extKey, 2);
         }
         $startNodeGOK = trim($startNodes[0]);
-        $firstNodeCondition = 'notation LIKE '.Utility::getDatabaseConnection()->fullQuoteStr($startNodeGOK, Utility::dataTable).' AND statusID = 0';
-        // run query and collect result
-        $queryResult = Utility::getDatabaseConnection()->exec_SELECTquery(
-            Element::NKWGOKQueryFields,
-            Utility::dataTable,
-            $firstNodeCondition,
-            '',
-            'notation ASC',
-            '');
 
-        while ($row = Utility::getDatabaseConnection()->sql_fetch_assoc($queryResult)) {
+        $queryResult = $queryBuilder
+            ->select('*')
+            ->from(Utility::dataTable)
+            ->where($queryBuilder->expr()->like('notation', $queryBuilder->quote($startNodeGOK)))
+            ->andWhere($queryBuilder->expr()->eq('statusID', 0))
+            ->orderBy('notation', 'ASC')
+            ->execute();
+
+        foreach ($queryResult->fetchAll() as $row) {
             $menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
             $this->appendGOKMenuChildren($row['ppn'], $form, $menuInlineThreshold);
         }

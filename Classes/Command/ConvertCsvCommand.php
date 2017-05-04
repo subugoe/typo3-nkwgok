@@ -13,7 +13,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * The file format is described in the processCSVFile function.
  */
-class ConvertCsvCommandController extends Command
+class ConvertCsvCommand extends Command
 {
     /**
      * Function executed from the Scheduler.
