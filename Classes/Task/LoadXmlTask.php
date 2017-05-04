@@ -14,7 +14,7 @@ class LoadXmlTask extends Task
 {
     public function execute()
     {
-        $task = GeneralUtility::makeInstance(LoadXmlCommand::class);
+        $task = GeneralUtility::makeInstance(LoadXmlCommand::class, $this->getTaskTitle());
 
         return $task->execute($this->input, $this->output);
     }

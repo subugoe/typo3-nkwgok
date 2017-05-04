@@ -14,7 +14,7 @@ class ImportAllTask extends Task
 {
     public function execute()
     {
-        $task = GeneralUtility::makeInstance(ImportAllCommand::class);
+        $task = GeneralUtility::makeInstance(ImportAllCommand::class, $this->getTaskTitle());
 
         return $task->execute($this->input, $this->output);
     }

@@ -14,7 +14,7 @@ class UpdateCsvTask extends Task
 {
     public function execute()
     {
-        $task = GeneralUtility::makeInstance(UpdateCsvCommand::class);
+        $task = GeneralUtility::makeInstance(UpdateCsvCommand::class, $this->getTaskTitle());
 
         return $task->execute($this->input, $this->output);
     }

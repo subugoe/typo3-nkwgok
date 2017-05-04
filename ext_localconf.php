@@ -8,7 +8,7 @@ $boot = function ($extKey) {
         'Pi1',
         ['Default' => 'main']
     );
-    // Scheduler task for downloading LKL data from OPAC.
+
     // Scheduler task for downloading LKL data from OPAC.
     $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\Subugoe\Nkwgok\Task\LoadFromOpacTask::class] = [
         'extension' => $extKey,
@@ -22,8 +22,8 @@ $boot = function ($extKey) {
         'title' => 'LLL:EXT:'.$extKey.'/Resources/Private/Language/locallang_scheduler.xml:scheduler.convertCSV.name',
         'description' => 'LLL:EXT:'.$extKey.'/Resources/Private/Language/locallang_scheduler.xml:scheduler.convertCSV.description',
     ];
-    // Scheduler task for importing Pica authority record XML files into TYPO3 database.
 
+    // Scheduler task for importing Pica authority record XML files into TYPO3 database.
     $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\Subugoe\Nkwgok\Task\LoadXmlTask::class] = [
         'extension' => $extKey,
         'title' => 'LLL:EXT:'.$extKey.'/Resources/Private/Language/locallang_scheduler.xml:scheduler.loadxml.name',
@@ -46,7 +46,7 @@ $boot = function ($extKey) {
     ];
 
     // Scheduler task 1+2+3 for running our 3 other Scheduler tasks in the correct order.
-    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['tx_nkwgok_importAll'] = [
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\Subugoe\Nkwgok\Task\ImportAllTask::class] = [
         'extension' => $extKey,
         'title' => 'LLL:EXT:'.$extKey.'/Resources/Private/Language/locallang_scheduler.xml:scheduler.importAll.name',
         'description' => 'LLL:EXT:'.$extKey.'/Resources/Private/Language/locallang_scheduler.xml:scheduler.importAll.description',

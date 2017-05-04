@@ -14,7 +14,7 @@ class LoadFromOpacTask extends Task
 {
     public function execute()
     {
-        $task = GeneralUtility::makeInstance(LoadFromOpacCommand::class);
+        $task = GeneralUtility::makeInstance(LoadFromOpacCommand::class, $this->getTaskTitle());
 
         return $task->execute($this->input, $this->output);
     }

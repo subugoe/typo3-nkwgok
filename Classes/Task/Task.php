@@ -23,7 +23,7 @@ abstract class Task extends AbstractTask
     public function __construct()
     {
         parent::__construct();
-        $this->input = new StringInput('');
+        $this->input = new StringInput($this->getTaskTitle());
         $this->output = new NullOutput();
     }
 

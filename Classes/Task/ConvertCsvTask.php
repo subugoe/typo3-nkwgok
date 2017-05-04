@@ -14,7 +14,7 @@ class ConvertCsvTask extends Task
 {
     public function execute()
     {
-        $task = GeneralUtility::makeInstance(ConvertCsvCommand::class);
+        $task = GeneralUtility::makeInstance(ConvertCsvCommand::class, $this->getTaskTitle());
 
         return $task->execute($this->input, $this->output);
     }
