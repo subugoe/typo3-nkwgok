@@ -68,7 +68,7 @@ class LoadFromOpac implements ImporterInterface
      *
      * @return bool sucess status of the download
      */
-    private function downloadAuthorityDataFromOpacToFolder($opacBaseURL, $folderPath, $fileBaseName)
+    private function downloadAuthorityDataFromOpacToFolder(string $opacBaseURL, string $folderPath, string $fileBaseName): bool
     {
         $success = true;
         $firstRecord = 1; // Pica result indexing is 1 based
@@ -76,7 +76,7 @@ class LoadFromOpac implements ImporterInterface
         $resultCount = (int) $hitsAttribute[0];
 
         while (($firstRecord < $resultCount) && $success) {
-            $URL = $opacBaseURL.'/SHRTST='.self::NKWGOKImportChunkSize.'/FRST='.$firstRecord;
+            $URL = sprintf('%s/SHRTST=%d/FRST=%s', $opacBaseURL, self::NKWGOKImportChunkSize, $firstRecord);
             $opacDownload = file_get_contents($URL);
             if ($opacDownload) {
                 $targetFilePath = $folderPath.$fileBaseName.'-'.$firstRecord.'.xml';
@@ -90,19 +90,17 @@ class LoadFromOpac implements ImporterInterface
                     fclose($targetFile);
                     $firstRecord += self::NKWGOKImportChunkSize;
                 } else {
-                    GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path '.$targetFilePath,
-                        Utility::extKey, 3);
+                    GeneralUtility::devLog(sprintf('loadFromOpac Scheduler Task: could not write file at path %s', $targetFilePath), Utility::extKey, 3);
                     $success = false;
                 }
             } else {
-                GeneralUtility::devLog('loadFromOpac Scheduler Task: failed to load '.$URL, Utility::extKey, 3);
+                GeneralUtility::devLog(sprintf('loadFromOpac Scheduler Task: failed to load %s', $URL), Utility::extKey, 3);
                 $success = false;
             }
         }
 
         if ($success) {
-            GeneralUtility::devLog('loadFromOpac Scheduler Task: LKL download for '.$fileBaseName - ' succeeded',
-                Utility::extKey, 1);
+            GeneralUtility::devLog(sprintf('loadFromOpac Scheduler Task: LKL download for %s succeeded', $fileBaseName), Utility::extKey, 1);
         }
 
         return $success;
