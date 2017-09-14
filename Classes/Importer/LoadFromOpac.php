@@ -38,7 +38,12 @@ class LoadFromOpac implements ImporterInterface
         $success = $this->downloadAuthorityDataFromOpacToFolder($opacLKLURL, $XMLDir, Utility::recordTypeGOK);
 
         $opacBRKURL = $opacBaseURL.'CMD?ACT=SRCHA/IKT=8600/TRM=tov/REC=2/PRS=XML/NORND=1';
-        $success &= $this->downloadAuthorityDataFromOpacToFolder($opacBRKURL, $XMLDir, Utility::recordTypeBRK);
+
+        if ($success === true) {
+            $success = $this->downloadAuthorityDataFromOpacToFolder($opacBRKURL, $XMLDir, Utility::recordTypeBRK);
+        } else {
+            return false;
+        }
 
         // Create the hitcounts folder if necessary and delete all files inside it if it exists.
         GeneralUtility::mkdir(PATH_site.'fileadmin/gok/hitcounts');
@@ -49,12 +54,26 @@ class LoadFromOpac implements ImporterInterface
         }
 
         $opacHitCountURL = $opacBaseURL.'CMD?ACT=BRWS&SCNST='.self::NKWGOKImportChunkSize;
-        $success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
-            Utility::typeToIndexName(Utility::recordTypeGOK), $hitCountDir);
-        $success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
-            Utility::typeToIndexName(Utility::recordTypeBRK), $hitCountDir);
-        $success &= $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
-            Utility::typeToIndexName(Utility::recordTypeMSC), $hitCountDir);
+
+        if ($success === true) {
+            $success = $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
+                Utility::typeToIndexName(Utility::recordTypeGOK), $hitCountDir);
+        } else {
+            return false;
+        }
+
+        if ($success === true) {
+            $success = $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
+                Utility::typeToIndexName(Utility::recordTypeBRK), $hitCountDir);
+        } else {
+            return false;
+        }
+        if ($success === true) {
+            $success = $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
+                Utility::typeToIndexName(Utility::recordTypeMSC), $hitCountDir);
+        } else {
+            return false;
+        }
 
         return $success;
     }
@@ -67,7 +86,7 @@ class LoadFromOpac implements ImporterInterface
      * @param string $folderPath
      * @param string $fileBaseName
      *
-     * @return bool sucess status of the download
+     * @return bool success status of the download
      */
     private function downloadAuthorityDataFromOpacToFolder(string $opacBaseURL, string $folderPath, string $fileBaseName): bool
     {
@@ -92,17 +111,17 @@ class LoadFromOpac implements ImporterInterface
                     fclose($targetFile);
                     $firstRecord += self::NKWGOKImportChunkSize;
                 } else {
-                    $logger->error(sprintf('loadFromOpac Scheduler Task: could not write file at path %s', $targetFilePath));
+                    $logger->error(sprintf('Could not write file at path %s', $targetFilePath));
                     $success = false;
                 }
             } else {
-                $logger->error(sprintf('loadFromOpac Scheduler Task: failed to load %s', $URL));
+                $logger->error(sprintf('Failed to load %s', $URL));
                 $success = false;
             }
         }
 
         if ($success) {
-            $logger->info(sprintf('loadFromOpac Scheduler Task: LKL download for %s succeeded', $fileBaseName));
+            $logger->info(sprintf('LKL download for %s succeeded', $fileBaseName));
         }
 
         return $success;
@@ -144,20 +163,20 @@ class LoadFromOpac implements ImporterInterface
                     fwrite($targetFile, $opacDownload);
                     fclose($targetFile);
                 } else {
-                    $logger->error(sprintf('loadFromOpac Scheduler Task: could not write file at path %s', $targetFilePath));
+                    $logger->error(sprintf('Could not write file at path %s', $targetFilePath));
                     $success = false;
                 }
 
                 $termAttribute = simplexml_load_string($opacDownload)->xpath('/RESULT/SCANNEXT/@term');
                 $scanNext = $termAttribute[0];
             } else {
-                $logger->error(sprintf('loadFromOpac Scheduler Task: failed to load %s', $URL));
+                $logger->error(sprintf('Failed to load %s', $URL));
                 $success = false;
             }
         }
 
         if ($success) {
-            $logger->info(sprintf('loadFromOpac Scheduler Task: hitcount download for index %s succeeded.', $indexName));
+            $logger->info(sprintf('Hitcount download for index %s succeeded.', $indexName));
         }
 
         return $success;

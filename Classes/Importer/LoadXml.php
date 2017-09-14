@@ -40,8 +40,18 @@ class LoadXml implements ImporterInterface
         // Load XML files. Process those coming from csv files first as they can
         // be quite large and we are less likely to run into memory limits this way.
         $result = $this->loadXMLForType(Utility::recordTypeCSV);
-        $result &= $this->loadXMLForType(Utility::recordTypeGOK);
-        $result &= $this->loadXMLForType(Utility::recordTypeBRK);
+
+        if ($result === true) {
+            $result = $this->loadXMLForType(Utility::recordTypeGOK);
+        } else {
+            return false;
+        }
+
+        if ($result === true) {
+            $result = $this->loadXMLForType(Utility::recordTypeBRK);
+        } else {
+            return false;
+        }
 
         // Delete all old records with statusID 1, then switch all new records to statusID 0.
         $queryBuilder->delete(Utility::dataTable)
@@ -53,7 +63,7 @@ class LoadXml implements ImporterInterface
             ->where($queryBuilder->expr()->eq('statusID', 1))
             ->execute();
 
-        $logger->info('loadXML Scheduler Task: Import of subject hierarchy XML to TYPO3 database completed');
+        $logger->info('Import of subject hierarchy XML to TYPO3 database completed');
 
         return $result;
     }
@@ -127,7 +137,7 @@ class LoadXml implements ImporterInterface
                                     // with three character strings that could be mistaken for index names.
                                     $search = $indexName.'="'.$notation.'"';
                                 } else {
-                                    $logger->info(sprintf('loadXML Scheduler Task: Unknown record type »%s« in record PPN %s. Skipping.', $recordType, $PPN), ['name' => $recordElement->getName()]);
+                                    $logger->info(sprintf('Unknown record type »%s« in record PPN %s. Skipping.', $recordType, $PPN), ['name' => $recordElement->getName()]);
                                     continue;
                                 }
                             }
@@ -147,13 +157,13 @@ class LoadXml implements ImporterInterface
                             if (array_key_exists($nextParent, $subjectTree)) {
                                 $nextParent = $subjectTree[$nextParent]['parent'];
                             } else {
-                                $logger->error(sprintf('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN %s for record PPN %s. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', $nextParent, $PPN),
+                                $logger->error(sprintf('Could not determine hierarchy level: Unknown parent PPN %s for record PPN %s. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', $nextParent, $PPN),
                                     ['element' => $recordElement->getName()]);
                                 $hierarchy = -1;
                                 break;
                             }
                             if ($hierarchy > self::NKWGOKMaxHierarchy) {
-                                $logger->error(sprintf('loadXML Scheduler Task: Hierarchy level for PPN %s exceeds the maximum limit of %s levels. This needs to be fixed, the subject tree may contain an infinite loop.', $PPN, self::NKWGOKMaxHierarchy), ['element' => $recordElement->getName()]);
+                                $logger->error(sprintf('Hierarchy level for PPN %s exceeds the maximum limit of %s levels. This needs to be fixed, the subject tree may contain an infinite loop.', $PPN, self::NKWGOKMaxHierarchy), ['element' => $recordElement->getName()]);
                                 $hierarchy = -1;
                                 break;
                             }
@@ -275,16 +285,18 @@ class LoadXml implements ImporterInterface
                 } // end of loop over subjects
 
                 foreach ($rows as $row) {
-                    $queryBuilder
+                    $queryResult = $queryBuilder
                         ->insert(Utility::dataTable)
                         ->values($row)
                         ->execute();
+
+                    $logger->info('Inserted row '.$row['ppn'].' with status '.$queryResult, $row);
                 }
             } // end of loop over files
 
             $result = true;
         } else {
-            $logger->error(sprintf('loadXML Scheduler Task: Found no XML files for type %s', $type));
+            $logger->error(sprintf('No XML files for type %s found.', $type));
             $result = true;
         }
 
@@ -377,7 +389,7 @@ class LoadXml implements ImporterInterface
                     $extraNotationTexts = $extraNotation->xpath('subfield[@code="a"]');
                     $extraNotationLabels = $extraNotation->xpath('subfield[@code="2"]');
                     if ($extraNotationTexts && $extraNotationLabels) {
-                        $tree[$PPN][strtolower(trim($extraNotationLabels[0]))] = strtolower(trim($extraNotationTexts[0]));
+                        $tree[$PPN][strtolower(trim($extraNotationLabels[0]->getName()))] = strtolower(trim($extraNotationTexts[0]->getName()));
                     }
                 }
             } // end foreach $records
@@ -425,13 +437,13 @@ class LoadXml implements ImporterInterface
                         }
                     }
                 } else {
-                    $logger->error(sprintf('loadXML Scheduler Task: could not load/parse XML from %s', $xmlPath));
+                    $logger->error(sprintf('Could not load/parse XML from %s', $xmlPath));
                 }
             }
         } // end foreach
 
         foreach ($hitCounts as $hitCountType => $array) {
-            $logger->info(sprintf('loadXML Scheduler Task: Loaded %d %s hit count entries.', count($array, $hitCountType)));
+            $logger->info(sprintf('Loaded %d %s hit count entries.', count($array), $hitCountType));
         }
 
         return $hitCounts;
@@ -447,7 +459,7 @@ class LoadXml implements ImporterInterface
      *
      * @return array with Key: PPN => Value: sum of hit counts
      */
-    private function computeTotalHitCounts($startPPN, $subjectTree, $hitCounts)
+    private function computeTotalHitCounts(string $startPPN, array $subjectTree, array $hitCounts): array
     {
         $totalHitCounts = [];
         $myHitCount = 0;
@@ -549,7 +561,7 @@ class LoadXml implements ImporterInterface
             } elseif ($recordTypeCode === 'csv') {
                 $queryElements = $record->xpath('datafield[@tag="str"]/subfield[@code="a"]');
                 if ($queryElements && count($queryElements) === 1
-                    && preg_match('/^msc=[0-9A-Zx-]*/', (string) $queryElements[0] > 0)
+                    && preg_match('/^msc=[0-9A-Zx-]*/', (string) ($queryElements[0] > 0))
                 ) {
                     // Special case: an MSC record.
                     $recordType = Utility::recordTypeMSC;
@@ -561,7 +573,7 @@ class LoadXml implements ImporterInterface
         }
 
         if ($recordType === Utility::recordTypeUnknown) {
-            GeneralUtility::devLog('loadXML Scheduler Task: Record of unknown type.', Utility::extKey, 1,
+            GeneralUtility::devLog('Record of unknown type.', Utility::extKey, 1,
                 [$record->saveXML()]);
         }
 

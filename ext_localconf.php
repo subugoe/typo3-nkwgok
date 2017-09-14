@@ -53,6 +53,24 @@ $boot = function ($extKey) {
     ];
 
     $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include'][$extKey] = 'EXT:'.$extKey.'/Resources/Private/Scripts/get.php';
+
+    if (!isset($GLOBALS['TYPO3_CONF_VARS']['LOG']['Subugoe']['Nkwgok']['writerConfiguration'])) {
+        $context = \TYPO3\CMS\Core\Utility\GeneralUtility::getApplicationContext();
+        if ($context->isProduction()) {
+            $logLevel = \TYPO3\CMS\Core\Log\LogLevel::ERROR;
+        } elseif ($context->isDevelopment()) {
+            $logLevel = \TYPO3\CMS\Core\Log\LogLevel::DEBUG;
+        } else {
+            $logLevel = \TYPO3\CMS\Core\Log\LogLevel::INFO;
+        }
+        $GLOBALS['TYPO3_CONF_VARS']['LOG']['Subugoe']['Nkwgok']['writerConfiguration'] = [
+            $logLevel => [
+                \TYPO3\CMS\Core\Log\Writer\FileWriter::class => [
+                    'logFile' => 'typo3temp/var/logs/nkwgok.log',
+                ],
+            ],
+        ];
+    }
 };
 
 $boot('nkwgok');

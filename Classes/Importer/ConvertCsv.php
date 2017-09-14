@@ -83,13 +83,13 @@ class ConvertCsv implements ImporterInterface
                 if ($localData != $remoteData) {
                     // Only overwrite local file if the file contents have changed.
                     if (file_put_contents($localPath, $remoteData) !== false) {
-                        $logger->info(sprintf('convertCSV Scheduler Task: replaced file %s.', $localPath));
+                        $logger->info(sprintf('Replaced file %s.', $localPath));
                     } else {
-                        $logger->warning(sprintf('convertCSV Scheduler Task: failed to write downloaded file to %s.', $localPath), [$localData, $remoteData]);
+                        $logger->warning(sprintf('Failed to write downloaded file to %s.', $localPath), [$localData, $remoteData]);
                     }
                 }
             } else {
-                $logger->warning(sprintf('convertCSV Scheduler Task: failed to download %s.', $URL));
+                $logger->warning(sprintf('Failed to download %s.', $URL));
             }
         }
     }
@@ -195,19 +195,19 @@ class ConvertCsv implements ImporterInterface
                     }
 
                     if ($this->PPNList[$PPN]) {
-                        $logger->warning(sprintf('convertCSV Scheduler Task: Duplicate PPN "%s" in file %s', $PPN, $CSVPath));
+                        $logger->warning(sprintf('Duplicate PPN "%s" in file %s', $PPN, $CSVPath));
                     }
                     if ($this->PPNList[$PPN]) {
-                        $logger->warning(sprintf('convertCSV Scheduler Task: Duplicate PPN "%s" in file %s', $PPN, $CSVPath));
+                        $logger->warning(sprintf('Duplicate PPN "%s" in file %s', $PPN, $CSVPath));
                     }
 
                     // Add current PPN to PPN list.
                     $this->PPNList[$PPN] = true;
                 } else {
-                    $logger->warning(sprintf('convertCSV Scheduler Task: Blank PPN  in line: "%s" of file %s', implode(';', $fields), $CSVPath));
+                    $logger->warning(sprintf('Blank PPN  in line: "%s" of file %s', implode(';', $fields), $CSVPath));
                 }
             } elseif (count($fields) > 1 && trim(implode('', $fields)) !== '') {
-                $logger->warning(sprintf('convertCSV Scheduler Task: Line "%s" of file %s contains less than 3 fields.', implode(';', $fields), $CSVPath));
+                $logger->warning(sprintf('Line "%s" of file %s contains less than 3 fields.', implode(';', $fields), $CSVPath));
             }
 
             // Write document to XML file every 500 lines or after the last line in the file.
@@ -219,7 +219,7 @@ class ConvertCsv implements ImporterInterface
                 $resultPath = PATH_site.'fileadmin/gok/xml/'.$XMLFileName;
 
                 if ($doc->save($resultPath) === false) {
-                    $logger->error(sprintf('convertCSV Scheduler Task: Failed to write XML file %s', $resultPath));
+                    $logger->error(sprintf('Failed to write XML file %s', $resultPath));
                     break;
                 } else {
                     $success = true;
@@ -260,7 +260,7 @@ class ConvertCsv implements ImporterInterface
 
             $subfield->appendChild($doc->createTextNode($content));
         } else {
-            $logger->error('convertCSV Scheduler Task: Some parameter was Null in appendFieldForDataTo');
+            $logger->error('Some parameter was Null in appendFieldForDataTo');
         }
 
         return $datafield;
