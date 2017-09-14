@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Subugoe\Nkwgok\Importer;
 
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LoadFromOpac implements ImporterInterface
@@ -74,6 +75,7 @@ class LoadFromOpac implements ImporterInterface
         $firstRecord = 1; // Pica result indexing is 1 based
         $hitsAttribute = simplexml_load_file($opacBaseURL)->xpath('/RESULT/SET/@hits');
         $resultCount = (int) $hitsAttribute[0];
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
         while (($firstRecord < $resultCount) && $success) {
             $URL = sprintf('%s/SHRTST=%d/FRST=%s', $opacBaseURL, self::NKWGOKImportChunkSize, $firstRecord);
@@ -90,17 +92,17 @@ class LoadFromOpac implements ImporterInterface
                     fclose($targetFile);
                     $firstRecord += self::NKWGOKImportChunkSize;
                 } else {
-                    GeneralUtility::devLog(sprintf('loadFromOpac Scheduler Task: could not write file at path %s', $targetFilePath), Utility::extKey, 3);
+                    $logger->error(sprintf('loadFromOpac Scheduler Task: could not write file at path %s', $targetFilePath));
                     $success = false;
                 }
             } else {
-                GeneralUtility::devLog(sprintf('loadFromOpac Scheduler Task: failed to load %s', $URL), Utility::extKey, 3);
+                $logger->error(sprintf('loadFromOpac Scheduler Task: failed to load %s', $URL));
                 $success = false;
             }
         }
 
         if ($success) {
-            GeneralUtility::devLog(sprintf('loadFromOpac Scheduler Task: LKL download for %s succeeded', $fileBaseName), Utility::extKey, 1);
+            $logger->info(sprintf('loadFromOpac Scheduler Task: LKL download for %s succeeded', $fileBaseName));
         }
 
         return $success;
@@ -118,6 +120,8 @@ class LoadFromOpac implements ImporterInterface
      */
     private function downloadHitCountsFromOpacToFolder($opacScanURL, $indexName, $folderPath)
     {
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+
         $success = true;
         /* Begin scanning the index at 0, except for LKL (which only start at a and have a lot of
             junk entries starting with digits. */
@@ -140,22 +144,20 @@ class LoadFromOpac implements ImporterInterface
                     fwrite($targetFile, $opacDownload);
                     fclose($targetFile);
                 } else {
-                    GeneralUtility::devLog('loadFromOpac Scheduler Task: could not write file at path '.$targetFilePath,
-                        Utility::extKey, 3);
+                    $logger->error(sprintf('loadFromOpac Scheduler Task: could not write file at path %s', $targetFilePath));
                     $success = false;
                 }
 
                 $termAttribute = simplexml_load_string($opacDownload)->xpath('/RESULT/SCANNEXT/@term');
                 $scanNext = $termAttribute[0];
             } else {
-                GeneralUtility::devLog('loadFromOpac Scheduler Task: failed to load '.$URL, Utility::extKey, 3);
+                $logger->error(sprintf('loadFromOpac Scheduler Task: failed to load %s', $URL));
                 $success = false;
             }
         }
 
         if ($success) {
-            GeneralUtility::devLog('loadFromOpac Scheduler Task: hitcount download for index '.$indexName.' succeeded',
-                Utility::extKey, 1);
+            $logger->info(sprintf('loadFromOpac Scheduler Task: hitcount download for index %s succeeded.', $indexName));
         }
 
         return $success;

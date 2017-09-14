@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Subugoe\Nkwgok\Importer;
 
-use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Output\ConsoleOutput;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class CheckNewCsv implements ImporterInterface
@@ -23,8 +22,7 @@ class CheckNewCsv implements ImporterInterface
     */
     protected function needsUpdate()
     {
-        $output = GeneralUtility::makeInstance(ConsoleOutput::class);
-        $output->setFormatter(new OutputFormatter(true));
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
         $needsUpdate = false;
         $CSVFiles = glob(PATH_site.'fileadmin/gok/csv/*.csv');
@@ -32,12 +30,12 @@ class CheckNewCsv implements ImporterInterface
             $CSVPathInfo = pathinfo($CSVPath);
             $XMLPath = PATH_site.'fileadmin/gok/xml/'.$CSVPathInfo['filename'].'-0.xml';
             if (!file_exists($XMLPath)) {
-                $output->writeln('Need to convert CSV files because '.$XMLPath.' is missing.');
+                $logger->info(sprintf('Need to convert CSV files because %s is missing.', $XMLPath));
                 $needsUpdate = true;
                 break;
             } else {
                 if (filemtime($XMLPath) < filemtime($CSVPath)) {
-                    $output->writeln('Need to convert CSV files because '.$CSVPath.' is newer than the corresponding XML file.');
+                    $logger->info(sprintf('Need to convert CSV files because %s is newer than the corresponding XML file.', $CSVPath));
                     $needsUpdate = true;
                     break;
                 }

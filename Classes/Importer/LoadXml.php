@@ -6,6 +6,7 @@ namespace Subugoe\Nkwgok\Importer;
 
 use Subugoe\Nkwgok\Utility\Utility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LoadXml implements ImporterInterface
@@ -23,6 +24,8 @@ class LoadXml implements ImporterInterface
 
     public function run(): bool
     {
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
 
         // Remove records with statusID 1. These should not be around, but can
@@ -50,8 +53,7 @@ class LoadXml implements ImporterInterface
             ->where($queryBuilder->expr()->eq('statusID', 1))
             ->execute();
 
-        GeneralUtility::devLog('loadXML Scheduler Task: Import of subject hierarchy XML to TYPO3 database completed',
-            Utility::extKey, 1);
+        $logger->info('loadXML Scheduler Task: Import of subject hierarchy XML to TYPO3 database completed');
 
         return $result;
     }
@@ -69,6 +71,7 @@ class LoadXml implements ImporterInterface
         $XMLFolder = PATH_site.'fileadmin/gok/xml/';
         $fileList = $this->fileListAtPathForType($XMLFolder, $type);
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
         if (is_array($fileList) && count($fileList) > 0) {
             // Parse XML files to extract just the tree structure.
@@ -124,8 +127,7 @@ class LoadXml implements ImporterInterface
                                     // with three character strings that could be mistaken for index names.
                                     $search = $indexName.'="'.$notation.'"';
                                 } else {
-                                    GeneralUtility::devLog('loadXML Scheduler Task: Unknown record type »'.$recordType.'« in record PPN '.$PPN.'. Skipping.',
-                                        Utility::extKey, 3, $recordElement);
+                                    $logger->info(sprintf('loadXML Scheduler Task: Unknown record type »%s« in record PPN %s. Skipping.', $recordType, $PPN), ['name' => $recordElement->getName()]);
                                     continue;
                                 }
                             }
@@ -145,14 +147,13 @@ class LoadXml implements ImporterInterface
                             if (array_key_exists($nextParent, $subjectTree)) {
                                 $nextParent = $subjectTree[$nextParent]['parent'];
                             } else {
-                                GeneralUtility::devLog('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN '.$nextParent.' for record PPN '.$PPN.'. This needs to be fixed if he subject is meant to appear in a subject hierarchy.',
-                                    Utility::extKey, 3, $recordElement);
+                                $logger->error(sprintf('loadXML Scheduler Task: Could not determine hierarchy level: Unknown parent PPN %s for record PPN %s. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', $nextParent, $PPN),
+                                    ['element' => $recordElement->getName()]);
                                 $hierarchy = -1;
                                 break;
                             }
                             if ($hierarchy > self::NKWGOKMaxHierarchy) {
-                                GeneralUtility::devLog('loadXML Scheduler Task: Hierarchy level for PPN '.$PPN.' exceeds the maximum limit of '.self::NKWGOKMaxHierarchy.' levels. This needs to be fixed, the subject tree may contain an infinite loop.',
-                                    Utility::extKey, 3, $recordElement);
+                                $logger->error(sprintf('loadXML Scheduler Task: Hierarchy level for PPN %s exceeds the maximum limit of %s levels. This needs to be fixed, the subject tree may contain an infinite loop.', $PPN, self::NKWGOKMaxHierarchy), ['element' => $recordElement->getName()]);
                                 $hierarchy = -1;
                                 break;
                             }
@@ -283,8 +284,7 @@ class LoadXml implements ImporterInterface
 
             $result = true;
         } else {
-            GeneralUtility::devLog('loadXML Scheduler Task: Found no XML files for type '.$type.'.',
-                Utility::extKey, 3);
+            $logger->error(sprintf('loadXML Scheduler Task: Found no XML files for type %s', $type));
             $result = true;
         }
 
@@ -396,6 +396,7 @@ class LoadXml implements ImporterInterface
     {
         $hitCountFolder = PATH_site.'/fileadmin/gok/hitcounts/';
         $fileList = $this->fileListAtPathForType($hitCountFolder, 'all');
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
         $hitCounts = [];
         if (is_array($fileList)) {
@@ -424,15 +425,13 @@ class LoadXml implements ImporterInterface
                         }
                     }
                 } else {
-                    GeneralUtility::devLog('loadXML Scheduler Task: could not load/parse XML from '.$xmlPath,
-                        Utility::extKey, 3);
+                    $logger->error(sprintf('loadXML Scheduler Task: could not load/parse XML from %s', $xmlPath));
                 }
             }
         } // end foreach
 
         foreach ($hitCounts as $hitCountType => $array) {
-            GeneralUtility::devLog('loadXML Scheduler Task: Loaded '.count($array).' '.$hitCountType.' hit count entries.',
-                Utility::extKey, 1);
+            $logger->info(sprintf('loadXML Scheduler Task: Loaded %d %s hit count entries.', count($array, $hitCountType)));
         }
 
         return $hitCounts;

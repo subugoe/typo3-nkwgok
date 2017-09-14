@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Subugoe\Nkwgok\Importer;
 
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ConvertCsv implements ImporterInterface
@@ -70,6 +71,8 @@ class ConvertCsv implements ImporterInterface
      */
     private function downloadURLs($URLList)
     {
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+
         foreach ($URLList as $URL) {
             $URLPathComponents = explode('/', parse_url($URL, PHP_URL_PATH));
             $fileName = $URLPathComponents[count($URLPathComponents) - 1];
@@ -80,16 +83,13 @@ class ConvertCsv implements ImporterInterface
                 if ($localData != $remoteData) {
                     // Only overwrite local file if the file contents have changed.
                     if (file_put_contents($localPath, $remoteData) !== false) {
-                        GeneralUtility::devLog('convertCSV Scheduler Task: replaced file '.$localPath.'.',
-                            Utility::extKey, 1);
+                        $logger->info(sprintf('convertCSV Scheduler Task: replaced file %s.', $localPath));
                     } else {
-                        GeneralUtility::devLog('convertCSV Scheduler Task: failed to write downloaded file to '.$localPath.'.',
-                            Utility::extKey, 2, [$localData, $remoteData]);
+                        $logger->warning(sprintf('convertCSV Scheduler Task: failed to write downloaded file to %s.', $localPath), [$localData, $remoteData]);
                     }
                 }
             } else {
-                GeneralUtility::devLog('convertCSV Scheduler Task: failed to download '.$URL.'.', Utility::extKey,
-                    2);
+                $logger->warning(sprintf('convertCSV Scheduler Task: failed to download %s.', $URL));
             }
         }
     }
@@ -117,6 +117,7 @@ class ConvertCsv implements ImporterInterface
         $success = false;
         $doc = null;
         $startLine = 0;
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
         $CSVString = file_get_contents($CSVPath);
         // Handle UTF-8, ISO, and Windows files. We expect the latter as the CSV is written by Excel.
@@ -194,23 +195,19 @@ class ConvertCsv implements ImporterInterface
                     }
 
                     if ($this->PPNList[$PPN]) {
-                        GeneralUtility::devLog('convertCSV Scheduler Task: Duplicate PPN "'.$PPN.'" in file '.$CSVPath,
-                            Utility::extKey, 2);
+                        $logger->warning(sprintf('convertCSV Scheduler Task: Duplicate PPN "%s" in file %s', $PPN, $CSVPath));
                     }
                     if ($this->PPNList[$PPN]) {
-                        GeneralUtility::devLog('convertCSV Scheduler Task: Duplicate PPN "'.$PPN.'" in file '.$CSVPath,
-                            Utility::extKey, 2);
+                        $logger->warning(sprintf('convertCSV Scheduler Task: Duplicate PPN "%s" in file %s', $PPN, $CSVPath));
                     }
 
                     // Add current PPN to PPN list.
                     $this->PPNList[$PPN] = true;
                 } else {
-                    GeneralUtility::devLog('convertCSV Scheduler Task: Blank PPN  in line: "'.implode(';',
-                            $fields).'" of file '.$CSVPath, Utility::extKey, 2);
+                    $logger->warning(sprintf('convertCSV Scheduler Task: Blank PPN  in line: "%s" of file %s', implode(';', $fields), $CSVPath));
                 }
             } elseif (count($fields) > 1 && trim(implode('', $fields)) !== '') {
-                GeneralUtility::devLog('convertCSV Scheduler Task: Line "'.implode(';',
-                        $fields).'" of file '.$CSVPath.' contains less than 3 fields.', Utility::extKey, 2);
+                $logger->warning(sprintf('convertCSV Scheduler Task: Line "%s" of file %s contains less than 3 fields.', implode(';', $fields), $CSVPath));
             }
 
             // Write document to XML file every 500 lines or after the last line in the file.
@@ -222,8 +219,7 @@ class ConvertCsv implements ImporterInterface
                 $resultPath = PATH_site.'fileadmin/gok/xml/'.$XMLFileName;
 
                 if ($doc->save($resultPath) === false) {
-                    GeneralUtility::devLog('convertCSV Scheduler Task: Failed to write XML file'.$resultPath,
-                        Utility::extKey, 3);
+                    $logger->error(sprintf('convertCSV Scheduler Task: Failed to write XML file %s', $resultPath));
                     break;
                 } else {
                     $success = true;
@@ -250,7 +246,7 @@ class ConvertCsv implements ImporterInterface
     private function appendFieldForDataTo($fieldName, $subfieldName, $content, $container, $doc)
     {
         $datafield = null;
-
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
         if ($fieldName !== null && $subfieldName !== null
             && $content !== null && $container !== null && $doc !== null
         ) {
@@ -264,8 +260,7 @@ class ConvertCsv implements ImporterInterface
 
             $subfield->appendChild($doc->createTextNode($content));
         } else {
-            GeneralUtility::devLog('convertCSV Scheduler Task: Some parameter was Null in appendFieldForDataTo',
-                Utility::extKey, 3);
+            $logger->error('convertCSV Scheduler Task: Some parameter was Null in appendFieldForDataTo');
         }
 
         return $datafield;
