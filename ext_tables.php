@@ -28,23 +28,6 @@ if (!defined('TYPO3_MODE')) {
 // Add TypoScript to Configuration
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($_EXTKEY, 'Configuration/TypoScript/', 'GOK');
 
-$TCA['tx_nkwgok_data'] = [
-    'ctrl' => [
-        'title' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data',
-        'label' => 'notation',
-        'label_alt' => 'descr',
-        'label_alt_force' => 1,
-        'tstamp' => 'tstamp',
-        'crdate' => 'crdate',
-        'cruser_id' => 'cruser_id',
-        'default_sortby' => 'ORDER BY crdate',
-        'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY).'Configuration/TCA/Data.php',
-        'iconfile' => \TYPO3\CMS\Core\Utility\PathUtility::getAbsoluteWebPath($_EXTKEY).'Resources/Public/Images/ext_icon.gif',
-        'searchFields' => 'descr, descr_en, notation',
-    ],
-];
-$TCA['tt_content']['types']['list']['subtypes_excludelist'][$_EXTKEY.'_pi1'] = 'layout,select_key,pages';
-$TCA['tt_content']['types']['list']['subtypes_addlist'][$_EXTKEY.'_pi1'] = 'pi_flexform';
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue($_EXTKEY.'_pi1', 'FILE:EXT:nkwgok/Resources/Private/Flexform/flexform.xml');
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(

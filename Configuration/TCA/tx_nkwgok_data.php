@@ -24,16 +24,45 @@
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
-$TCA['tx_nkwgok_data'] = [
-    'ctrl' => $TCA['tx_nkwgok_data']['ctrl'],
+
+$nkwgok_data = [
+    'ctrl' => [
+        'title' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data',
+        'label' => 'notation',
+        'label_alt' => 'descr',
+        'label_alt_force' => 1,
+        'tstamp' => 'tstamp',
+        'crdate' => 'crdate',
+        'cruser_id' => 'cruser_id',
+        'default_sortby' => 'ORDER BY crdate',
+        'iconfile' => \TYPO3\CMS\Core\Utility\PathUtility::getAbsoluteWebPath($_EXTKEY).'Resources/Public/Images/ext_icon.gif',
+        'searchFields' => 'descr, descr_en, notation',
+    ],
     'interface' => [
         'showRecordFieldList' => 'notation,search,ppn,descr,descr_en,parent,hierarchy,hitcount,tags',
     ],
-    'feInterface' => $TCA['tx_nkwgok_data']['feInterface'],
     'columns' => [
+        'crdate' => [
+            'label' => 'crdate',
+            'config' => [
+                'type' => 'passthrough',
+            ],
+        ],
+        'tstamp' => [
+            'label' => 'tstamp',
+            'config' => [
+                'type' => 'passthrough',
+            ],
+        ],
+        'statusID' => [
+            'label' => 'tstamp',
+            'config' => [
+                'type' => 'passthrough',
+            ],
+        ],
         'ppn' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.ppn',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.ppn',
             'config' => [
                 'type' => 'input',
                 'size' => '30',
@@ -42,7 +71,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'notation' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.notation',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.notation',
             'config' => [
                 'type' => 'input',
                 'size' => '30',
@@ -51,7 +80,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'search' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.search',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.search',
             'config' => [
                 'type' => 'input',
                 'size' => '30',
@@ -60,7 +89,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'descr' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.descr',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.descr',
             'config' => [
                 'type' => 'text',
                 'cols' => '30',
@@ -69,7 +98,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'descr_en' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.descr_en',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.descr_en',
             'config' => [
                 'type' => 'text',
                 'cols' => '30',
@@ -78,7 +107,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'descr_alternate' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.descr_alternate',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.descr_alternate',
             'config' => [
                 'type' => 'text',
                 'cols' => '30',
@@ -87,7 +116,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'descr_alternate_en' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.descr_alternate_en',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.descr_alternate_en',
             'config' => [
                 'type' => 'text',
                 'cols' => '30',
@@ -96,7 +125,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'parent' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.parent',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.parent',
             'config' => [
                 'type' => 'input',
                 'size' => '30',
@@ -105,7 +134,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'hierarchy' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.hierarchy',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.hierarchy',
             'config' => [
                 'type' => 'input',
                 'size' => '10',
@@ -121,7 +150,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'childcount' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.childcount',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.childcount',
             'config' => [
                 'type' => 'input',
                 'size' => '10',
@@ -137,7 +166,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'hitcount' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.hitcount',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.hitcount',
             'config' => [
                 'type' => 'input',
                 'size' => '10',
@@ -153,7 +182,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'totalhitcount' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.totalhitcount',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.totalhitcount',
             'config' => [
                 'type' => 'input',
                 'size' => '10',
@@ -169,7 +198,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'tags' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.tags',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.tags',
             'config' => [
                 'type' => 'text',
                 'cols' => '30',
@@ -178,7 +207,7 @@ $TCA['tx_nkwgok_data'] = [
         ],
         'type' => [
             'exclude' => 0,
-            'label' => 'LLL:EXT:nkwgok/locallang_db.xml:tx_nkwgok_data.type',
+            'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.type',
             'config' => [
                 'type' => 'input',
                 'size' => '30',
@@ -193,3 +222,5 @@ $TCA['tx_nkwgok_data'] = [
         '1' => ['showitem' => ''],
     ],
 ];
+
+return $nkwgok_data;
