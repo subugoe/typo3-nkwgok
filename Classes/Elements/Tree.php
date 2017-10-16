@@ -112,7 +112,7 @@ class Tree extends Element
             $topElement = $this->appendGOKTreeItem($topItemContainer, $topElementType, $GOK, [], 1, ($resultCount > 1));
             $topElement->setAttribute('class', 'rootNode');
 
-            if ($resultCount === 1) {
+            if (1 === $resultCount) {
                 // There is a single element: display expanded tree without controls at top level.
                 $this->appendGOKTreeChildren($GOK['ppn'], $container, [], 1);
             }
@@ -156,7 +156,7 @@ class Tree extends Element
         }";
 
         $HTMLInsertionTarget = 'jContainerLI';
-        if ($this->arguments['style'] === 'column') {
+        if ('column' === $this->arguments['style']) {
             $HTMLInsertionTarget = 'jQuery("#tx_nkwgok-'.$this->objectID.'")';
         }
 
@@ -166,7 +166,7 @@ class Tree extends Element
             selectGOK".$this->objectID."(id);
             jContainerLI.removeClass('open').addClass('close');
             var link = jQuery('#openCloseLink-".$this->objectID."-' + id);";
-        if ($this->arguments['style'] === 'column') {
+        if ('column' === $this->arguments['style']) {
             $js .= "
             jContainerLI.parent().nextAll('ul').remove();";
         }
@@ -202,7 +202,7 @@ class Tree extends Element
             link[0].onclick = new Function(functionText);
         }";
 
-        if ($this->arguments['style'] === 'column') {
+        if ('column' === $this->arguments['style']) {
             $js .= '
         function unselectSiblings'.$this->objectID." (jElement) {
             jElement.siblings('.close').each( function() {
@@ -264,7 +264,7 @@ class Tree extends Element
                  * 1. it has no child elements and
                  * 2. it is known to have no matching hits
                  */
-                if ($GOK['hitcount'] != 0 || $GOK['childcount'] != 0) {
+                if (0 != $GOK['hitcount'] || 0 != $GOK['childcount']) {
                     $this->appendGOKTreeItem($ul, 'li', $GOK, $expandMarker, $autoExpandLevel);
                 }
             } // end foreach ($GOKs as $GOK)
@@ -311,7 +311,7 @@ class Tree extends Element
         $control = $this->doc->createElement('span');
         $openLink->appendChild($control);
         $openLinkClass = 'plusMinus';
-        if ($isInteractive !== true) {
+        if (true !== $isInteractive) {
             $openLinkClass .= ' nkwgok-invisible';
         }
         $control->setAttribute('class', $openLinkClass);
@@ -330,19 +330,19 @@ class Tree extends Element
         $openLink->appendChild($GOKNameSpan);
 
         // Add OPAC links when not in column mode.
-        if ($this->arguments['style'] !== 'column') {
+        if ('column' !== $this->arguments['style']) {
             $this->appendOpacLinksTo($GOK, $item);
         }
         // Careful: These are three non-breaking spaces to get better alignment.
         $buttonText = '   ';
         $JSCommand = '';
         $itemClass = 'nochildren';
-        if ($isInteractive === true) {
+        if (true === $isInteractive) {
             // Set up addition to title, if it exists.
             $titleAddition = '';
-            if ($this->language === 'en' && $GOK['descr_alternate_en'] !== '') {
+            if ('en' === $this->language && '' !== $GOK['descr_alternate_en']) {
                 $titleAddition = $GOK['descr_alternate_en'];
-            } elseif ($GOK['descr_alternate'] !== '') {
+            } elseif ('' !== $GOK['descr_alternate']) {
                 $titleAddition = $GOK['descr_alternate'];
             }
 
@@ -352,7 +352,7 @@ class Tree extends Element
                 $urlComponents = parse_url(GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
                 $baseURL = $urlComponents['scheme'].'://'.$urlComponents['host'].$urlComponents['path'];
                 $queryComponents = [];
-                parse_str($urlComponents['query'], $queryComponents);
+                parse_str((string) $urlComponents['query'], $queryComponents);
                 $queryComponents['no_cache'] = 1;
 
                 if ((array_key_exists('expand', $this->arguments)
@@ -373,7 +373,7 @@ class Tree extends Element
                     // Add it into the current item for the default tree style.
                     // Add it as a sibling to our parent node in column style.
                     $childListContainer = $item;
-                    if ($this->arguments['style'] === 'column') {
+                    if ('column' === $this->arguments['style']) {
                         $childListContainer = $container->parentNode;
                     }
                     $this->appendGOKTreeChildren($PPN, $childListContainer, $expand, $autoExpandLevel);
@@ -390,20 +390,20 @@ class Tree extends Element
                 $openLink->setAttribute('rel', 'nofollow');
 
                 // Add extra note to title if it exists.
-                if ($titleAddition !== '') {
+                if ('' !== $titleAddition) {
                     $mainTitle .= ': '.$titleAddition;
                     $alternativeTitle .= ': '.$titleAddition;
                 }
                 // Set up title attribute and its alternate.
                 $openLink->setAttribute('title', $mainTitle);
                 $openLink->setAttribute('alttitle', $alternativeTitle);
-            } elseif ($this->arguments['style'] === 'column') {
+            } elseif ('column' === $this->arguments['style']) {
                 // Column style: set up the JavaScript command.
                 $openLink->setAttribute('href', '#');
                 $JSCommand = 'selectGOK'.$this->objectID;
             } else {
                 // Tree style: add tooltip to the surrounding anchor tag if an alternative title exists.
-                if ($titleAddition !== '') {
+                if ('' !== $titleAddition) {
                     $openLink->setAttribute('title', $titleAddition);
                 }
             }
@@ -413,7 +413,7 @@ class Tree extends Element
             $openLink->setAttribute('onclick', $JSCommand.'("'.$PPN.'");return false;');
         }
 
-        if ($extraClass !== null) {
+        if (null !== $extraClass) {
             $itemClass .= ' '.$extraClass;
         }
         $item->setAttribute('class', $itemClass);
@@ -459,14 +459,14 @@ class Tree extends Element
         $opacLink = null;
         $hitCount = $GOKData['hitcount'];
         $useDeepSearch = $deepSearch && ($GOKData['totalhitcount'] > 0);
-        if ($useDeepSearch === true) {
+        if (true === $useDeepSearch) {
             $hitCount = $GOKData['totalhitcount'];
         }
         $URL = $this->opacGOKSearchURL($GOKData, $deepSearch);
-        if ($hitCount != 0 && $URL) {
+        if (0 != $hitCount && $URL) {
             $opacLink = $this->doc->createElement('a');
             $opacLink->setAttribute('href', $URL);
-            if ($useDeepSearch === true && $GOKData['childcount'] != 0) {
+            if (true === $useDeepSearch && 0 != $GOKData['childcount']) {
                 $titleString = $this->localise('Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen');
             } else {
                 $titleString = $this->localise('Bücher zu genau diesem Thema im Opac anzeigen');
@@ -484,7 +484,7 @@ class Tree extends Element
                 $opacLink->appendChild($this->doc->createTextNode($this->localise('Treffer anzeigen')));
             }
 
-            $linkClass = 'opacLink '.(($deepSearch === true) ? 'deep' : 'shallow');
+            $linkClass = 'opacLink '.((true === $deepSearch) ? 'deep' : 'shallow');
             $opacLink->setAttribute('class', $linkClass);
         }
 
@@ -508,11 +508,11 @@ class Tree extends Element
         $GOKSearchURL = null;
 
         $conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][Utility::extKey]);
-        $picaLanguageCode = ($this->language === 'en') ? 'EN' : 'DU';
+        $picaLanguageCode = ('en' === $this->language) ? 'EN' : 'DU';
         $GOKSearchURL = $conf['opacBaseURL'].'LNG='.$picaLanguageCode;
 
-        if ($deepSearch === true
-            && ($GOKData['type'] === Utility::recordTypeGOK || $GOKData['type'] === Utility::recordTypeBRK)
+        if (true === $deepSearch
+            && (Utility::recordTypeGOK === $GOKData['type'] || Utility::recordTypeBRK === $GOKData['type'])
         ) {
             // Use special command to do the hierarchical search for records related
             // to the Normsatz PPN.

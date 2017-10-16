@@ -33,7 +33,7 @@ class Utility
     {
         $type = $indexName;
 
-        if ($indexName === 'lkl') {
+        if ('lkl' === $indexName) {
             $type = self::recordTypeGOK;
         }
 
@@ -53,7 +53,7 @@ class Utility
     {
         $indexName = $type;
 
-        if ($type === self::recordTypeGOK) {
+        if (self::recordTypeGOK === $type) {
             $indexName = 'lkl';
         }
 

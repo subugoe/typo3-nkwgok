@@ -203,7 +203,7 @@ class Menu extends Element
     {
         $GOKs = $this->getChildren($parentPPN);
         if (sizeof($GOKs) > 0) {
-            if ((sizeof($GOKs) <= $autoExpandLevel) && ($level != 0) && $autoExpandStep == 0) {
+            if ((sizeof($GOKs) <= $autoExpandLevel) && (0 != $level) && 0 == $autoExpandStep) {
                 // We are auto-expanded, so throw away the elements, as they are already present in the previous menu
                 $GOKs = [];
             }
@@ -212,7 +212,7 @@ class Menu extends Element
             // Element which should be passed to us as $container.
             $select = $container;
 
-            if ($autoExpandStep == 0) {
+            if (0 == $autoExpandStep) {
                 // Create the containing <select> when we’re not auto-expanding.
                 $select = $this->doc->createElement('select');
                 $container->appendChild($select);
@@ -224,7 +224,7 @@ class Menu extends Element
                 $select->setAttribute('level', $level);
 
                 // add dummy item at the beginning of the menu
-                if ($level == 0) {
+                if (0 == $level) {
                     $option = $this->doc->createElement('option');
                     $select->appendChild($option);
                     $option->appendChild($this->doc->createTextNode($this->localise('Bitte Fachgebiet auswählen:')));
@@ -277,7 +277,7 @@ class Menu extends Element
                     $this->appendGOKMenuChildren($PPN, $select, $autoExpandLevel, $level, $autoExpandStep + 1);
                 }
 
-                if ($PPN === $this->arguments['expand'][$level]) {
+                if ($this->arguments['expand'][$level] === $PPN) {
                     // this item should be selected and the next menu should be added
                     $option->setAttribute('selected', 'selected');
                     $this->appendGOKMenuChildren($PPN, $container, $autoExpandLevel, $level + 1);

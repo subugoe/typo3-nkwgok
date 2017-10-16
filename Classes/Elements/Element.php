@@ -105,7 +105,7 @@ abstract class Element
     {
         $subclass = null;
 
-        if ($arguments['style'] === 'menu') {
+        if ('menu' === $arguments['style']) {
             $subclass = GeneralUtility::makeInstance(Menu::class);
         } else {
             // Default to displaying the tree. Expected for styles 'tree' and 'column'.
@@ -121,7 +121,7 @@ abstract class Element
             $subclass->arguments = $arguments;
             $domImplementation = new \DOMImplementation();
             $subclass->doc = $domImplementation->createDocument();
-            $subclass->objectID = $arguments['objectID'];
+            $subclass->objectID = (string) $arguments['objectID'];
             $subclass->language = $arguments['language'];
         }
 
@@ -194,7 +194,7 @@ abstract class Element
     {
         $displayName = $gokRecord['descr'];
 
-        if ($this->language == 'en') {
+        if ('en' == $this->language) {
             $englishName = $gokRecord['descr_en'];
 
             if ($englishName) {

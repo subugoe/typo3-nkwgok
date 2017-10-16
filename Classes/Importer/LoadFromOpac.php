@@ -39,7 +39,7 @@ class LoadFromOpac implements ImporterInterface
 
         $opacBRKURL = $opacBaseURL.'CMD?ACT=SRCHA/IKT=8600/TRM=tov/REC=2/PRS=XML/NORND=1';
 
-        if ($success === true) {
+        if (true === $success) {
             $success = $this->downloadAuthorityDataFromOpacToFolder($opacBRKURL, $XMLDir, Utility::recordTypeBRK);
         } else {
             return false;
@@ -55,20 +55,20 @@ class LoadFromOpac implements ImporterInterface
 
         $opacHitCountURL = $opacBaseURL.'CMD?ACT=BRWS&SCNST='.self::NKWGOKImportChunkSize;
 
-        if ($success === true) {
+        if (true === $success) {
             $success = $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
                 Utility::typeToIndexName(Utility::recordTypeGOK), $hitCountDir);
         } else {
             return false;
         }
 
-        if ($success === true) {
+        if (true === $success) {
             $success = $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
                 Utility::typeToIndexName(Utility::recordTypeBRK), $hitCountDir);
         } else {
             return false;
         }
-        if ($success === true) {
+        if (true === $success) {
             $success = $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
                 Utility::typeToIndexName(Utility::recordTypeMSC), $hitCountDir);
         } else {
@@ -145,14 +145,14 @@ class LoadFromOpac implements ImporterInterface
         /* Begin scanning the index at 0, except for LKL (which only start at a and have a lot of
             junk entries starting with digits. */
         $scanNext = '0';
-        if ($indexName === 'lkl') {
+        if ('lkl' === $indexName) {
             $scanNext = 'a';
-        } elseif ($indexName === 'brk') {
+        } elseif ('brk' === $indexName) {
             $scanNext = '01';
         }
         $index = 0;
 
-        while ($scanNext !== null && $success) {
+        while (null !== $scanNext && $success) {
             ++$index;
             $URL = $opacScanURL.'/TRM='.$indexName.'+%22'.$scanNext.'%22';
             $opacDownload = file_get_contents($URL);

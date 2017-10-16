@@ -41,13 +41,13 @@ class LoadXml implements ImporterInterface
         // be quite large and we are less likely to run into memory limits this way.
         $result = $this->loadXMLForType(Utility::recordTypeCSV);
 
-        if ($result === true) {
+        if (true === $result) {
             $result = $this->loadXMLForType(Utility::recordTypeGOK);
         } else {
             return false;
         }
 
-        if ($result === true) {
+        if (true === $result) {
             $result = $this->loadXMLForType(Utility::recordTypeBRK);
         } else {
             return false;
@@ -113,9 +113,9 @@ class LoadXml implements ImporterInterface
                     $mscs = $recordElement->xpath('datafield[@tag="044H" and subfield[@code="2"]="msc"]/subfield[@code="a"]');
                     $csvSearches = $recordElement->xpath('datafield[@tag="str"]/subfield[@code="a"]');
 
-                    if ($PPN !== '' && array_key_exists($PPN, $subjectTree)) {
+                    if ('' !== $PPN && array_key_exists($PPN, $subjectTree)) {
                         $search = '';
-                        if ($recordType === Utility::recordTypeCSV) {
+                        if (Utility::recordTypeCSV === $recordType) {
                             // Subject coming from CSV file with a CCL search query in the 'str/a' field.
                             if (count($csvSearches) > 0) {
                                 $csvSearch = trim($csvSearches[0]);
@@ -128,8 +128,8 @@ class LoadXml implements ImporterInterface
                                 $msc = trim($mscs[0]);
                                 $search = 'msc="'.$msc.'"';
                             } elseif (count($notations) > 0) {
-                                if ($recordType === Utility::recordTypeGOK
-                                    || $recordType === Utility::recordTypeBRK
+                                if (Utility::recordTypeGOK === $recordType
+                                    || Utility::recordTypeBRK === $recordType
                                 ) {
                                     // GOK or BRK OPAC search, using the corresponding index.
                                     $indexName = Utility::typeToIndexName($recordType);
@@ -152,7 +152,7 @@ class LoadXml implements ImporterInterface
                         // Cut off at 32 to prevent an infinite loop.
                         $hierarchy = 0;
                         $nextParent = $parentID;
-                        while ($nextParent !== null && $nextParent !== Utility::rootNode) {
+                        while (null !== $nextParent && Utility::rootNode !== $nextParent) {
                             ++$hierarchy;
                             if (array_key_exists($nextParent, $subjectTree)) {
                                 $nextParent = $subjectTree[$nextParent]['parent'];
@@ -217,12 +217,12 @@ class LoadXml implements ImporterInterface
                             ) {
                                 $hitCount = $this->hitCounts[Utility::recordTypeMSC][$msc];
                             }
-                        } elseif (($recordType === Utility::recordTypeGOK
-                                || $recordType === Utility::recordTypeBRK)
+                        } elseif ((Utility::recordTypeGOK === $recordType
+                                || Utility::recordTypeBRK === $recordType)
                             && array_key_exists(strtolower($notation), $this->hitCounts[$recordType])
                         ) {
                             $hitCount = $this->hitCounts[$recordType][strtolower($notation)];
-                        } elseif ($recordType === Utility::recordTypeCSV && count($csvSearches) > 0) {
+                        } elseif (Utility::recordTypeCSV === $recordType && count($csvSearches) > 0) {
                             // Try to detect simple GOK and MSC queries from CSV files so hit counts can be displayed for them.
                             $csvSearch = trim($csvSearches[0]);
 
@@ -361,7 +361,7 @@ class LoadXml implements ImporterInterface
                     $tree[$PPN]['parent'] = $parentPPN;
                 }
 
-                if ($recordType === Utility::recordTypeGOK || $recordType === Utility::recordTypeBRK) {
+                if (Utility::recordTypeGOK === $recordType || Utility::recordTypeBRK === $recordType) {
                     // Store notation information.
                     $notationStrings = $record->xpath('datafield[@tag="045A"]/subfield[@code="a"]');
                     if (count($notationStrings) > 0) {
@@ -371,10 +371,10 @@ class LoadXml implements ImporterInterface
                     }
                 } else {
                     $queries = $record->xpath('datafield[@tag="str"]/subfield[@code="a"]');
-                    if (count($queries) === 1) {
+                    if (1 === count($queries)) {
                         $query = (string) ($queries[0]);
                         $foundQueries = null;
-                        if (preg_match('/^msc=([^ ]*)$/', $query, $foundQueries) && count($foundQueries) === 2) {
+                        if (preg_match('/^msc=([^ ]*)$/', $query, $foundQueries) && 2 === count($foundQueries)) {
                             $msc = $foundQueries[1];
                             $tree[$PPN][Utility::recordTypeMSC] = $msc;
                             $tree[$PPN]['type'] = Utility::recordTypeMSC;
@@ -421,15 +421,15 @@ class LoadXml implements ImporterInterface
                         $description = null;
                         $hitCountType = null;
                         foreach ($scanline->attributes() as $name => $value) {
-                            if ($name === 'hits') {
+                            if ('hits' === $name) {
                                 $hits = (int) $value;
-                            } elseif ($name === 'description') {
+                            } elseif ('description' === $name) {
                                 $description = (string) $value;
-                            } elseif ($name === 'mnemonic') {
+                            } elseif ('mnemonic' === $name) {
                                 $hitCountType = Utility::indexNameToType(strtolower((string) $value));
                             }
                         }
-                        if ($hits !== null && $description !== null && $hitCountType !== null) {
+                        if (null !== $hits && null !== $description && null !== $hitCountType) {
                             if (!array_key_exists($hitCountType, $hitCounts)) {
                                 $hitCounts[$hitCountType] = [];
                             }
@@ -468,7 +468,7 @@ class LoadXml implements ImporterInterface
             $type = $record['type'];
             $notation = strtolower($record[$type]);
             if (array_key_exists(Utility::recordTypeMSC, $record)
-                && $type !== Utility::recordTypeBRK
+                && Utility::recordTypeBRK !== $type
             ) {
                 $type = Utility::recordTypeMSC;
                 $notation = strtolower($record[Utility::recordTypeMSC]);
@@ -519,9 +519,9 @@ class LoadXml implements ImporterInterface
      */
     private function fileListAtPathForType($basePath, $type)
     {
-        if ($type === 'all') {
+        if ('all' === $type) {
             $fileList = glob($basePath.'*.xml');
-        } elseif ($type === Utility::recordTypeGOK || $type === Utility::recordTypeBRK) {
+        } elseif (Utility::recordTypeGOK === $type || Utility::recordTypeBRK === $type) {
             $fileList = glob($basePath.$type.'-*.xml');
         } else {
             $fileList = glob($basePath.'*.xml');
@@ -551,16 +551,16 @@ class LoadXml implements ImporterInterface
         $recordType = Utility::recordTypeUnknown;
         $recordTypes = $record->xpath('datafield[@tag="002@"]/subfield[@code="0"]');
 
-        if ($recordTypes && count($recordTypes) === 1) {
+        if ($recordTypes && 1 === count($recordTypes)) {
             $recordTypeCode = (string) $recordTypes[0];
 
-            if ($recordTypeCode === 'Tev') {
+            if ('Tev' === $recordTypeCode) {
                 $recordType = Utility::recordTypeGOK;
-            } elseif ($recordTypeCode === 'Tov') {
+            } elseif ('Tov' === $recordTypeCode) {
                 $recordType = Utility::recordTypeBRK;
-            } elseif ($recordTypeCode === 'csv') {
+            } elseif ('csv' === $recordTypeCode) {
                 $queryElements = $record->xpath('datafield[@tag="str"]/subfield[@code="a"]');
-                if ($queryElements && count($queryElements) === 1
+                if ($queryElements && 1 === count($queryElements)
                     && preg_match('/^msc=[0-9A-Zx-]*/', (string) ($queryElements[0] > 0))
                 ) {
                     // Special case: an MSC record.
@@ -572,7 +572,7 @@ class LoadXml implements ImporterInterface
             }
         }
 
-        if ($recordType === Utility::recordTypeUnknown) {
+        if (Utility::recordTypeUnknown === $recordType) {
             GeneralUtility::devLog('Record of unknown type.', Utility::extKey, 1,
                 [$record->saveXML()]);
         }

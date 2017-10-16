@@ -54,7 +54,7 @@ class ConvertCsv implements ImporterInterface
             $URLStrings = explode(' ', trim($URLsString));
             foreach ($URLStrings as $URL) {
                 $URL = trim($URL);
-                if ($URL !== '') {
+                if ('' !== $URL) {
                     $downloadURLs[] = $URL;
                 }
             }
@@ -77,12 +77,12 @@ class ConvertCsv implements ImporterInterface
             $URLPathComponents = explode('/', parse_url($URL, PHP_URL_PATH));
             $fileName = $URLPathComponents[count($URLPathComponents) - 1];
             $remoteData = file_get_contents($URL);
-            if ($remoteData !== false) {
+            if (false !== $remoteData) {
                 $localPath = PATH_site.'fileadmin/gok/csv/'.$fileName;
                 $localData = file_get_contents($localPath);
                 if ($localData != $remoteData) {
                     // Only overwrite local file if the file contents have changed.
-                    if (file_put_contents($localPath, $remoteData) !== false) {
+                    if (false !== file_put_contents($localPath, $remoteData)) {
                         $logger->info(sprintf('Replaced file %s.', $localPath));
                     } else {
                         $logger->warning(sprintf('Failed to write downloaded file to %s.', $localPath), [$localData, $remoteData]);
@@ -122,7 +122,7 @@ class ConvertCsv implements ImporterInterface
         $CSVString = file_get_contents($CSVPath);
         // Handle UTF-8, ISO, and Windows files. We expect the latter as the CSV is written by Excel.
         $stringEncoding = mb_detect_encoding($CSVString, ['UTF-8', 'ISO-8859-1', 'windows-1252']);
-        if ($stringEncoding != 'UTF-8') {
+        if ('UTF-8' != $stringEncoding) {
             $CSVString = mb_convert_encoding($CSVString, 'UTF-8', $stringEncoding);
         }
         $CSVString = str_replace("\r\n", "\n", $CSVString);
@@ -130,7 +130,7 @@ class ConvertCsv implements ImporterInterface
         $CSVLines = explode("\n", $CSVString);
         foreach ($CSVLines as $lineNumber => $line) {
             // Set up document.
-            if ($doc === null) {
+            if (null === $doc) {
                 $domImplementation = new \DOMImplementation();
                 $doc = $domImplementation->createDocument();
                 $result = $doc->createElement('RESULT');
@@ -143,12 +143,12 @@ class ConvertCsv implements ImporterInterface
             $fields = str_getcsv($line, ';', '"');
 
             // Use data from CSV to build Pica-style data fields in XML.
-            if (count($fields) >= 3 && trim(implode('', $fields)) !== '') {
+            if (count($fields) >= 3 && '' !== trim(implode('', $fields))) {
                 // subject name is in field 5, so ignore lines with fewer fields
                 // as well as those with only empty fields.
                 $PPN = trim($fields[0]);
 
-                if ($PPN != '') {
+                if ('' != $PPN) {
                     // The record is required to have a non-empty PPN.
                     $shorttitle = $doc->createElement('SHORTTITLE');
                     $set->appendChild($shorttitle);
@@ -160,7 +160,7 @@ class ConvertCsv implements ImporterInterface
                     $this->appendFieldForDataTo('003@', '0', $PPN, $record, $doc);
                     // 045A contains the subject notation in $a and subject name in $j.
                     $d045A = $this->appendFieldForDataTo('045A', 'a', $PPN, $record, $doc);
-                    if (trim($fields[2]) !== null) {
+                    if (null !== trim($fields[2])) {
                         $subfieldJ = $doc->createElement('subfield');
                         $subfieldJ->setAttribute('code', 'j');
                         $subfieldJ->appendChild($doc->createTextNode(trim($fields[2])));
@@ -206,19 +206,19 @@ class ConvertCsv implements ImporterInterface
                 } else {
                     $logger->warning(sprintf('Blank PPN  in line: "%s" of file %s', implode(';', $fields), $CSVPath));
                 }
-            } elseif (count($fields) > 1 && trim(implode('', $fields)) !== '') {
+            } elseif (count($fields) > 1 && '' !== trim(implode('', $fields))) {
                 $logger->warning(sprintf('Line "%s" of file %s contains less than 3 fields.', implode(';', $fields), $CSVPath));
             }
 
             // Write document to XML file every 500 lines or after the last line in the file.
-            if (($lineNumber + 1) % 500 === 0 || $lineNumber + 1 === count($CSVLines)) {
+            if (0 === ($lineNumber + 1) % 500 || $lineNumber + 1 === count($CSVLines)) {
                 $csvPathParts = explode('/', $CSVPath);
                 $originalFileName = $csvPathParts[count($csvPathParts) - 1];
                 $originalFileNameParts = explode('.', $originalFileName);
                 $XMLFileName = $originalFileNameParts[0].'-'.$startLine.'.xml';
                 $resultPath = PATH_site.'fileadmin/gok/xml/'.$XMLFileName;
 
-                if ($doc->save($resultPath) === false) {
+                if (false === $doc->save($resultPath)) {
                     $logger->error(sprintf('Failed to write XML file %s', $resultPath));
                     break;
                 } else {
@@ -247,8 +247,8 @@ class ConvertCsv implements ImporterInterface
     {
         $datafield = null;
         $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
-        if ($fieldName !== null && $subfieldName !== null
-            && $content !== null && $container !== null && $doc !== null
+        if (null !== $fieldName && null !== $subfieldName
+            && null !== $content && null !== $container && null !== $doc
         ) {
             $datafield = $doc->createElement('datafield');
             $datafield->setAttribute('tag', $fieldName);
