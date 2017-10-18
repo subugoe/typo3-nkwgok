@@ -177,7 +177,7 @@ class Tree extends Element
             var functionText = 'hideGOK".$this->objectID."(\"' + id + '\");return false;';
             link[0].onclick = new Function(functionText);
             jQuery.get("
-            ."'".GeneralUtility::getIndpEnv('TYPO3_SITE_URL')."',
+            ."'/',
                 {'eID': '".Utility::extKey."', "
             ."'tx_".Utility::extKey."[language]': '".$this->language."', "
             ."'tx_".Utility::extKey."[expand][0]': id, "
