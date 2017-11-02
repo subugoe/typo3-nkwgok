@@ -10,8 +10,7 @@ Die Hierarchien können als Baum, Spalten oder Menüs dargestellt werden.
 Es gibt Scheduler Tasks, um die benötigten Daten automatisch neu zu
 importieren.
 
-Grundeinstellungen im Extension Manager
----------------------------------------
+## Grundeinstellungen im Extension Manager
 
 Im TYPO3 Extension-Manager gibt es zwei Grundeinstellungen für die
 Extension:
@@ -27,8 +26,7 @@ Extension:
     Die einzelnen zu ladenden Dateien müssen unterschiedliche Namen
     haben. \[Standardwer: leer\]
 
-Einstellungen für das Content Element
--------------------------------------
+## Einstellungen für das Content Element
 
 Jedes Content-Element mit dem Plug-In hat drei
 Einstellungsmöglichkeiten:
@@ -61,8 +59,7 @@ Weitere Einstellungsmöglichkeiten mit TypoScript `plugin.tx_nkwgok_pi1.`
     höchstens so viele Kindelemente, werden diese Kindelemente direkt im
     Menü der übergeordneten Ebene angezeigt.
 
-Datenimport im Scheduler
-------------------------
+## Datenimport im Scheduler
 
 Die Extension kann aus zwei Quellen Fachhierarchien importieren:
 
@@ -192,3 +189,10 @@ fileadmin/gok/xml/\*.xml.
 Die Dauer dieses Imports hängt von der Anzahl der Datensätze, der
 Rechnergeschwindigkeit und der Datenbankanbindung ab. 5-10 Minuten sind
 nicht ungewöhnlich.
+
+## Development
+
+This extension provides a hook for manipulation the tree JavaScript.
+`$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['nkwgok']['gokTreeJavaScript']` has to be used,
+i.e. ```$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['nkwgok']['gokTreeJavaScript'][] = 'Subugoe\\TmplFidmath\\Hooks\\Gok->javascript';```
+in your `ext_localconf.php`

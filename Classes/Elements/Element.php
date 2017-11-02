@@ -52,7 +52,7 @@ abstract class Element
      *
      * @var array
      */
-    protected $arguments;
+    public $arguments;
 
     /**
      * Language code to use for the localisation.
@@ -67,7 +67,7 @@ abstract class Element
      *
      * @var string
      */
-    protected $objectID;
+    public $objectID;
 
     /**
      * DOMDocument used by subclasses to create their content. This variable
