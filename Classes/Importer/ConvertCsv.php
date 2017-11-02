@@ -148,7 +148,7 @@ class ConvertCsv implements ImporterInterface
                 // as well as those with only empty fields.
                 $PPN = trim($fields[0]);
 
-                if ('' != $PPN) {
+                if ('' !== $PPN) {
                     // The record is required to have a non-empty PPN.
                     $shorttitle = $doc->createElement('SHORTTITLE');
                     $set->appendChild($shorttitle);

@@ -8,8 +8,6 @@ CREATE TABLE tx_nkwgok_data (
   crdate             INT(11) DEFAULT '0'     NOT NULL,
   cruser_id          INT(11) DEFAULT '0'     NOT NULL,
   sys_language_uid   INT(11) DEFAULT '0'     NOT NULL,
-  l18n_parent        INT(11) DEFAULT '0'     NOT NULL,
-  l18n_diffsource    MEDIUMBLOB              NOT NULL,
 
   notation           VARCHAR(255) DEFAULT '' NOT NULL,
   ppn                VARCHAR(255) DEFAULT '' NOT NULL,

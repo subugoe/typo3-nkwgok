@@ -28,8 +28,6 @@ if (!defined('TYPO3_MODE')) {
 // Add TypoScript to Configuration
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($_EXTKEY, 'Configuration/TypoScript/', 'GOK');
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue($_EXTKEY.'_pi1', 'FILE:EXT:nkwgok/Resources/Private/Flexform/flexform.xml');
-
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
         'Subugoe.'.$_EXTKEY,
         'Pi1',
@@ -39,6 +37,3 @@ if (!defined('TYPO3_MODE')) {
 if (TYPO3_MODE == 'BE') {
     \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('xMOD_tx_nkwgok', 'EXT:'.$_EXTKEY.'/locallang_csh.xml');
 }
-
-// class for dynamic FF
-include_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY).'/Classes/Elements/Flexform.php';

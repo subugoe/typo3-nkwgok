@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Subugoe\Nkwgok\Importer;
 
+use Subugoe\Nkwgok\Domain\Model\Description;
+use Subugoe\Nkwgok\Domain\Model\Term;
 use Subugoe\Nkwgok\Utility\Utility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Log\LogManager;
@@ -42,14 +44,20 @@ class LoadXml implements ImporterInterface
         $result = $this->loadXMLForType(Utility::recordTypeCSV);
 
         if (true === $result) {
+            $logger->info(sprintf('Import for %s succeeded', Utility::recordTypeCSV));
             $result = $this->loadXMLForType(Utility::recordTypeGOK);
         } else {
+            $logger->error(sprintf('Import for %s failed', Utility::recordTypeCSV));
+
             return false;
         }
 
         if (true === $result) {
+            $logger->info(sprintf('Import for %s succeeded', Utility::recordTypeBRK));
             $result = $this->loadXMLForType(Utility::recordTypeBRK);
         } else {
+            $logger->error(sprintf('Import for %s failed', Utility::recordTypeBRK));
+
             return false;
         }
 
@@ -80,7 +88,6 @@ class LoadXml implements ImporterInterface
     {
         $XMLFolder = PATH_site.'fileadmin/gok/xml/';
         $fileList = $this->fileListAtPathForType($XMLFolder, $type);
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
         $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
         if (is_array($fileList) && count($fileList) > 0) {
@@ -93,115 +100,89 @@ class LoadXml implements ImporterInterface
             // Run through the files again, read all data, add the information
             // about parent elements and store it to our table in the database.
             foreach ($fileList as $xmlPath) {
-                $rows = [];
+                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
 
                 $xml = simplexml_load_file($xmlPath);
+
                 foreach ($xml->xpath('/RESULT/SET/SHORTTITLE/record') as $recordElement) {
-                    $recordType = $this->typeOfRecord($recordElement);
+                    $term = new Term();
+
+                    $term
+                        ->setStatusId(1)
+                        ->setType($this->typeOfRecord($recordElement));
 
                     // Build complete record and insert into database.
                     // Discard records without a PPN.
                     $PPNs = $recordElement->xpath('datafield[@tag="003@"]/subfield[@code="0"]');
-                    $PPN = trim($PPNs[0]);
+                    $term->setPpn(trim((string) $PPNs[0]));
 
                     $notations = $recordElement->xpath('datafield[@tag="045A"]/subfield[@code="a"]');
-                    $notation = '';
+
                     if (count($notations) > 0) {
-                        $notation = trim($notations[0]);
+                        $term->setNotation(trim((string) $notations[0]));
                     }
 
                     $mscs = $recordElement->xpath('datafield[@tag="044H" and subfield[@code="2"]="msc"]/subfield[@code="a"]');
                     $csvSearches = $recordElement->xpath('datafield[@tag="str"]/subfield[@code="a"]');
 
-                    if ('' !== $PPN && array_key_exists($PPN, $subjectTree)) {
-                        $search = '';
-                        if (Utility::recordTypeCSV === $recordType) {
+                    if ('' !== $term->getPpn() && array_key_exists($term->getPpn(), $subjectTree)) {
+                        if (Utility::recordTypeCSV === $term->getType()) {
                             // Subject coming from CSV file with a CCL search query in the 'str/a' field.
                             if (count($csvSearches) > 0) {
-                                $csvSearch = trim($csvSearches[0]);
-                                $search = $csvSearch;
+                                $csvSearch = trim((string) $csvSearches[0]);
+                                $term->setSearch($csvSearch);
                             }
                         } else {
                             // Subject coming from a Pica authority record.
                             if (count($mscs) > 0) {
                                 // Maths type GOK with an MSC type search term.
-                                $msc = trim($mscs[0]);
-                                $search = 'msc="'.$msc.'"';
+                                $msc = trim((string) $mscs[0]);
+                                $term->setSearch('msc="'.$msc.'"');
                             } elseif (count($notations) > 0) {
-                                if (Utility::recordTypeGOK === $recordType
-                                    || Utility::recordTypeBRK === $recordType
-                                ) {
+                                if (Utility::recordTypeGOK === $term->getType() || Utility::recordTypeBRK === $term->getType()) {
                                     // GOK or BRK OPAC search, using the corresponding index.
-                                    $indexName = Utility::typeToIndexName($recordType);
+                                    $indexName = Utility::typeToIndexName($term->getType());
                                     // Requires quotation marks around the search term as notations can begin
                                     // with three character strings that could be mistaken for index names.
-                                    $search = $indexName.'="'.$notation.'"';
+                                    $term->setSearch($indexName.'="'.$term->getNotation().'"');
                                 } else {
-                                    $logger->info(sprintf('Unknown record type »%s« in record PPN %s. Skipping.', $recordType, $PPN), ['name' => $recordElement->getName()]);
+                                    $logger->info(sprintf('Unknown record type »%s« in record PPN %s. Skipping.', $term->getType(), $term->getPpn()), ['name' => $recordElement->getName()]);
                                     continue;
                                 }
                             }
                         }
 
-                        $treeElement = $subjectTree[$PPN];
-                        $parentID = $treeElement['parent'];
+                        $treeElement = $subjectTree[$term->getPpn()];
+                        $term->setParent($treeElement['parent']);
 
                         // Use stored subject tree to determine hierarchy level.
                         // The hierarchy should be no deeper than 12 levels
                         // (for GOK) and 25 levels (for BRK).
                         // Cut off at 32 to prevent an infinite loop.
-                        $hierarchy = 0;
-                        $nextParent = $parentID;
+                        $nextParent = $term->getParent();
                         while (null !== $nextParent && Utility::rootNode !== $nextParent) {
-                            ++$hierarchy;
+                            $term->setHierarchy($term->getHierarchy() + 1);
                             if (array_key_exists($nextParent, $subjectTree)) {
                                 $nextParent = $subjectTree[$nextParent]['parent'];
                             } else {
-                                $logger->error(sprintf('Could not determine hierarchy level: Unknown parent PPN %s for record PPN %s. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', $nextParent, $PPN),
+                                $logger->error(sprintf('Could not determine hierarchy level: Unknown parent PPN %s for record PPN %s. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', $nextParent, $term->getPpn()),
                                     ['element' => $recordElement->getName()]);
-                                $hierarchy = -1;
+                                $term->setHierarchy(-1);
                                 break;
                             }
-                            if ($hierarchy > self::NKWGOKMaxHierarchy) {
-                                $logger->error(sprintf('Hierarchy level for PPN %s exceeds the maximum limit of %s levels. This needs to be fixed, the subject tree may contain an infinite loop.', $PPN, self::NKWGOKMaxHierarchy), ['element' => $recordElement->getName()]);
-                                $hierarchy = -1;
+                            if ($term->getHierarchy() > self::NKWGOKMaxHierarchy) {
+                                $logger->error(sprintf('Hierarchy level for PPN %s exceeds the maximum limit of %s levels. This needs to be fixed, the subject tree may contain an infinite loop.', $term->getPpn(), self::NKWGOKMaxHierarchy), ['element' => $recordElement->getName()]);
+                                $term->setHierarchy(-1);
                                 break;
                             }
                         }
 
-                        // Main subject name from field 045A $j.
-                        $descr = '';
-                        $descrs = $recordElement->xpath('datafield[@tag="045A"]/subfield[@code="j"]');
-                        if (count($descrs) > 0) {
-                            $descr = trim($descrs[0]);
-                        }
-
-                        // English version of the subject’s name from field 044F $a if $S is »d«.
-                        $descr_en = '';
-                        $descr_ens = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="d"]/subfield[@code="a"]');
-                        if (count($descr_ens) > 0) {
-                            $descr_en = trim($descr_ens[0]);
-                        }
-
-                        // Alternate/additional description of the subject from field 044F $a if $S is »g« and $L is not »eng«
-                        $descr_alternate = '';
-                        $descr_alternates = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="g" and not(subfield[@code="L"]="eng")]/subfield[@code="a"]');
-                        if (count($descr_alternates) > 0) {
-                            $descr_alternate = trim(implode('; ', $descr_alternates));
-                        }
-
-                        // English version of alternate/additional description of the subject from field 044F $a if $S is »g« and $L is  »eng«
-                        $descr_alternate_en = '';
-                        $descr_alternate_ens = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="g" and subfield[@code="L"]="eng"]/subfield[@code="a"]');
-                        if (count($descr_alternate_ens) > 0) {
-                            $descr_alternate_en = trim(implode('; ', $descr_alternate_ens));
-                        }
+                        $term->setDescription($this->getDescription($recordElement));
 
                         // Tags from the field tags artificially inserted by our CSV converter.
-                        $tags = '';
                         $tagss = $recordElement->xpath('datafield[@tag="tags"]/subfield[@code="a"]');
                         if (count($tagss) > 0) {
-                            $tags = trim($tagss[0]);
+                            $term->setTags(trim((string) $tagss[0]));
                         }
 
                         // Hitcount keys are lowercase.
@@ -209,89 +190,82 @@ class LoadXml implements ImporterInterface
                         // * for GOK, BRK, and MSC-type records: try to use hitcount
                         // * for CSV-type records: if only one LKL query, try to use hitcount, else use -1
                         // * otherwise: use 0
-                        $hitCount = -1;
                         if (count($mscs) > 0) {
-                            $msc = trim($mscs[0]);
+                            $msc = trim((string) $mscs[0]);
                             if (array_key_exists(Utility::recordTypeMSC, $this->hitCounts)
                                 && array_key_exists($msc, $this->hitCounts[Utility::recordTypeMSC])
                             ) {
-                                $hitCount = $this->hitCounts[Utility::recordTypeMSC][$msc];
+                                $term->setHitCount($this->hitCounts[Utility::recordTypeMSC][$msc]);
                             }
-                        } elseif ((Utility::recordTypeGOK === $recordType
-                                || Utility::recordTypeBRK === $recordType)
-                            && array_key_exists(strtolower($notation), $this->hitCounts[$recordType])
+                        } elseif ((Utility::recordTypeGOK === $term->getType() || Utility::recordTypeBRK === $term->getType())
+                            && array_key_exists(strtolower($term->getNotation()), $this->hitCounts[$term->getType()])
                         ) {
-                            $hitCount = $this->hitCounts[$recordType][strtolower($notation)];
-                        } elseif (Utility::recordTypeCSV === $recordType && count($csvSearches) > 0) {
+                            $term->setHitCount($this->hitCounts[$term->getType()][strtolower($term->getNotation())]);
+                        } elseif (Utility::recordTypeCSV === $term->getType() && count($csvSearches) > 0) {
                             // Try to detect simple GOK and MSC queries from CSV files so hit counts can be displayed for them.
-                            $csvSearch = trim($csvSearches[0]);
+                            $csvSearch = trim((string) $csvSearches[0]);
 
                             $foundGOKs = [];
                             $GOKPattern = '/^lkl=([a-zA-Z]*\s?[.X0-9]*)$/';
                             preg_match($GOKPattern, $csvSearch, $foundGOKs);
-                            $foundGOK = strtolower($foundGOKs[1]);
+                            $foundGOK = strtolower((string) $foundGOKs[1]);
 
                             $foundMSCs = [];
                             $MSCPattern = '/^msc=([0-9Xx][0-9Xx][A-Z-]*[0-9Xx]*)/';
                             preg_match($MSCPattern, $csvSearch, $foundMSCs);
-                            $foundMSC = strtolower($foundMSCs[1]);
+                            $foundMSC = strtolower((string) $foundMSCs[1]);
 
                             if (count($foundGOKs) > 1
                                 && $foundGOK
                                 && array_key_exists(Utility::recordTypeGOK, $this->hitCounts)
                                 && array_key_exists($foundGOK, $this->hitCounts[Utility::recordTypeGOK])
                             ) {
-                                $hitCount = $this->hitCounts[Utility::recordTypeGOK][$foundGOK];
+                                $term->setHitCount($this->hitCounts[Utility::recordTypeGOK][$foundGOK]);
                             } elseif (count($foundMSCs) > 1
                                 && $foundMSC
                                 && array_key_exists(Utility::recordTypeMSC, $this->hitCounts)
                                 && array_key_exists($foundMSC, $this->hitCounts[Utility::recordTypeMSC])
                             ) {
-                                $hitCount = $this->hitCounts[Utility::recordTypeMSC][$foundMSC];
-                                $recordType = Utility::recordTypeMSC;
+                                $term->setHitCount($this->hitCounts[Utility::recordTypeMSC][$foundMSC]);
+                                $term->setType(Utility::recordTypeMSC);
                             }
                         } else {
-                            $hitCount = 0;
+                            $term->setHitCount(0);
                         }
 
                         // Add total hit count information if it exists.
-                        $totalHitCount = -1;
-                        if (array_key_exists($PPN, $totalHitCounts)) {
-                            $totalHitCount = $totalHitCounts[$PPN];
+                        if (array_key_exists($term->getPpn(), $totalHitCounts)) {
+                            $term->setTotalHitCounts($totalHitCounts[$term->getPpn()]);
                         }
 
-                        $childCount = count($treeElement['children']);
+                        $term->setChildCount(count($treeElement['children']));
 
-                        $rows[] = [
-                            'ppn' => $PPN,
-                            'hierarchy' => $hierarchy,
-                            'notation' => $notation,
-                            'parent' => $parentID,
-                            'descr' => $descr,
-                            'descr_en' => $descr_en,
-                            'descr_alternate' => $descr_alternate,
-                            'descr_alternate_en' => $descr_alternate_en,
-                            'search' => $search,
-                            'tags' => $tags,
-                            'childcount' => $childCount,
-                            'type' => $recordType,
-                            'hitcount' => $hitCount,
-                            'totalhitcount' => $totalHitCount,
+                        $row = [
+                            'ppn' => $term->getPpn(),
+                            'hierarchy' => $term->getHierarchy(),
+                            'notation' => $term->getNotation(),
+                            'parent' => $term->getParent(),
+                            'descr' => $term->getDescription()->getDescription(),
+                            'descr_en' => $term->getDescription()->getDescriptionEnglish(),
+                            'descr_alternate' => $term->getDescription()->getAlternate(),
+                            'descr_alternate_en' => $term->getDescription()->getAlternateEnglish(),
+                            'search' => $term->getSearch(),
+                            'tags' => $term->getTags(),
+                            'childcount' => $term->getChildCount(),
+                            'type' => $term->getType(),
+                            'hitcount' => $term->getHitCount(),
+                            'totalhitcount' => $term->getTotalHitCounts(),
                             'crdate' => time(),
                             'tstamp' => time(),
-                            'statusID' => 1,
+                            'statusID' => $term->getStatusId(),
                         ];
+
+                        $queryBuilder
+                           ->insert(Utility::dataTable)
+                           ->values($row)
+                           ->execute();
                     }
                 } // end of loop over subjects
-
-                foreach ($rows as $row) {
-                    $queryResult = $queryBuilder
-                        ->insert(Utility::dataTable)
-                        ->values($row)
-                        ->execute();
-
-                    $logger->info('Inserted row '.$row['ppn'].' with status '.$queryResult, $row);
-                }
             } // end of loop over files
 
             $result = true;
@@ -466,10 +440,10 @@ class LoadXml implements ImporterInterface
         if (array_key_exists($startPPN, $subjectTree)) {
             $record = $subjectTree[$startPPN];
             $type = $record['type'];
-            $notation = strtolower($record[$type]);
-            if (array_key_exists(Utility::recordTypeMSC, $record)
-                && Utility::recordTypeBRK !== $type
-            ) {
+
+            $notation = strtolower($record[$type] ?? '');
+
+            if (array_key_exists(Utility::recordTypeMSC, $record) && Utility::recordTypeBRK !== $type) {
                 $type = Utility::recordTypeMSC;
                 $notation = strtolower($record[Utility::recordTypeMSC]);
             }
@@ -578,5 +552,36 @@ class LoadXml implements ImporterInterface
         }
 
         return $recordType;
+    }
+
+    private function getDescription(\SimpleXMLElement $recordElement): Description
+    {
+        $description = new Description();
+
+        // Main subject name from field 045A $j.
+        $descrs = $recordElement->xpath('datafield[@tag="045A"]/subfield[@code="j"]');
+        if (count($descrs) > 0) {
+            $description->setDescription(trim((string) $descrs[0]));
+        }
+
+        // English version of the subject’s name from field 044F $a if $S is »d«.
+        $descr_ens = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="d"]/subfield[@code="a"]');
+        if (count($descr_ens) > 0) {
+            $description->setDescriptionEnglish(trim((string) $descr_ens[0]));
+        }
+
+        // Alternate/additional description of the subject from field 044F $a if $S is »g« and $L is not »eng«
+        $descr_alternates = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="g" and not(subfield[@code="L"]="eng")]/subfield[@code="a"]');
+        if (count($descr_alternates) > 0) {
+            $description->setAlternate(trim(implode('; ', $descr_alternates)));
+        }
+
+        // English version of alternate/additional description of the subject from field 044F $a if $S is »g« and $L is  »eng«
+        $descr_alternate_ens = $recordElement->xpath('datafield[@tag="044F" and subfield[@code="S"]="g" and subfield[@code="L"]="eng"]/subfield[@code="a"]');
+        if (count($descr_alternate_ens) > 0) {
+            $description->setAlternateEnglish(trim(implode('; ', $descr_alternate_ens)));
+        }
+
+        return $description;
     }
 }

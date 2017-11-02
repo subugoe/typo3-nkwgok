@@ -30,8 +30,11 @@ namespace Subugoe\Nkwgok\Elements;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
+use Subugoe\Nkwgok\Domain\Model\Description;
+use Subugoe\Nkwgok\Domain\Model\Term;
 use Subugoe\Nkwgok\Utility\Utility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -58,6 +61,9 @@ class Tree extends Element
     public function getMarkup()
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+
+        $queryResult = $queryBuilder->select('*')->from(Utility::dataTable);
 
         $this->addGOKTreeJSToElement($this->doc);
 
@@ -73,7 +79,7 @@ class Tree extends Element
         $useShallowLinks = ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowSearch'] == 1);
         if ($this->arguments['omitXXX']) {
             $useShallowLinks = true;
-            GeneralUtility::devLog('Configured to use deep links together with omitXXX. This will not work as the totalhitcount is incorrect when we arbitrarily leave out child elements. Using shallow links instead.', Utility::extKey, 2);
+            $logger->error('Configured to use deep links together with omitXXX. This will not work as the totalhitcount is incorrect when we arbitrarily leave out child elements. Using shallow links instead.');
         }
         if ($useShallowLinks) {
             $containerClasses[] = 'shallowLinks';
@@ -84,20 +90,17 @@ class Tree extends Element
 
         // Get and insert start nodes.
         $startNodes = explode(',', $this->arguments['notation']);
-        $queryParts = [];
-        foreach ($startNodes as $startNodeGOK) {
-            $queryParts[] = 'notation = '.$queryBuilder->quote(trim($startNodeGOK));
-        }
-        $query = implode(' OR ', $queryParts);
 
-        $queryResult = $queryBuilder->select('*')
-            ->from(Utility::dataTable)
-            ->where($query)
+        foreach ($startNodes as $startNodeGOK) {
+            $queryResult->orWhere($queryBuilder->expr()->eq('notation', $queryBuilder->quote(trim($startNodeGOK))));
+        }
+
+        $results = $queryResult
             ->andWhere($queryBuilder->expr()->eq('statusID', 0))
             ->orderBy('notation', 'ASC')
-            ->execute()
-            ->fetchAll();
-        $resultCount = count($queryResult);
+            ->execute();
+
+        $resultCount = $results->rowCount();
 
         $topElementType = 'span';
         $topItemContainer = $container;
@@ -108,13 +111,14 @@ class Tree extends Element
             $topItemContainer = $ul;
         }
 
-        foreach ($queryResult as $GOK) {
+        while ($GOK = $results->fetch()) {
+            $GOK = $this->rowToObject($GOK);
             $topElement = $this->appendGOKTreeItem($topItemContainer, $topElementType, $GOK, [], 1, ($resultCount > 1));
             $topElement->setAttribute('class', 'rootNode');
 
             if (1 === $resultCount) {
                 // There is a single element: display expanded tree without controls at top level.
-                $this->appendGOKTreeChildren($GOK['ppn'], $container, [], 1);
+                $this->appendGOKTreeChildren($GOK->getPpn(), $container, [], 1);
             }
         }
 
@@ -141,7 +145,7 @@ class Tree extends Element
      *
      * @param \DOMNode $container the <script> tag is inserted into
      */
-    private function addGOKTreeJSToElement($container)
+    private function addGOKTreeJSToElement(\DOMNode $container)
     {
         $scriptElement = $this->doc->createElement('script');
         $container->appendChild($scriptElement);
@@ -243,7 +247,7 @@ class Tree extends Element
      * @param array    $expandMarker    list of PPNs of open parent elements
      * @param int      $autoExpandLevel automatically expand subentries if they have at most this many child elements
      */
-    private function appendGOKTreeChildren($parentPPN, $container, $expandMarker, $autoExpandLevel)
+    private function appendGOKTreeChildren(string $parentPPN, \DOMNode $container, array $expandMarker, int $autoExpandLevel)
     {
         $GOKs = $this->getChildren($parentPPN, true);
         if (count($GOKs) > 1) {
@@ -252,22 +256,25 @@ class Tree extends Element
             $ul->setAttribute('id', 'ul-'.$this->objectID.'-'.$parentPPN);
 
             // The first item in the array is the root element.
+            /** @var Term $firstGOK */
             $firstGOK = array_shift($GOKs);
-            $ul->setAttribute('class', 'level-'.$firstGOK['hierarchy']);
-            if ($firstGOK['hitcount'] > 0) {
-                $firstGOK['descr'] = $this->localise('Allgemeines');
+            $ul->setAttribute('class', 'level-'.$firstGOK->getHierarchy());
+            if ($firstGOK->getHitCount() > 0) {
+                $description = (new Description())->setDescription($this->localise('Allgemeines'));
+                $firstGOK->setDescription($description);
                 $this->appendGOKTreeItem($ul, 'li', $firstGOK, $expandMarker, $autoExpandLevel, false, 'general-items-node');
             }
 
+            /** @var Term $GOK */
             foreach ($GOKs as $GOK) {
                 /* Do not display the GOK item if
                  * 1. it has no child elements and
                  * 2. it is known to have no matching hits
                  */
-                if (0 != $GOK['hitcount'] || 0 != $GOK['childcount']) {
+                if (0 !== $GOK->getHitCount() || 0 !== $GOK->getChildCount()) {
                     $this->appendGOKTreeItem($ul, 'li', $GOK, $expandMarker, $autoExpandLevel);
                 }
-            } // end foreach ($GOKs as $GOK)
+            }
         }
     }
 
@@ -277,18 +284,17 @@ class Tree extends Element
      *
      * @param \DOMElement $container       the created markup is appended to (needs to be a child element of $this->doc)
      * @param string      $elementName     name of the element to insert into $container
-     * @param array       $GOK
+     * @param Term        $GOK
      * @param array       $expandMarker    list of PPNs of open parent elements [defaults to Array()]
      * @param int         $autoExpandLevel automatically expand subentries if they have at most this many child elements [defaults to 0]
      * @param bool        $isInteractive   whether the element can be an expandable part of the tree and should have dynamic links [defaults to TRUE]
-     * @param string|null $extraClass      class added to the appended links [defaults to NULL]
+     * @param string      $extraClass      class added to the appended links [defaults to NULL]
      *
      * @return \DOMElement
      */
-    private function appendGOKTreeItem($container, $elementName, $GOK, $expandMarker = [], $autoExpandLevel = 0, $isInteractive = true, $extraClass = null)
+    private function appendGOKTreeItem(\DOMElement $container, string $elementName, Term $GOK, array $expandMarker = [], int $autoExpandLevel = 0, bool $isInteractive = true, string $extraClass = '')
     {
-        $PPN = $GOK['ppn'];
-        $expand = [$PPN];
+        $expand = [$GOK->getPpn()];
 
         if (count($expandMarker) > 0) {
             $expand = array_merge($expandMarker, $expand);
@@ -301,11 +307,11 @@ class Tree extends Element
          */
         $item = $this->doc->createElement($elementName);
         $container->appendChild($item);
-        $item->setAttribute('id', 'c'.$this->objectID.'-'.$PPN);
-        $item->setAttribute('query', $GOK['search']);
+        $item->setAttribute('id', 'c'.$this->objectID.'-'.$GOK->getPpn());
+        $item->setAttribute('query', $GOK->getSearch());
 
         $openLink = $this->doc->createElement('a');
-        $openLink->setAttribute('id', 'openCloseLink-'.$this->objectID.'-'.$PPN);
+        $openLink->setAttribute('id', 'openCloseLink-'.$this->objectID.'-'.$GOK->getPpn());
         $item->appendChild($openLink);
 
         $control = $this->doc->createElement('span');
@@ -318,7 +324,7 @@ class Tree extends Element
 
         $GOKIDSpan = $this->doc->createElement('span');
         $GOKIDSpan->setAttribute('class', 'GOKID');
-        $GOKIDSpan->appendChild($this->doc->createTextNode($GOK['notation']));
+        $GOKIDSpan->appendChild($this->doc->createTextNode($GOK->getNotation()));
 
         $GOKNameSpan = $this->doc->createElement('span');
         $GOKNameSpan->setAttribute('class', 'GOKName');
@@ -340,14 +346,14 @@ class Tree extends Element
         if (true === $isInteractive) {
             // Set up addition to title, if it exists.
             $titleAddition = '';
-            if ('en' === $this->language && '' !== $GOK['descr_alternate_en']) {
-                $titleAddition = $GOK['descr_alternate_en'];
-            } elseif ('' !== $GOK['descr_alternate']) {
-                $titleAddition = $GOK['descr_alternate'];
+            if ('en' === $this->language && '' !== $GOK->getDescription()->getAlternateEnglish()) {
+                $titleAddition = $GOK->getDescription()->getAlternateEnglish();
+            } elseif ('' !== $GOK->getDescription()->getAlternate()) {
+                $titleAddition = $GOK->getDescription()->getAlternate();
             }
 
-            if ($GOK['childcount'] > 0) {
-                $mainTitle = sprintf($this->localise('%s Unterkategorien anzeigen'), $GOK['childcount']);
+            if ($GOK->getChildCount() > 0) {
+                $mainTitle = sprintf($this->localise('%s Unterkategorien anzeigen'), $GOK->getChildCount());
                 $alternativeTitle = $this->localise('Unterkategorien ausblenden');
                 $urlComponents = parse_url(GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
                 $baseURL = $urlComponents['scheme'].'://'.$urlComponents['host'].$urlComponents['path'];
@@ -357,8 +363,8 @@ class Tree extends Element
 
                 if ((array_key_exists('expand', $this->arguments)
                         && is_array($this->arguments['expand'])
-                        && in_array($PPN, $this->arguments['expand']))
-                    || $GOK['childcount'] <= $autoExpandLevel
+                        && in_array($GOK->getPpn(), $this->arguments['expand']))
+                    || $GOK->getChildCount() <= $autoExpandLevel
                 ) {
                     $itemClass = 'close';
                     $JSCommand = 'hideGOK'.$this->objectID;
@@ -376,14 +382,14 @@ class Tree extends Element
                     if ('column' === $this->arguments['style']) {
                         $childListContainer = $container->parentNode;
                     }
-                    $this->appendGOKTreeChildren($PPN, $childListContainer, $expand, $autoExpandLevel);
+                    $this->appendGOKTreeChildren($GOK->getPpn(), $childListContainer, $expand, $autoExpandLevel);
                 } else {
                     $itemClass = 'open';
                     $JSCommand = 'expandGOK'.$this->objectID;
                     $buttonText = '[+]';
                     $queryComponents['tx_nkwgok']['expand'] = $expand;
                     $noscriptLink = GeneralUtility::linkThisUrl($baseURL, $queryComponents)
-                        .'#c'.$this->objectID.'-'.$PPN;
+                        .'#c'.$this->objectID.'-'.$GOK->getPpn();
                 }
 
                 $openLink->setAttribute('href', $noscriptLink);
@@ -410,10 +416,10 @@ class Tree extends Element
         }
 
         if ($JSCommand) {
-            $openLink->setAttribute('onclick', $JSCommand.'("'.$PPN.'");return false;');
+            $openLink->setAttribute('onclick', $JSCommand.'("'.$GOK->getPpn().'");return false;');
         }
 
-        if (null !== $extraClass) {
+        if ('' !== $extraClass) {
             $itemClass .= ' '.$extraClass;
         }
         $item->setAttribute('class', $itemClass);
@@ -427,10 +433,10 @@ class Tree extends Element
      * Appends two OPAC search links to $container, one for shallow search and
      * one for deep search. One of them will be hidden by CSS.
      *
-     * @param array       $GOK       subject record
+     * @param Term        $GOK       subject record
      * @param \DOMElement $container the link elements are appended to
      */
-    private function appendOpacLinksTo($GOK, $container)
+    private function appendOpacLinksTo(Term $GOK, $container)
     {
         $opacLinkElement = $this->OPACLinkElement($GOK, true);
         if ($opacLinkElement) {
@@ -449,24 +455,24 @@ class Tree extends Element
      * Returns DOMElement with complete markup for linking to the OPAC entry.
      * The link text indicates the number of results if it is known.
      *
-     * @param array $GOKData    subject record
-     * @param bool  $deepSearch
+     * @param Term $GOKData    subject record
+     * @param bool $deepSearch
      *
      * @return \DOMElement
      */
-    private function OPACLinkElement($GOKData, $deepSearch)
+    private function OPACLinkElement(Term $GOKData, $deepSearch)
     {
         $opacLink = null;
-        $hitCount = $GOKData['hitcount'];
-        $useDeepSearch = $deepSearch && ($GOKData['totalhitcount'] > 0);
+        $hitCount = $GOKData->getHitCount();
+        $useDeepSearch = $deepSearch && ($GOKData->getTotalHitCounts() > 0);
         if (true === $useDeepSearch) {
-            $hitCount = $GOKData['totalhitcount'];
+            $hitCount = $GOKData->getTotalHitCounts();
         }
         $URL = $this->opacGOKSearchURL($GOKData, $deepSearch);
         if (0 != $hitCount && $URL) {
             $opacLink = $this->doc->createElement('a');
             $opacLink->setAttribute('href', $URL);
-            if (true === $useDeepSearch && 0 != $GOKData['childcount']) {
+            if (true === $useDeepSearch && 0 != $GOKData->getChildCount()) {
                 $titleString = $this->localise('Bücher zu diesem und enthaltenen Themengebieten im Opac anzeigen');
             } else {
                 $titleString = $this->localise('Bücher zu genau diesem Thema im Opac anzeigen');
@@ -498,12 +504,12 @@ class Tree extends Element
      * to the ID (PPN) of the subject’s authority  record is used.
      * If the record did not originate from OPAC, Null is returned.
      *
-     * @param array $GOKData    subject record
-     * @param bool  $deepSearch
+     * @param Term $GOKData    subject record
+     * @param bool $deepSearch
      *
      * @return string|null URL
      */
-    private function opacGOKSearchURL($GOKData, $deepSearch)
+    private function opacGOKSearchURL(Term $GOKData, $deepSearch)
     {
         $GOKSearchURL = null;
 
@@ -512,14 +518,14 @@ class Tree extends Element
         $GOKSearchURL = $conf['opacBaseURL'].'LNG='.$picaLanguageCode;
 
         if (true === $deepSearch
-            && (Utility::recordTypeGOK === $GOKData['type'] || Utility::recordTypeBRK === $GOKData['type'])
+            && (Utility::recordTypeGOK === $GOKData->getType() || Utility::recordTypeBRK === $GOKData->getType())
         ) {
             // Use special command to do the hierarchical search for records related
             // to the Normsatz PPN.
-            $GOKSearchURL .= '/EPD?PPN='.$GOKData['ppn'].'&FRM=';
-        } elseif ($GOKData['search']) {
+            $GOKSearchURL .= '/EPD?PPN='.$GOKData->getPpn().'&FRM=';
+        } elseif ($GOKData->getSearch()) {
             // Convert CCL string to OPAC-style search string and escape.
-            $searchString = urlencode(str_replace('=', ' ', $GOKData['search']));
+            $searchString = urlencode(str_replace('=', ' ', $GOKData->getSearch()));
             $GOKSearchURL .= '/REC=1/CMD?ACT=SRCHA&IKT=1016&SRT=YOP&TRM='.$searchString;
         } else {
             $GOKSearchURL = null;

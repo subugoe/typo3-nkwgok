@@ -28,8 +28,10 @@ namespace Subugoe\Nkwgok\Elements;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
+use Subugoe\Nkwgok\Domain\Model\Term;
 use Subugoe\Nkwgok\Utility\Utility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -45,6 +47,7 @@ class Menu extends Element
     public function getMarkup()
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
+        $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
         $this->addGOKMenuJSToElement($this->doc);
 
@@ -63,11 +66,11 @@ class Menu extends Element
         $form->appendChild($pageID);
         $pageID->setAttribute('type', 'hidden');
         $pageID->setAttribute('name', 'no_cache');
-        $pageID->setAttribute('value', 1); //$GLOBALS['TSFE']->id);
+        $pageID->setAttribute('value', '1');
 
         $startNodes = explode(',', $this->arguments['notation']);
         if (count($startNodes) > 1) {
-            GeneralUtility::devLog('several start nodes given ('.$this->arguments['notation'].') but only the first is used in menu mode', Utility::extKey, 2);
+            $logger->error(sprintf('several start nodes given (%s) but only the first is used in menu mode', $this->arguments['notation']));
         }
         $startNodeGOK = trim($startNodes[0]);
 
@@ -79,7 +82,7 @@ class Menu extends Element
             ->orderBy('notation', 'ASC')
             ->execute();
 
-        foreach ($queryResult->fetchAll() as $row) {
+        while ($row = $queryResult->fetch()) {
             $menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
             $this->appendGOKMenuChildren($row['ppn'], $form, $menuInlineThreshold);
         }
@@ -199,7 +202,7 @@ class Menu extends Element
      * @param int      $level           the depth in the menu hierarchy [defaults to 0]
      * @param int      $autoExpandStep  the depth of auto-expansion [defaults to 0]
      */
-    private function appendGOKMenuChildren($parentPPN, $container, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0)
+    private function appendGOKMenuChildren(string $parentPPN, $container, $autoExpandLevel = 0, $level = 0, $autoExpandStep = 0)
     {
         $GOKs = $this->getChildren($parentPPN);
         if (sizeof($GOKs) > 0) {
@@ -238,8 +241,8 @@ class Menu extends Element
                      */
                     $option = $this->doc->createElement('option');
                     $select->appendChild($option);
-                    if ($GOKs[0]['type'] === Utility::recordTypeGOK
-                        || $GOKs[0]['type'] === Utility::recordTypeBRK
+                    if (Utility::recordTypeGOK === $GOKs[0]->getType()
+                        || Utility::recordTypeBRK === $GOKs[0]->getType()
                     ) {
                         $label = 'Treffer für diese Zwischenebene zeigen';
                     } else {
@@ -258,29 +261,28 @@ class Menu extends Element
                 }
             }
 
+            /** @var Term $GOK */
             foreach ($GOKs as $GOK) {
-                $PPN = $GOK['ppn'];
-
                 $option = $this->doc->createElement('option');
                 $select->appendChild($option);
-                $option->setAttribute('value', $PPN);
-                $option->setAttribute('query', $GOK['search']);
+                $option->setAttribute('value', $GOK->getPpn());
+                $option->setAttribute('query', $GOK->getSearch());
                 // Careful: non-breaking spaces used here to create in-menu indentation
                 $menuItemString = str_repeat('   ', $autoExpandStep).$this->GOKName($GOK, true);
-                if ($GOK['childcount'] > 0) {
+                if ($GOK->getChildCount() > 0) {
                     $menuItemString .= $this->localise(' ...');
-                    $option->setAttribute('hasChildren', $GOK['childcount']);
+                    $option->setAttribute('hasChildren', $GOK->getChildCount());
                 }
                 $option->appendChild($this->doc->createTextNode($menuItemString));
-                if (($GOK['childcount'] > 0) && ($GOK['childcount'] <= $autoExpandLevel)) {
+                if (($GOK->getChildCount() > 0) && ($GOK->getChildCount() <= $autoExpandLevel)) {
                     $option->setAttribute('isAutoExpanded', '');
-                    $this->appendGOKMenuChildren($PPN, $select, $autoExpandLevel, $level, $autoExpandStep + 1);
+                    $this->appendGOKMenuChildren($GOK->getPpn(), $select, $autoExpandLevel, $level, $autoExpandStep + 1);
                 }
 
-                if ($this->arguments['expand'][$level] === $PPN) {
+                if ($this->arguments['expand'][$level] === $GOK->getPpn()) {
                     // this item should be selected and the next menu should be added
                     $option->setAttribute('selected', 'selected');
-                    $this->appendGOKMenuChildren($PPN, $container, $autoExpandLevel, $level + 1);
+                    $this->appendGOKMenuChildren($GOK->getPpn(), $container, $autoExpandLevel, $level + 1);
                     // remove the first/default item of the menu if we have a selection already
                 }
             }

@@ -26,6 +26,8 @@ namespace Subugoe\Nkwgok\Elements;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
+use Subugoe\Nkwgok\Domain\Model\Description;
+use Subugoe\Nkwgok\Domain\Model\Term;
 use Subugoe\Nkwgok\Utility\Utility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Localization\Parser\LocallangXmlParser;
@@ -185,17 +187,17 @@ abstract class Element
      * when viewed inside the subject hierarchy. The parameter $simplify = True
      * removes that indicator.
      *
-     * @param array $gokRecord
-     * @param bool  $simplify  should the trailing {…} be removed? [defaults to False]
+     * @param Term $gokRecord
+     * @param bool $simplify  should the trailing {…} be removed? [defaults to False]
      *
      * @return string
      */
-    protected function GOKName($gokRecord, $simplify = false)
+    protected function GOKName(Term $gokRecord, $simplify = false)
     {
-        $displayName = $gokRecord['descr'];
+        $displayName = $gokRecord->getDescription()->getDescription();
 
         if ('en' == $this->language) {
-            $englishName = $gokRecord['descr_en'];
+            $englishName = $gokRecord->getDescription()->getDescriptionEnglish();
 
             if ($englishName) {
                 $displayName = $englishName;
@@ -244,6 +246,40 @@ abstract class Element
             ->addOrderBy('notation', 'ASC')
             ->execute();
 
-        return $queryResult->fetchAll();
+        $children = [];
+
+        while ($row = $queryResult->fetch()) {
+            $children[] = $this->rowToObject($row);
+        }
+
+        return $children;
+    }
+
+    protected function rowToObject(array $row): Term
+    {
+        $term = new Term();
+        $description = new Description();
+
+        $description
+            ->setDescription($row['descr'])
+            ->setDescriptionEnglish($row['desc_en'] ?? '')
+            ->setAlternate($row['descr_alternate'])
+            ->setAlternateEnglish($row['descr_alternat_en'] ?? '');
+
+        $term
+            ->setTotalHitCounts($row['totalhitcount'])
+            ->setPpn($row['ppn'])
+            ->setSearch($row['search'])
+            ->setDescription($description)
+            ->setTags($row['tags'])
+            ->setParent($row['parent'])
+            ->setHierarchy($row['hierarchy'])
+            ->setChildCount($row['childcount'])
+            ->setHitCount($row['hitcount'])
+            ->setStatusId($row['statusID'])
+            ->setType($row['type'])
+            ->setNotation($row['notation']);
+
+        return $term;
     }
 }
