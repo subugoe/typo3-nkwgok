@@ -192,7 +192,11 @@ nicht ungewöhnlich.
 
 ## Development
 
-This extension provides a hook for manipulation the tree JavaScript.
-`$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['nkwgok']['gokTreeJavaScript']` has to be used,
+### Hooks
+
+This extension provides hooks for the manipulation the tree and menu JavaScript.
+```$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['nkwgok']['gokTreeJavaScript']``` has to 
+be used for the tree and ```$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['nkwgok']['gokMenuJavaScript']``` for the menu,
 i.e. ```$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['nkwgok']['gokTreeJavaScript'][] = 'Subugoe\\TmplFidmath\\Hooks\\Gok->javascript';```
 in your `ext_localconf.php`
+

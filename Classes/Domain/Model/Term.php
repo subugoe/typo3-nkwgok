@@ -77,7 +77,7 @@ class Term
      *
      * @return Term
      */
-    public function setPpn(string $ppn): Term
+    public function setPpn(string $ppn): self
     {
         $this->ppn = $ppn;
 
@@ -97,7 +97,7 @@ class Term
      *
      * @return Term
      */
-    public function setSearch(string $search): Term
+    public function setSearch(string $search): self
     {
         $this->search = $search;
 
@@ -117,7 +117,7 @@ class Term
      *
      * @return Term
      */
-    public function setDescription(Description $description): Term
+    public function setDescription(Description $description): self
     {
         $this->description = $description;
 
@@ -137,7 +137,7 @@ class Term
      *
      * @return Term
      */
-    public function setParent(string $parent): Term
+    public function setParent(string $parent): self
     {
         $this->parent = $parent;
 
@@ -157,7 +157,7 @@ class Term
      *
      * @return Term
      */
-    public function setHierarchy(int $hierarchy): Term
+    public function setHierarchy(int $hierarchy): self
     {
         $this->hierarchy = $hierarchy;
 
@@ -177,7 +177,7 @@ class Term
      *
      * @return Term
      */
-    public function setChildCount(int $childCount): Term
+    public function setChildCount(int $childCount): self
     {
         $this->childCount = $childCount;
 
@@ -197,7 +197,7 @@ class Term
      *
      * @return Term
      */
-    public function setHitCount(int $hitCount): Term
+    public function setHitCount(int $hitCount): self
     {
         $this->hitCount = $hitCount;
 
@@ -217,7 +217,7 @@ class Term
      *
      * @return Term
      */
-    public function setStatusId(int $statusId): Term
+    public function setStatusId(int $statusId): self
     {
         $this->statusId = $statusId;
 
@@ -237,7 +237,7 @@ class Term
      *
      * @return Term
      */
-    public function setType(string $type): Term
+    public function setType(string $type): self
     {
         $this->type = $type;
 
@@ -257,7 +257,7 @@ class Term
      *
      * @return Term
      */
-    public function setNotation(string $notation): Term
+    public function setNotation(string $notation): self
     {
         $this->notation = $notation;
 
@@ -277,7 +277,7 @@ class Term
      *
      * @return Term
      */
-    public function setTags(string $tags): Term
+    public function setTags(string $tags): self
     {
         $this->tags = $tags;
 
@@ -297,7 +297,7 @@ class Term
      *
      * @return Term
      */
-    public function setTotalHitCounts(int $totalHitCounts): Term
+    public function setTotalHitCounts(int $totalHitCounts): self
     {
         $this->totalHitCounts = $totalHitCounts;
 

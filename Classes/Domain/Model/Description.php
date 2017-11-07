@@ -37,7 +37,7 @@ class Description
      *
      * @return Description
      */
-    public function setDescription(string $description): Description
+    public function setDescription(string $description): self
     {
         $this->description = $description;
 
@@ -57,7 +57,7 @@ class Description
      *
      * @return Description
      */
-    public function setDescriptionEnglish(string $descriptionEnglish): Description
+    public function setDescriptionEnglish(string $descriptionEnglish): self
     {
         $this->descriptionEnglish = $descriptionEnglish;
 
@@ -77,7 +77,7 @@ class Description
      *
      * @return Description
      */
-    public function setAlternate(string $alternate): Description
+    public function setAlternate(string $alternate): self
     {
         $this->alternate = $alternate;
 
@@ -97,7 +97,7 @@ class Description
      *
      * @return Description
      */
-    public function setAlternateEnglish(string $alternateEnglish): Description
+    public function setAlternateEnglish(string $alternateEnglish): self
     {
         $this->alternateEnglish = $alternateEnglish;
 

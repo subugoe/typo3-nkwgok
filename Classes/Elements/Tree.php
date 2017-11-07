@@ -232,10 +232,8 @@ class Tree extends Element
             ';
         }
 
-        if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][Utility::extKey]['gokTreeJavaScript'])) {
-            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][Utility::extKey]['gokTreeJavaScript'] as $reference) {
-                $js = GeneralUtility::callUserFunction($reference, $js, $this);
-            }
+        foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][Utility::extKey]['gokTreeJavaScript'] ?? [] as $reference) {
+            $js = GeneralUtility::callUserFunction($reference, $js, $this);
         }
 
         $scriptElement->appendChild($this->doc->createTextNode($js));

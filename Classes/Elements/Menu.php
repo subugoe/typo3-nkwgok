@@ -141,7 +141,7 @@ class Menu extends Element
         }
 
         function newMenuForSelection'.$this->objectID." (option) {
-            var URL = location.protocol + '//' + location.host + location.pathname;
+            var URL = '//' + location.host + location.pathname;
             var PPN = option.value;
             var level = parseInt(option.parentNode.getAttribute('level')) + 1;
             var parameters = location.search.replace(/^\?/, '') + '&tx_".Utility::extKey."[expand]=' + PPN
@@ -184,6 +184,10 @@ class Menu extends Element
             nkwgokItemSelected(option);
         }
 ';
+        foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][Utility::extKey]['gokMenuJavaScript'] ?? [] as $reference) {
+            $js = GeneralUtility::callUserFunction($reference, $js, $this);
+        }
+
         $scriptElement->appendChild($this->doc->createTextNode($js));
     }
 
