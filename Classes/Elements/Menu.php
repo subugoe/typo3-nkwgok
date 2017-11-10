@@ -228,7 +228,7 @@ class Menu extends Element
                 $select->setAttribute('onchange', 'GOKMenuSelectionChanged'.$this->objectID.'(this);');
                 $select->setAttribute('title', $this->localise('Fachgebiet auswählen').' ('
                     .$this->localise('Ebene').' '.($level + 1).')');
-                $select->setAttribute('level', $level);
+                $select->setAttribute('level', (string) $level);
 
                 // add dummy item at the beginning of the menu
                 if (0 == $level) {
@@ -275,7 +275,7 @@ class Menu extends Element
                 $menuItemString = str_repeat('   ', $autoExpandStep).$this->GOKName($GOK, true);
                 if ($GOK->getChildCount() > 0) {
                     $menuItemString .= $this->localise(' ...');
-                    $option->setAttribute('hasChildren', $GOK->getChildCount());
+                    $option->setAttribute('hasChildren', (string) $GOK->getChildCount());
                 }
                 $option->appendChild($this->doc->createTextNode($menuItemString));
                 if (($GOK->getChildCount() > 0) && ($GOK->getChildCount() <= $autoExpandLevel)) {
