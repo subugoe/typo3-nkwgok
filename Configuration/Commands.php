@@ -1,19 +1,19 @@
 <?php
 
 return [
-    'nkwgok:updateCsv' => [
+    'nkwgok:csv:update' => [
         'class' => \Subugoe\Nkwgok\Command\UpdateCsvCommand::class,
     ],
-    'nkwgok:importAll' => [
+    'nkwgok:import:all' => [
         'class' => \Subugoe\Nkwgok\Command\ImportAllCommand::class,
     ],
-    'nkwgok:checkNewCsv' => [
+    'nkwgok:csv:check' => [
         'class' => \Subugoe\Nkwgok\Command\CheckNewCsvCommand::class,
     ],
-    'nkwgok:loadFromOpac' => [
+    'nkwgok:opac:loac' => [
         'class' => \Subugoe\Nkwgok\Command\LoadFromOpacCommand::class,
     ],
-    'nkwgok:loadXml' => [
+    'nkwgok:xml:load' => [
         'class' => \Subugoe\Nkwgok\Command\LoadXmlCommand::class,
     ],
 ];

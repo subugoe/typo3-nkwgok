@@ -38,6 +38,15 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class LoadXmlCommand extends Command
 {
+    public function configure()
+    {
+        parent::configure();
+
+        $this
+            ->setName('nkwgok:xml:load')
+            ->setDescription('Import XML data');
+    }
+
     /**
      * Function executed from the Scheduler.
      *

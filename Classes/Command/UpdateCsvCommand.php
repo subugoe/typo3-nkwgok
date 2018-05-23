@@ -20,6 +20,15 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class UpdateCsvCommand extends Command
 {
+    public function configure()
+    {
+        parent::configure();
+
+        $this
+            ->setName('nkwgok:csv:update')
+            ->setDescription('TYPO3 Scheduler task to automatically our scheduler tasks for converting and importing CSV data.');
+    }
+
     /**
      * Function executed by the Scheduler.
      *

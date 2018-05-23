@@ -18,6 +18,15 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class CheckNewCsvCommand extends Command
 {
+    public function configure()
+    {
+        parent::configure();
+
+        $this
+            ->setName('nkwgok:csv:check')
+            ->setDescription('Task to check whether any of our CSV files has been updated and triggering the CSV to XML conversion as well as database update if it has');
+    }
+
     /**
      * Function executed by the Scheduler.
      *

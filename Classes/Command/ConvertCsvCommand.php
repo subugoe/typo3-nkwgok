@@ -17,6 +17,15 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class ConvertCsvCommand extends Command
 {
+    public function configure()
+    {
+        parent::configure();
+
+        $this
+            ->setName('nkwgok:csv:convert')
+            ->setDescription('Task to process CSV files with subject tree information');
+    }
+
     /**
      * Function executed from the Scheduler.
      *

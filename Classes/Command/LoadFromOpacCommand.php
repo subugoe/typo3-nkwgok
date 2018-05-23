@@ -19,6 +19,15 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class LoadFromOpacCommand extends Command
 {
+    public function configure()
+    {
+        parent::configure();
+
+        $this
+            ->setName('nkwgok:opac:load')
+            ->setDescription('Download the OPAC data we need');
+    }
+
     /**
      * Function executed from the Scheduler.
      *
