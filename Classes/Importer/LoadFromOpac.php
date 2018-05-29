@@ -56,21 +56,30 @@ class LoadFromOpac implements ImporterInterface
         $opacHitCountURL = $opacBaseURL.'CMD?ACT=BRWS&SCNST='.self::NKWGOKImportChunkSize;
 
         if (true === $success) {
-            $success = $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
-                Utility::typeToIndexName(Utility::recordTypeGOK), $hitCountDir);
+            $success = $this->downloadHitCountsFromOpacToFolder(
+                $opacHitCountURL,
+                Utility::typeToIndexName(Utility::recordTypeGOK),
+                $hitCountDir
+            );
         } else {
             return false;
         }
 
         if (true === $success) {
-            $success = $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
-                Utility::typeToIndexName(Utility::recordTypeBRK), $hitCountDir);
+            $success = $this->downloadHitCountsFromOpacToFolder(
+                $opacHitCountURL,
+                Utility::typeToIndexName(Utility::recordTypeBRK),
+                $hitCountDir
+            );
         } else {
             return false;
         }
         if (true === $success) {
-            $success = $this->downloadHitCountsFromOpacToFolder($opacHitCountURL,
-                Utility::typeToIndexName(Utility::recordTypeMSC), $hitCountDir);
+            $success = $this->downloadHitCountsFromOpacToFolder(
+                $opacHitCountURL,
+                Utility::typeToIndexName(Utility::recordTypeMSC),
+                $hitCountDir
+            );
         } else {
             return false;
         }

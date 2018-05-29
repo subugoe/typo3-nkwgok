@@ -13,5 +13,8 @@
         "psr-4": {
             "Subugoe\\Nkwgok\\": "Classes/"
         }
+    },
+    "require": {
+        "typo3/cms-core": "^8.7.13 || >=9.1.0 <9.3.0"
     }
 }

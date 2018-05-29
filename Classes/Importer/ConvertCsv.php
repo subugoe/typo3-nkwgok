@@ -47,7 +47,7 @@ class ConvertCsv implements ImporterInterface
     {
         $downloadURLs = [];
 
-        $conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][Utility::extKey]);
+        $conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
         $URLsString = $conf['CSVURLs'];
 
         if ($URLsString) {

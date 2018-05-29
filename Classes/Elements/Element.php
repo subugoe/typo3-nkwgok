@@ -145,7 +145,7 @@ abstract class Element
      */
     protected function localise($key)
     {
-        $filePath = GeneralUtility::getFileAbsFileName('EXT:'.Utility::extKey.'/Resources/Private/Language/locallang.xml');
+        $filePath = GeneralUtility::getFileAbsFileName('EXT:nkwgok/Resources/Private/Language/locallang.xml');
         if (!$this->localisation) {
             /**
              * The returned $localisation seems to have the following structure:

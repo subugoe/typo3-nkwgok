@@ -103,10 +103,12 @@ class Menu extends Element
     public function getAJAXMarkup()
     {
         $menuInlineThreshold = $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['menuInlineThreshold'];
-        $this->appendGOKMenuChildren($this->arguments['expand'],
+        $this->appendGOKMenuChildren(
+            $this->arguments['expand'],
             $this->doc,
             $menuInlineThreshold,
-            (int) $this->arguments['level']);
+            (int) $this->arguments['level']
+        );
 
         return $this->doc;
     }

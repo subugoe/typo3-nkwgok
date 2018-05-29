@@ -165,8 +165,10 @@ class LoadXml implements ImporterInterface
                             if (array_key_exists($nextParent, $subjectTree)) {
                                 $nextParent = $subjectTree[$nextParent]['parent'];
                             } else {
-                                $logger->error(sprintf('Could not determine hierarchy level: Unknown parent PPN %s for record PPN %s. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', $nextParent, $term->getPpn()),
-                                    ['element' => $recordElement->getName()]);
+                                $logger->error(
+                                    sprintf('Could not determine hierarchy level: Unknown parent PPN %s for record PPN %s. This needs to be fixed if he subject is meant to appear in a subject hierarchy.', $nextParent, $term->getPpn()),
+                                    ['element' => $recordElement->getName()]
+                                );
                                 $term->setHierarchy(-1);
                                 break;
                             }
@@ -547,8 +549,12 @@ class LoadXml implements ImporterInterface
         }
 
         if (Utility::recordTypeUnknown === $recordType) {
-            GeneralUtility::devLog('Record of unknown type.', Utility::extKey, 1,
-                [$record->saveXML()]);
+            GeneralUtility::devLog(
+                'Record of unknown type.',
+                Utility::extKey,
+                1,
+                [$record->saveXML()]
+            );
         }
 
         return $recordType;
