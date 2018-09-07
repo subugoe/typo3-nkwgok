@@ -1,0 +1,16 @@
+{
+  "name": "nkwgok",
+  "version": "1.0.0",
+  "repository": "https://github.com/subugoe/typo3-nkwgok.git",
+  "author": "Ingo Pfennigstorf <i.pfennigstorf@gmail.com>",
+  "license": "GPL",
+  "private": true,
+  "devDependencies": {
+    "autoprefixer": "^9.1.5",
+    "gulp": "^4.0.0",
+    "gulp-postcss": "^8.0.0",
+    "gulp-sass": "^4.0.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "postcss": "^7.0.2"
+  }
+}

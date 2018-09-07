@@ -1,171 +1,188 @@
+@charset "UTF-8";
 /* Styles for the GOK Tree */
 .gokContainer.tree a {
-    text-decoration: none;
-    border: 0 none;
-    position: relative;
-}
-
-.gokContainer.tree ul {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-.gokContainer.tree ul ul {
-    margin: 0 0 0 -7.5em;
-}
-
-.gokContainer.tree ul li {
-    padding-left: 9em;
-    text-indent: -9em;
+  text-decoration: none;
+  border: 0 none;
+  position: relative;
 }
 
 .gokContainer.tree a:link:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .gokContainer.tree a .GOKID {
-    font-weight: normal;
-    display: block;
-    float: left;
-    width: 6em;
-    text-align: right;
-    color: #999;
-    position: relative;
+  font-weight: normal;
+  display: block;
+  float: left;
+  width: 6em;
+  text-align: right;
+  color: #999;
+  position: relative;
+}
+
+.gokContainer.tree ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.gokContainer.tree ul ul {
+  margin: 0 0 0 -7.5em;
+}
+
+.gokContainer.tree ul li {
+  padding-left: 9em;
+  text-indent: -9em;
 }
 
 .gokContainer.tree.hideGOKID ul li {
-    padding-left: 3em;
-    text-indent: -3em;
+  padding-left: 3em;
+  text-indent: -3em;
 }
 
 .gokContainer.tree.hideGOKID ul ul {
-    margin: 0 0 0 -1em;
+  margin: 0 0 0 -1em;
 }
 
 .gokContainer.tree.hideGOKID .GOKID {
-    display: none;
+  display: none;
 }
 
 .gokContainer.tree .rootNode .GOKID {
-    left: -0.5em;
+  left: -0.5em;
 }
 
 .gokContainer.tree a .GOKID,
 .gokContainer.tree ul .rootNode .GOKID {
-    left: -9.5em
+  left: -9.5em;
 }
 
 a:hover .GOKID {
-    text-decoration: none;
-    color: #666;
+  text-decoration: none;
+  color: #666;
 }
 
 .gokContainer.tree .plusMinus, .gokTreeContainer .GOKID {
-    font-family: monospace;
+  font-family: monospace;
 }
 
 .gokContainer.tree .GOKName {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .gokContainer.tree .opacLink {
-    font-size: 71%;
-    font-style: italic;
-    color: #999;
+  font-size: 71%;
+  font-style: italic;
+  color: #999;
 }
 
 .gokContainer.tree .opacLink.shallow {
-    display: none;
+  display: none;
 }
 
 .gokContainer.tree .general-items-node .opacLink.shallow {
-    display: inline;
+  display: inline;
 }
 
 .gokContainer.tree .general-items-node .opacLink.deep {
-    display: none;
+  display: none;
 }
 
 .gokContainer.tree.shallowLinks .opacLink.shallow {
-    display: inline;
+  display: inline;
 }
 
 .gokContainer.tree.shallowLinks .opacLink.deep {
-    display: none;
+  display: none;
 }
 
 .gokContainer.tree.shallowLinks .general-items-node {
-    display: none;
+  display: none;
 }
 
 .gokContainer.tree .opacLink:link:after {
-    content: "\002192";
-    padding-left: 0.2em;
+  content: "\002192";
+  padding-left: 0.2em;
 }
 
 .gokContainer.tree .opacLink:hover {
-    color: #333;
+  color: #333;
 }
 
 .gokContainer.tree .rootNode .plusMinus.nkwgok-invisible {
-    display: none;
+  display: none;
 }
 
 /*  Styles for the GOK Columns  */
-
 .gokContainer.column {
-    background: #eee;
-    overflow: visible;
+  background: #eee;
+  overflow: visible;
+}
+
+.gokContainer.column a.opacLink {
+  display: none;
 }
 
 .gokContainer.column ul {
-    position: relative;
-    width: 22%;
-    margin: 0;
-    padding: 0 10px 0 0;
-    list-style-type: none;
-    background: #eef;
-    border-left: 1px solid #999;
-    float: left;
+  position: relative;
+  width: 22%;
+  margin: 0;
+  padding: 0 10px 0 0;
+  list-style-type: none;
+  background: #eef;
+  border-left: 1px solid #999;
+  float: left;
+}
+
+.gokContainer.column ul.level-0 .GOKID {
+  display: none;
 }
 
 .gokContainer.column li {
-    position: relative;
-    margin: 0;
-    border-bottom: 1px dotted #999;
+  position: relative;
+  margin: 0;
+  border-bottom: 1px dotted #999;
 }
 
-.gokContainer.column li.close a,
-.gokContainer.column li.close:after {
-    color: #900;
+.gokContainer.column li.close a {
+  color: #900;
 }
 
-.gokContainer.column li.open:after,
 .gokContainer.column li.close:after {
-    display: block;
-    position: absolute;
-    top: 0.3em;
-    right: 0;
-    content: '»';
+  color: #900;
+  display: block;
+  position: absolute;
+  top: 0.3em;
+  right: 0;
+  content: '»';
+}
+
+.gokContainer.column li.open:after {
+  display: block;
+  position: absolute;
+  top: 0.3em;
+  right: 0;
+  content: '»';
 }
 
 .gokContainer.column li a {
-    display: block;
-    padding: 4px 0 4px 6px;
+  display: block;
+  padding: 4px 0 4px 6px;
 }
 
-/* Hide unnecessary elements */
-.gokContainer.column .plusMinus,
-.gokContainer.column a.opacLink,
-.gokContainer.column .general-items-node,
-.gokContainer.column .rootNode,
-.gokContainer.column ul.level-0 .GOKID {
-    display: none;
+.gokContainer.column .plusMinus {
+  display: none;
+}
+
+.gokContainer.column .general-items-node {
+  display: none;
+}
+
+.gokContainer.column .rootNode {
+  display: none;
 }
 
 /*  Styles for the GOK Menu  */
-
 .gokMenuForm select {
-    width: 50%;
-    display: block;
+  width: 50%;
+  display: block;
 }
