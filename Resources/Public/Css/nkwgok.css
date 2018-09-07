@@ -18,6 +18,7 @@
   text-align: right;
   color: #999;
   position: relative;
+  left: -9.5em;
 }
 
 .gokContainer.tree ul {
@@ -32,6 +33,10 @@
 .gokContainer.tree ul li {
   padding-left: 9em;
   text-indent: -9em;
+}
+
+.gokContainer.tree ul .rootNode .GOKID {
+  left: -9.5em;
 }
 
 .gokContainer.tree.hideGOKID ul li {
@@ -51,20 +56,6 @@
   left: -0.5em;
 }
 
-.gokContainer.tree a .GOKID,
-.gokContainer.tree ul .rootNode .GOKID {
-  left: -9.5em;
-}
-
-a:hover .GOKID {
-  text-decoration: none;
-  color: #666;
-}
-
-.gokContainer.tree .plusMinus, .gokTreeContainer .GOKID {
-  font-family: monospace;
-}
-
 .gokContainer.tree .GOKName {
   font-weight: bold;
 }
@@ -77,6 +68,15 @@ a:hover .GOKID {
 
 .gokContainer.tree .opacLink.shallow {
   display: none;
+}
+
+.gokTreeContainer .GOKID {
+  font-family: monospace;
+}
+
+a:hover .GOKID {
+  text-decoration: none;
+  color: #666;
 }
 
 .gokContainer.tree .general-items-node .opacLink.shallow {

@@ -20,6 +20,7 @@
                 text-align: right;
                 color: #999;
                 position: relative;
+                left: -9.5em;
             }
         }
 
@@ -34,6 +35,12 @@
             li {
                 padding-left: 9em;
                 text-indent: -9em;
+            }
+
+            .rootNode {
+                .GOKID {
+                    left: -9.5em;
+                }
             }
 
         }
@@ -60,13 +67,28 @@
                 left: -0.5em;
             }
         }
+
+        .GOKName {
+            font-weight: bold;
+        }
+
+        .opacLink {
+            font-size: 71%;
+            font-style: italic;
+            color: #999;
+
+            &.shallow {
+                display: none;
+            }
+        }
+
     }
 }
 
-
-.gokContainer.tree a .GOKID,
-.gokContainer.tree ul .rootNode .GOKID {
-    left: -9.5em
+.gokTreeContainer {
+    .GOKID {
+        font-family: monospace;
+    }
 }
 
 a:hover {
@@ -74,24 +96,6 @@ a:hover {
         text-decoration: none;
         color: #666;
     }
-}
-
-.gokContainer.tree .plusMinus, .gokTreeContainer .GOKID {
-    font-family: monospace;
-}
-
-.gokContainer.tree .GOKName {
-    font-weight: bold;
-}
-
-.gokContainer.tree .opacLink {
-    font-size: 71%;
-    font-style: italic;
-    color: #999;
-}
-
-.gokContainer.tree .opacLink.shallow {
-    display: none;
 }
 
 .gokContainer.tree .general-items-node .opacLink.shallow {
