@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Subugoe\Nkwgok\Importer;
 
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -19,7 +20,7 @@ class LoadFromOpac implements ImporterInterface
 
     public function run(): bool
     {
-        $this->configuration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][Utility::extKey]);
+        $this->configuration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('nkwgok');
         $opacBaseURL = $this->configuration['opacBaseURL'].'XML=1/XMLSAVE=N/';
 
         $baseDir = PATH_site.'fileadmin/gok/';

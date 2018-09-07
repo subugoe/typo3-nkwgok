@@ -33,6 +33,7 @@ namespace Subugoe\Nkwgok\Elements;
 use Subugoe\Nkwgok\Domain\Model\Description;
 use Subugoe\Nkwgok\Domain\Model\Term;
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -517,9 +518,9 @@ class Tree extends Element
     {
         $GOKSearchURL = null;
 
-        $conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][Utility::extKey]);
+        $opacBaseUrl = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('nkwgok', 'opacBaseURL');
         $picaLanguageCode = ('en' === $this->language) ? 'EN' : 'DU';
-        $GOKSearchURL = $conf['opacBaseURL'].'LNG='.$picaLanguageCode;
+        $GOKSearchURL = $opacBaseUrl.'LNG='.$picaLanguageCode;
 
         if (true === $deepSearch
             && (Utility::recordTypeGOK === $GOKData->getType() || Utility::recordTypeBRK === $GOKData->getType())

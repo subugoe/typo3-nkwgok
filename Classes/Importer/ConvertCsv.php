@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Subugoe\Nkwgok\Importer;
 
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -45,12 +47,16 @@ class ConvertCsv implements ImporterInterface
      */
     protected function getCSVDownloadURLs()
     {
-        $downloadURLs = [];
 
-        $conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['nkwgok']);
-        $URLsString = $conf['CSVURLs'];
+        try {
+            $URLsString = (string) GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('nkwgok', 'CSVURLs');
+        } catch (ExtensionConfigurationPathDoesNotExistException $e) {
+            return [];
+        }
 
         if ($URLsString) {
+            $downloadURLs = [];
+
             $URLStrings = explode(' ', trim($URLsString));
             foreach ($URLStrings as $URL) {
                 $URL = trim($URL);

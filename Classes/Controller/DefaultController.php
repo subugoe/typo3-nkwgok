@@ -6,6 +6,7 @@ namespace Subugoe\Nkwgok\Controller;
 
 use Subugoe\Nkwgok\Elements\Element;
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
@@ -85,8 +86,7 @@ class DefaultController extends ActionController
      */
     protected function addStylesheet()
     {
-        $nkwgokGlobalConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf'][Utility::extKey]);
-        $cssPath = $nkwgokGlobalConf['CSSPath'];
+        $cssPath = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('nkwgok', 'CSSPath');
         if (!$cssPath) {
             $cssPath = 'EXT:nkwgok/Resources/Public/Css/nkwgok.css';
         }
