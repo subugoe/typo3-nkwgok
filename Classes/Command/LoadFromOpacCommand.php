@@ -22,10 +22,7 @@ class LoadFromOpacCommand extends Command
     public function configure()
     {
         parent::configure();
-
-        $this
-            ->setName('nkwgok:opac:load')
-            ->setDescription('Download the OPAC data we need');
+        $this->setDescription('Download the OPAC data we need');
     }
 
     /**

@@ -41,10 +41,7 @@ class LoadXmlCommand extends Command
     public function configure()
     {
         parent::configure();
-
-        $this
-            ->setName('nkwgok:xml:load')
-            ->setDescription('Import XML data');
+        $this->setDescription('Import XML data');
     }
 
     /**

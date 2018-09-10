@@ -20,10 +20,7 @@ class ConvertCsvCommand extends Command
     public function configure()
     {
         parent::configure();
-
-        $this
-            ->setName('nkwgok:csv:convert')
-            ->setDescription('Task to process CSV files with subject tree information');
+        $this->setDescription('Task to process CSV files with subject tree information');
     }
 
     /**

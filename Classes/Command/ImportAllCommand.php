@@ -24,10 +24,7 @@ class ImportAllCommand extends Command
     public function configure()
     {
         parent::configure();
-
-        $this
-            ->setName('nkwgok:import:all')
-            ->setDescription('Task to automatically run three tasks: Load LKL data from OPAC, convert History CSV Data to XML, import all the XML to the TYPO3 Database.');
+        $this->setDescription('Task to automatically run three tasks: Load LKL data from OPAC, convert History CSV Data to XML, import all the XML to the TYPO3 Database.');
     }
 
     /**

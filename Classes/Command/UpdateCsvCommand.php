@@ -23,10 +23,7 @@ class UpdateCsvCommand extends Command
     public function configure()
     {
         parent::configure();
-
-        $this
-            ->setName('nkwgok:csv:update')
-            ->setDescription('TYPO3 Scheduler task to automatically our scheduler tasks for converting and importing CSV data.');
+        $this->setDescription('TYPO3 Scheduler task to automatically our scheduler tasks for converting and importing CSV data.');
     }
 
     /**

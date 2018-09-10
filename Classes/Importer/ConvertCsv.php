@@ -23,7 +23,10 @@ class ConvertCsv implements ImporterInterface
     public function run(): bool
     {
         $URLList = $this->getCSVDownloadURLs();
-        $this->downloadURLs($URLList);
+
+        if (!empty($URLList)) {
+            $this->downloadURLs($URLList);
+        }
 
         $success = true;
         $fileList = glob(PATH_site.'fileadmin/gok/csv/*.csv');
