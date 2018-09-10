@@ -56,6 +56,10 @@
   left: -0.5em;
 }
 
+.gokContainer.tree .rootNode .plusMinus.nkwgok-invisible {
+  display: none;
+}
+
 .gokContainer.tree .GOKName {
   font-weight: bold;
 }
@@ -66,17 +70,17 @@
   color: #999;
 }
 
+.gokContainer.tree .opacLink:link:after {
+  content: "\002192";
+  padding-left: 0.2em;
+}
+
+.gokContainer.tree .opacLink:hover {
+  color: #333;
+}
+
 .gokContainer.tree .opacLink.shallow {
   display: none;
-}
-
-.gokTreeContainer .GOKID {
-  font-family: monospace;
-}
-
-a:hover .GOKID {
-  text-decoration: none;
-  color: #666;
 }
 
 .gokContainer.tree .general-items-node .opacLink.shallow {
@@ -99,17 +103,13 @@ a:hover .GOKID {
   display: none;
 }
 
-.gokContainer.tree .opacLink:link:after {
-  content: "\002192";
-  padding-left: 0.2em;
+.gokTreeContainer .GOKID {
+  font-family: monospace;
 }
 
-.gokContainer.tree .opacLink:hover {
-  color: #333;
-}
-
-.gokContainer.tree .rootNode .plusMinus.nkwgok-invisible {
-  display: none;
+a:hover .GOKID {
+  text-decoration: none;
+  color: #666;
 }
 
 /*  Styles for the GOK Columns  */
