@@ -50,7 +50,6 @@ class ConvertCsv implements ImporterInterface
      */
     protected function getCSVDownloadURLs()
     {
-
         try {
             $URLsString = (string) GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('nkwgok', 'CSVURLs');
         } catch (ExtensionConfigurationPathDoesNotExistException $e) {
