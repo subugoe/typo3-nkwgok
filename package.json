@@ -2,15 +2,21 @@
   "name": "nkwgok",
   "version": "1.0.0",
   "repository": "https://github.com/subugoe/typo3-nkwgok.git",
-  "author": "Ingo Pfennigstorf <i.pfennigstorf@gmail.com>",
+  "author": "Ingo Pfennigstorf <pfennigstorf@sub.uni-goettingen.de>",
   "license": "GPL",
   "private": true,
   "devDependencies": {
-    "autoprefixer": "^9.1.5",
+    "autoprefixer": "^9.7.4",
     "gulp": "^4.0.0",
     "gulp-postcss": "^8.0.0",
     "gulp-sass": "^4.0.1",
     "gulp-sourcemaps": "^2.6.4",
-    "postcss": "^7.0.2"
-  }
+    "postcss": "^7.0.2",
+    "sass": "^1.25.0"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "ie 11",
+    "opera 12.1"
+  ]
 }

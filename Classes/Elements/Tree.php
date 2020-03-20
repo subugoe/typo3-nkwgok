@@ -90,7 +90,7 @@ class Tree extends Element
         $container->setAttribute('id', 'tx_nkwgok-'.$this->objectID);
 
         // Get and insert start nodes.
-        $startNodes = explode(',', $this->arguments['notation']);
+        $startNodes = explode(',', (string) $this->arguments['notation']);
 
         foreach ($startNodes as $startNodeGOK) {
             $queryResult->orWhere($queryBuilder->expr()->eq('notation', $queryBuilder->quote(trim($startNodeGOK))));

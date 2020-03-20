@@ -21,9 +21,6 @@
 *
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
-if (!defined('TYPO3_MODE')) {
-    die('Access denied.');
-}
 
 $nkwgok_data = [
     'ctrl' => [
@@ -35,7 +32,7 @@ $nkwgok_data = [
         'crdate' => 'crdate',
         'cruser_id' => 'cruser_id',
         'default_sortby' => 'ORDER BY crdate',
-        'iconfile' => \TYPO3\CMS\Core\Utility\PathUtility::getAbsoluteWebPath($_EXTKEY).'Resources/Public/Images/ext_icon.gif',
+        'iconfile' => \TYPO3\CMS\Core\Utility\PathUtility::getAbsoluteWebPath('nkwgok').'Resources/Public/Images/ext_icon.gif',
         'searchFields' => 'descr, descr_en, notation',
     ],
     'interface' => [

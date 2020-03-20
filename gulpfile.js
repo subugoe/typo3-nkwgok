@@ -4,6 +4,7 @@ const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const sourcemaps = require('gulp-sourcemaps');
 
+sass.compiler = require('sass');
 
 const config = {
   paths: {
@@ -13,36 +14,29 @@ const config = {
     ],
   },
   autoprefixer: {
-    browsers: [
-      'last 2 versions',
-      'ie 11',
-      'opera 12.1',
-      'ios 9',
-      'android 4'
-    ],
     cascade: true
   }
 };
 
 const sassTask = () => {
   return gulp.src(config.paths.sass)
-      .pipe(sass({
-        outputStyle: 'expanded'
-      }))
-      .pipe(sourcemaps.init())
-           .pipe(postcss([autoprefixer(config.autoprefixer)]))
-           .pipe(sourcemaps.write('.'))
-      .pipe(gulp.dest('./Resources/Public/Css/'))
+    .pipe(sass({
+      outputStyle: 'expanded'
+    }))
+    .pipe(sourcemaps.init())
+    .pipe(postcss([autoprefixer(config.autoprefixer)]))
+    .pipe(sourcemaps.write('.'))
+    .pipe(gulp.dest('./Resources/Public/Css/'))
 };
 
 const sassProd = () => {
   return gulp.src(config.paths.sass)
-      .pipe(sass({
-        outputStyle: 'expanded'
-      }))
-      .pipe(postcss([autoprefixer(config.autoprefixer)]))
+    .pipe(sass({
+      outputStyle: 'expanded'
+    }))
+    .pipe(postcss([autoprefixer(config.autoprefixer)]))
 
-      .pipe(gulp.dest('./Resources/Public/Css/'))
+    .pipe(gulp.dest('./Resources/Public/Css/'))
 };
 
 gulp.task('build', gulp.parallel([sassProd]));

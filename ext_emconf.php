@@ -1,6 +1,6 @@
 <?php
 
-$EM_CONF[$_EXTKEY] = [
+$EM_CONF['nkwgok'] = [
     'title' => 'Subject Hierarchy / GOK',
     'description' => 'Displays subject hierarchies as trees, menus or columns',
     'category' => 'plugin',
