@@ -20,10 +20,9 @@ $EM_CONF['nkwgok'] = [
     'clearCacheOnLoad' => 0,
     'lockType' => '',
     'author_company' => 'Göttingen State and University Library, Germany http://www.sub.uni-goettingen.de',
-    'version' => '6.0.0',
+    'version' => '6.0.3',
     'constraints' => [
         'depends' => [
-            'typo3' => '9.4.0-9.5.99',
         ],
         'conflicts' => [
         ],
