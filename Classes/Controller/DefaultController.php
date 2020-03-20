@@ -53,10 +53,10 @@ class DefaultController extends ActionController
 
         // get flexform
         $arguments['notation'] = $this->settings['source'];
-        $altSource = trim($this->settings['altSource']);
+
         // alternative source overrides first definition
-        if ($altSource) {
-            $arguments['notation'] = $altSource;
+        if ($this->settings['altSource'] !== null) {
+            $arguments['notation'] = trim($this->settings['altSource']);
         }
 
         // unique expand array
