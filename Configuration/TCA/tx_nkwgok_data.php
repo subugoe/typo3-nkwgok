@@ -62,7 +62,7 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.ppn',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
+                'size' => 30,
                 'eval' => 'trim',
             ],
         ],
@@ -71,7 +71,7 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.notation',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
+                'size' => 30,
                 'eval' => 'trim',
             ],
         ],
@@ -80,7 +80,7 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.search',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
+                'size' => 30,
                 'eval' => 'trim',
             ],
         ],
@@ -89,8 +89,8 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.descr',
             'config' => [
                 'type' => 'text',
-                'cols' => '30',
-                'rows' => '5',
+                'cols' => 30,
+                'rows' => 5,
             ],
         ],
         'descr_en' => [
@@ -98,8 +98,8 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.descr_en',
             'config' => [
                 'type' => 'text',
-                'cols' => '30',
-                'rows' => '5',
+                'cols' => 30,
+                'rows' => 5,
             ],
         ],
         'descr_alternate' => [
@@ -107,8 +107,8 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.descr_alternate',
             'config' => [
                 'type' => 'text',
-                'cols' => '30',
-                'rows' => '5',
+                'cols' => 30,
+                'rows' => 5,
             ],
         ],
         'descr_alternate_en' => [
@@ -116,8 +116,8 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.descr_alternate_en',
             'config' => [
                 'type' => 'text',
-                'cols' => '30',
-                'rows' => '5',
+                'cols' => 30,
+                'rows' => 5,
             ],
         ],
         'parent' => [
@@ -125,7 +125,7 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.parent',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
+                'size' => 30,
                 'eval' => 'trim',
             ],
         ],
@@ -134,8 +134,8 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.hierarchy',
             'config' => [
                 'type' => 'input',
-                'size' => '10',
-                'max' => '4',
+                'size' => 10,
+                'max' => 4,
                 'eval' => 'int',
                 'checkbox' => '0',
                 'range' => [
@@ -150,8 +150,8 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.childcount',
             'config' => [
                 'type' => 'input',
-                'size' => '10',
-                'max' => '4',
+                'size' => 10,
+                'max' => 4,
                 'eval' => 'int',
                 'checkbox' => '0',
                 'range' => [
@@ -166,8 +166,8 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.hitcount',
             'config' => [
                 'type' => 'input',
-                'size' => '10',
-                'max' => '10',
+                'size' => 10,
+                'max' => 10,
                 'eval' => 'int',
                 'checkbox' => '0',
                 'range' => [
@@ -182,8 +182,8 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.totalhitcount',
             'config' => [
                 'type' => 'input',
-                'size' => '10',
-                'max' => '10',
+                'size' => 10,
+                'max' => 10,
                 'eval' => 'int',
                 'checkbox' => '0',
                 'range' => [
@@ -198,8 +198,8 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.tags',
             'config' => [
                 'type' => 'text',
-                'cols' => '30',
-                'rows' => '5',
+                'cols' => 30,
+                'rows' => 5,
             ],
         ],
         'type' => [
@@ -207,7 +207,7 @@ $nkwgok_data = [
             'label' => 'LLL:EXT:nkwgok/Resources/Private/Language/locallang_db.xml:tx_nkwgok_data.type',
             'config' => [
                 'type' => 'input',
-                'size' => '30',
+                'size' => 30,
                 'eval' => 'trim',
             ],
         ],

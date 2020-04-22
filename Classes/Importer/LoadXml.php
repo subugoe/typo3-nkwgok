@@ -305,7 +305,7 @@ class LoadXml implements ImporterInterface
         // Run through all files once to gather information about the
         // structure of the data we process.
         foreach ($fileList as $xmlPath) {
-            $xml = simplexml_load_file($xmlPath);
+            $xml = simplexml_load_string(file_get_contents($xmlPath));
             $records = $xml->xpath('/RESULT/SET/SHORTTITLE/record');
 
             foreach ($records as $record) {

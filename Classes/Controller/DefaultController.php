@@ -70,7 +70,7 @@ class DefaultController extends ActionController
         $arguments['objectID'] = $contentObject->data['uid'];
         $arguments['language'] = $GLOBALS['TSFE']->lang;
         $arguments['pageLink'] = $this->uriBuilder->reset()
-            ->setTargetPageUid($GLOBALS['TSFE']->id)
+            ->setTargetPageUid((int) $GLOBALS['TSFE']->id)
             ->setCreateAbsoluteUri(true)
             ->build();
 

@@ -212,7 +212,7 @@ class Menu extends Element
     {
         $GOKs = $this->getChildren($parentPPN);
         if (sizeof($GOKs) > 0) {
-            if ((sizeof($GOKs) <= $autoExpandLevel) && (0 != $level) && 0 == $autoExpandStep) {
+            if ((sizeof($GOKs) <= $autoExpandLevel) && (0 !== (int) $level) && 0 === (int) $autoExpandStep) {
                 // We are auto-expanded, so throw away the elements, as they are already present in the previous menu
                 $GOKs = [];
             }
@@ -221,7 +221,7 @@ class Menu extends Element
             // Element which should be passed to us as $container.
             $select = $container;
 
-            if (0 == $autoExpandStep) {
+            if (0 === (int) $autoExpandStep) {
                 // Create the containing <select> when we’re not auto-expanding.
                 $select = $this->doc->createElement('select');
                 $container->appendChild($select);
@@ -233,7 +233,7 @@ class Menu extends Element
                 $select->setAttribute('level', (string) $level);
 
                 // add dummy item at the beginning of the menu
-                if (0 == $level) {
+                if (0 === (int) $level) {
                     $option = $this->doc->createElement('option');
                     $select->appendChild($option);
                     $option->appendChild($this->doc->createTextNode($this->localise('Bitte Fachgebiet auswählen:')));

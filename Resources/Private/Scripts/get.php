@@ -23,9 +23,5 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
 
-if (!defined('PATH_typo3conf')) {
-    die('Could not access this script directly!');
-}
-
 $menu = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\Subugoe\Nkwgok\Ajax\Menu::class);
 echo $menu->main();

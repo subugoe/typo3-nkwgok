@@ -169,7 +169,7 @@ class LoadFromOpac implements ImporterInterface
             $opacDownload = file_get_contents($URL);
             if ($opacDownload) {
                 $targetFilePath = $folderPath.$indexName.'-'.$index.'.xml';
-                $targetFile = fopen($targetFilePath, 'w');
+                $targetFile = fopen($targetFilePath, 'wb');
                 if ($targetFile) {
                     fwrite($targetFile, $opacDownload);
                     fclose($targetFile);

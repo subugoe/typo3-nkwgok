@@ -9,16 +9,16 @@ namespace Subugoe\Nkwgok\Utility;
  */
 class Utility
 {
-    const extKey = 'nkwgok';
-    const dataTable = 'tx_nkwgok_data';
+    public const extKey = 'nkwgok';
+    public const dataTable = 'tx_nkwgok_data';
 
-    const rootNode = 'Root';
+    public const rootNode = 'Root';
 
-    const recordTypeGOK = 'gok';
-    const recordTypeBRK = 'brk';
-    const recordTypeCSV = 'csv';
-    const recordTypeMSC = 'msc';
-    const recordTypeUnknown = 'unknown';
+    public const recordTypeGOK = 'gok';
+    public const recordTypeBRK = 'brk';
+    public const recordTypeCSV = 'csv';
+    public const recordTypeMSC = 'msc';
+    public const recordTypeUnknown = 'unknown';
 
     /**
      * Returns the internal type name for the given index name.

@@ -77,7 +77,7 @@ class Tree extends Element
             $containerClasses[] = 'hideGOKID';
         }
 
-        $useShallowLinks = ($GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowSearch'] == 1);
+        $useShallowLinks = ((int) $GLOBALS['TSFE']->tmpl->setup['plugin.']['tx_nkwgok_pi1.']['shallowSearch'] === 1);
         if ($this->arguments['omitXXX']) {
             $useShallowLinks = true;
             $logger->error('Configured to use deep links together with omitXXX. This will not work as the totalhitcount is incorrect when we arbitrarily leave out child elements. Using shallow links instead.');

@@ -43,7 +43,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * */
 abstract class Element
 {
-    const NKWGOKQueryFields = 'ppn, notation, search, descr, descr_en, descr_alternate, descr_alternate_en, parent, hierarchy, childcount, hitcount, totalhitcount, type';
+    public const NKWGOKQueryFields = 'ppn, notation, search, descr, descr_en, descr_alternate, descr_alternate_en, parent, hierarchy, childcount, hitcount, totalhitcount, type';
 
     /**
      * Arguments from the GET query as well as further settings that may have
@@ -196,7 +196,7 @@ abstract class Element
     {
         $displayName = $gokRecord->getDescription()->getDescription();
 
-        if ('en' == $this->language) {
+        if ('en' === $this->language) {
             $englishName = $gokRecord->getDescription()->getDescriptionEnglish();
 
             if ($englishName) {
