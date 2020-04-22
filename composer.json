@@ -6,7 +6,7 @@
     "authors": [
         {
             "name": "Ingo Pfennigstorf",
-            "email": "i.pfennigstorf@gmail.com"
+            "email": "pfennigstorf@sub.uni-goettingen.de"
         }
     ],
     "autoload": {
@@ -16,7 +16,7 @@
     },
     "require": {
         "php": ">7.3.0",
-        "typo3/cms-core": "^9.5"
+        "typo3/cms-core": "^9.5 || ^10.4"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.15"
