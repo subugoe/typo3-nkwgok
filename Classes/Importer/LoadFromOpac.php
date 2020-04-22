@@ -25,7 +25,7 @@ class LoadFromOpac implements ImporterInterface
 
         $baseDir = PATH_site.'fileadmin/gok/';
 
-        GeneralUtility::mkdir_deep(PATH_site, 'fileadmin/gok/xml');
+        GeneralUtility::mkdir_deep(PATH_site. 'fileadmin/gok/xml');
         // Create lkl folder if necessary and remove all files whose names begin with a digit.
         // (This is a simple heuristic to delete all the files we downloaded and keep
         // the CSV files whose names begin with a letter.)
@@ -102,7 +102,7 @@ class LoadFromOpac implements ImporterInterface
     {
         $success = true;
         $firstRecord = 1; // Pica result indexing is 1 based
-        $hitsAttribute = simplexml_load_file($opacBaseURL)->xpath('/RESULT/SET/@hits');
+        $hitsAttribute = simplexml_load_string(file_get_contents($opacBaseURL))->xpath('/RESULT/SET/@hits');
         $resultCount = (int) $hitsAttribute[0];
         $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 

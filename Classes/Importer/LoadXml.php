@@ -200,7 +200,7 @@ class LoadXml implements ImporterInterface
                                 $term->setHitCount($this->hitCounts[Utility::recordTypeMSC][$msc]);
                             }
                         } elseif ((Utility::recordTypeGOK === $term->getType() || Utility::recordTypeBRK === $term->getType())
-                            && array_key_exists(strtolower($term->getNotation()), $this->hitCounts[$term->getType()])
+                            && (is_array($this->hitCounts[$term->getType()]) && array_key_exists(strtolower($term->getNotation()), $this->hitCounts[$term->getType()]))
                         ) {
                             $term->setHitCount($this->hitCounts[$term->getType()][strtolower($term->getNotation())]);
                         } elseif (Utility::recordTypeCSV === $term->getType() && count($csvSearches) > 0) {
