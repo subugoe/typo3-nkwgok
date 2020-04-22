@@ -6,6 +6,7 @@ namespace Subugoe\Nkwgok\Importer;
 
 use Subugoe\Nkwgok\Utility\Utility;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -23,9 +24,9 @@ class LoadFromOpac implements ImporterInterface
         $this->configuration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('nkwgok');
         $opacBaseURL = $this->configuration['opacBaseURL'].'XML=1/XMLSAVE=N/';
 
-        $baseDir = PATH_site.'fileadmin/gok/';
+        $baseDir = Environment::getPublicPath().'/fileadmin/gok/';
 
-        GeneralUtility::mkdir_deep(PATH_site. 'fileadmin/gok/xml');
+        GeneralUtility::mkdir_deep(Environment::getPublicPath(). '/fileadmin/gok/xml');
         // Create lkl folder if necessary and remove all files whose names begin with a digit.
         // (This is a simple heuristic to delete all the files we downloaded and keep
         // the CSV files whose names begin with a letter.)
@@ -47,7 +48,7 @@ class LoadFromOpac implements ImporterInterface
         }
 
         // Create the hitcounts folder if necessary and delete all files inside it if it exists.
-        GeneralUtility::mkdir(PATH_site.'fileadmin/gok/hitcounts');
+        GeneralUtility::mkdir(Environment::getPublicPath().'/fileadmin/gok/hitcounts');
         $hitCountDir = $baseDir.'hitcounts/';
         $hitCountFileList = glob($hitCountDir.'*');
         foreach ($hitCountFileList as $file) {

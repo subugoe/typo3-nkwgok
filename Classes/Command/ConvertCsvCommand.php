@@ -26,12 +26,12 @@ class ConvertCsvCommand extends Command
     /**
      * Function executed from the Scheduler.
      *
-     * @return int
+     * @return bool TRUE if success, otherwise FALSE
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $service = GeneralUtility::makeInstance(ConvertCsv::class);
 
-        return $service->run() ? 0 : false;
+        return $service->run();
     }
 }

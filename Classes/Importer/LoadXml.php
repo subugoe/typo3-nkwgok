@@ -7,6 +7,7 @@ namespace Subugoe\Nkwgok\Importer;
 use Subugoe\Nkwgok\Domain\Model\Description;
 use Subugoe\Nkwgok\Domain\Model\Term;
 use Subugoe\Nkwgok\Utility\Utility;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -86,7 +87,7 @@ class LoadXml implements ImporterInterface
      */
     protected function loadXMLForType($type)
     {
-        $XMLFolder = PATH_site.'fileadmin/gok/xml/';
+        $XMLFolder = Environment::getPublicPath().'/fileadmin/gok/xml/';
         $fileList = $this->fileListAtPathForType($XMLFolder, $type);
         $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
@@ -102,7 +103,7 @@ class LoadXml implements ImporterInterface
             foreach ($fileList as $xmlPath) {
                 $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(Utility::dataTable);
 
-                $xml = simplexml_load_file($xmlPath);
+                $xml = simplexml_load_string(file_get_contents($xmlPath));
 
                 foreach ($xml->xpath('/RESULT/SET/SHORTTITLE/record') as $recordElement) {
                     $term = new Term();
@@ -382,14 +383,14 @@ class LoadXml implements ImporterInterface
      */
     private function loadHitCounts()
     {
-        $hitCountFolder = PATH_site.'/fileadmin/gok/hitcounts/';
+        $hitCountFolder = Environment::getPublicPath().'/fileadmin/gok/hitcounts/';
         $fileList = $this->fileListAtPathForType($hitCountFolder, 'all');
         $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
 
         $hitCounts = [];
         if (is_array($fileList)) {
             foreach ($fileList as $xmlPath) {
-                $xml = simplexml_load_file($xmlPath);
+                $xml = simplexml_load_string(file_get_contents($xmlPath));
                 if ($xml) {
                     $scanlines = $xml->xpath('/RESULT/SCANLIST/SCANLINE');
                     foreach ($scanlines as $scanline) {
@@ -465,13 +466,10 @@ class LoadXml implements ImporterInterface
                 ) {
                     $myHitCount += $hitCounts[$type][$notation];
                 }
-            } else {
-                // A leaf node: just store its hit count.
-                if (array_key_exists($type, $hitCounts)
-                    && array_key_exists($notation, $hitCounts[$type])
-                ) {
-                    $myHitCount += $hitCounts[$type][$notation];
-                }
+            } elseif (array_key_exists($type, $hitCounts)
+                && array_key_exists($notation, $hitCounts[$type])
+            ) {
+                $myHitCount += $hitCounts[$type][$notation];
             }
         }
 

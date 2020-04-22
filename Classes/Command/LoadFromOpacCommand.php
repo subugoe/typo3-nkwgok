@@ -28,7 +28,7 @@ class LoadFromOpacCommand extends Command
     /**
      * Function executed from the Scheduler.
      *
-     * @return int
+     * @return bool TRUE if success, otherwise FALSE
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -36,6 +36,6 @@ class LoadFromOpacCommand extends Command
 
         $service = GeneralUtility::makeInstance(LoadFromOpac::class);
 
-        return $service->run() ? 0 : 1;
+        return $service->run();
     }
 }

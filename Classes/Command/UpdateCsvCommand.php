@@ -29,7 +29,7 @@ class UpdateCsvCommand extends Command
     /**
      * Function executed by the Scheduler.
      *
-     * @return int
+     * @return bool TRUE if success, otherwise FALSE
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -47,6 +47,6 @@ class UpdateCsvCommand extends Command
             }
         }
 
-        return $success ? 0 : 1;
+        return $success;
     }
 }

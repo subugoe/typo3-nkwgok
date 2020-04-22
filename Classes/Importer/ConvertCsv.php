@@ -7,6 +7,7 @@ namespace Subugoe\Nkwgok\Importer;
 use Subugoe\Nkwgok\Utility\Utility;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -29,7 +30,7 @@ class ConvertCsv implements ImporterInterface
         }
 
         $success = true;
-        $fileList = glob(PATH_site.'fileadmin/gok/csv/*.csv');
+        $fileList = glob(Environment::getPublicPath().'/fileadmin/gok/csv/*.csv');
         foreach ($fileList as $CSVPath) {
             $success = $this->processCSVFile($CSVPath);
             if (!$success) {
@@ -86,7 +87,7 @@ class ConvertCsv implements ImporterInterface
             $fileName = $URLPathComponents[count($URLPathComponents) - 1];
             $remoteData = file_get_contents($URL);
             if (false !== $remoteData) {
-                $localPath = PATH_site.'fileadmin/gok/csv/'.$fileName;
+                $localPath = Environment::getPublicPath().'/fileadmin/gok/csv/'.$fileName;
                 $localData = file_get_contents($localPath);
                 if ($localData != $remoteData) {
                     // Only overwrite local file if the file contents have changed.
@@ -224,14 +225,14 @@ class ConvertCsv implements ImporterInterface
                 $originalFileName = $csvPathParts[count($csvPathParts) - 1];
                 $originalFileNameParts = explode('.', $originalFileName);
                 $XMLFileName = $originalFileNameParts[0].'-'.$startLine.'.xml';
-                $resultPath = PATH_site.'fileadmin/gok/xml/'.$XMLFileName;
+                $resultPath = Environment::getPublicPath().'/fileadmin/gok/xml/'.$XMLFileName;
 
                 if (false === $doc->save($resultPath)) {
                     $logger->error(sprintf('Failed to write XML file %s', $resultPath));
                     break;
-                } else {
-                    $success = true;
                 }
+
+                $success = true;
                 $doc = null;
             }
         }
