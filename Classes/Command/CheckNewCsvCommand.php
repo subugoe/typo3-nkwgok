@@ -27,7 +27,7 @@ class CheckNewCsvCommand extends Command
     /**
      * Function executed by the Scheduler.
      *
-     * @return bool TRUE if success, otherwise FALSE
+     * @return int
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -48,6 +48,6 @@ class CheckNewCsvCommand extends Command
             }
         }
 
-        return $success;
+        return $success ? 0 : false;
     }
 }

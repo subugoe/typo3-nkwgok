@@ -47,13 +47,13 @@ class LoadXmlCommand extends Command
     /**
      * Function executed from the Scheduler.
      *
-     * @return bool TRUE if success, otherwise FALSE
+     * @return int
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         set_time_limit(1200);
         $service = GeneralUtility::makeInstance(LoadXml::class);
 
-        return $service->run();
+        return $service->run() ? 0 : 1;
     }
 }
