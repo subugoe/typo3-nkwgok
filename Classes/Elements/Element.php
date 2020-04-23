@@ -174,7 +174,7 @@ abstract class Element
             $result = $result[0]['target'];
         }
 
-        return $result;
+        return (string) $result;
     }
 
     /**
