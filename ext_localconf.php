@@ -50,7 +50,7 @@ $boot = function ($extKey) {
         'description' => 'LLL:EXT:'.$extKey.'/Resources/Private/Language/locallang_scheduler.xml:scheduler.importAll.description',
     ];
 
-    $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include'][$extKey] = 'EXT:'.$extKey.'/Resources/Private/Scripts/get.php';
+    $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include'][$extKey] = \Subugoe\Nkwgok\Ajax\Menu::class.'::main';
 
     if (!isset($GLOBALS['TYPO3_CONF_VARS']['LOG']['Subugoe']['Nkwgok']['writerConfiguration'])) {
         $context = \TYPO3\CMS\Core\Utility\GeneralUtility::getApplicationContext();

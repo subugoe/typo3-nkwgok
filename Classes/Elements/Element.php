@@ -103,7 +103,7 @@ abstract class Element
      *
      * @return Element
      */
-    public static function instantiateSubclassFor($arguments)
+    public static function instantiateSubclassFor(array $arguments)
     {
         $subclass = null;
 
