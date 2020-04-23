@@ -3,7 +3,8 @@
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
     'Subugoe.nkwgok',
     'Pi1',
-    'Nkwgok'
+    'Nkwgok',
+    \TYPO3\CMS\Core\Core\Environment::getExtensionsPath().'/nkwgok/Resources/Public/Images/ext_icon.gif'
 );
 
 $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_excludelist']['nkwgok_pi1'] = 'layout,select_key,pages';

@@ -37,6 +37,7 @@ use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * Subclass of tx_nkwgok that creates markup for a subject hierarchy as a tree.
@@ -233,7 +234,7 @@ class Tree extends Element
             ';
         }
 
-        foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][Utility::extKey]['gokTreeJavaScript'] ?? [] as $reference) {
+        foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['nkwgok']['gokTreeJavaScript'] ?? [] as $reference) {
             $js = GeneralUtility::callUserFunction($reference, $js, $this);
         }
 

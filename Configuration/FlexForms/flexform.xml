@@ -13,6 +13,7 @@
                     <label>LLL:EXT:nkwgok/Resources/Private/Language/locallang.xml:source</label>
                     <config>
                         <type>select</type>
+                        <renderType>selectSingle</renderType>
                         <itemsProcFunc>Subugoe\Nkwgok\Elements\Flexform->addFields</itemsProcFunc>
                     </config>
                 </TCEforms>

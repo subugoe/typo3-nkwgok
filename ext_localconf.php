@@ -53,7 +53,7 @@ $boot = function ($extKey) {
     $GLOBALS['TYPO3_CONF_VARS']['FE']['eID_include'][$extKey] = \Subugoe\Nkwgok\Ajax\Menu::class.'::main';
 
     if (!isset($GLOBALS['TYPO3_CONF_VARS']['LOG']['Subugoe']['Nkwgok']['writerConfiguration'])) {
-        $context = \TYPO3\CMS\Core\Utility\GeneralUtility::getApplicationContext();
+        $context = \TYPO3\CMS\Core\Core\Environment::getContext();
         if ($context->isProduction()) {
             $logLevel = \TYPO3\CMS\Core\Log\LogLevel::ERROR;
         } elseif ($context->isDevelopment()) {
