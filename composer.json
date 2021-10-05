@@ -16,9 +16,15 @@
     },
     "require": {
         "php": ">7.3.0",
+        "ext-dom": "*",
         "typo3/cms-core": "^10.4 || ^11.5"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0"
+    },
+    "extra": {
+       "typo3/cms": {
+          "extension-key": "nkwgok"
+       }
     }
 }

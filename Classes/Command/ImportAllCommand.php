@@ -32,7 +32,7 @@ class ImportAllCommand extends Command
      *
      * @return int
      */
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $loadFromOpacTask = GeneralUtility::makeInstance(LoadFromOpac::class);
         $output->writeln('<info>Starting import from Opac</info>');

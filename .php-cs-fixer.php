@@ -3,7 +3,7 @@ $finder = PhpCsFixer\Finder::create()
     ->exclude('node_modules')
     ->exclude('vendor')
     ->in(__DIR__);
-$config = PhpCsFixer\Config::create();
+$config = new PhpCsFixer\Config();
 $config
     ->setRules([
         '@PSR2' => true,
