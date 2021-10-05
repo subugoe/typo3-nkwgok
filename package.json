@@ -6,13 +6,13 @@
   "license": "GPL",
   "private": true,
   "devDependencies": {
-    "autoprefixer": "^9.7.4",
+    "autoprefixer": "^10.3",
     "gulp": "^4.0.0",
-    "gulp-postcss": "^8.0.0",
-    "gulp-sass": "^4.0.1",
-    "gulp-sourcemaps": "^2.6.4",
-    "postcss": "^7.0.2",
-    "sass": "^1.25.0"
+    "gulp-postcss": "^9.0",
+    "gulp-sass": "^5.0",
+    "gulp-sourcemaps": "^3.0",
+    "postcss": "^8.3",
+    "sass": "^1.42"
   },
   "browserslist": [
     "last 2 versions",
